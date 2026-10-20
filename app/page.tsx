@@ -107,7 +107,6 @@ export default function KupkoApp() {
   const [odabranaPodkategorija, setOdabranaPodkategorija] = useState("sve");
   const [odabranaZupanija, setOdabranaZupanija] = useState("sve");
   
-  // Omiljeni oglasi
   const [omiljeniIds, setOmiljeniIds] = useState<number[]>([]);
   const [prikaziSamoOmiljene, setPrikaziSamoOmiljene] = useState(false);
 
@@ -122,9 +121,12 @@ export default function KupkoApp() {
   const [prikaziUredivanje, setPrikaziUredivanje] = useState(false);
   const [oglasZaUrediti, setOglasZaUrediti] = useState<any>(null);
 
-  // Stanje za potvrdu prijave putem mreža (Apple/Google/Facebook)
-  const [odabranaMrezaZaPotvrdu, setOdabranaMrezaZaPotvrdu] = useState<string | null>(null);
-  const [mrezaForma, setMrezaForma] = useState({ ime: "", email: "" });
+  // Stanje za verifikacijski korak (e-mail verifikacija)
+  const [korakVerifikacije, setKorakVerifikacije] = useState(false);
+  const [privremeniEmail, setPrivremeniEmail] = useState("");
+  const [privremenoIme, setPrivremenoIme] = useState("");
+  const [uneseniKod, setUneseniKod] = useState("");
+  const [generiraniKod, setGeneriraniKod] = useState("");
 
   // Modal za Informativne Stranice iz Footera
   const [aktivnaInfoStranica, setAktivnaInfoStranica] = useState<string | null>(null);
@@ -133,7 +135,6 @@ export default function KupkoApp() {
   const [formaPrijava, setFormaPrijava] = useState({ email: "", lozinka: "" });
   const [formaRegistracija, setFormaRegistracija] = useState({ ime: "", email: "", lozinka: "" });
 
-  // Sigurnosna provjera (Anti-Spam Captcha)
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
 
   useEffect(() => {
@@ -186,45 +187,49 @@ export default function KupkoApp() {
   const rukujPrijavom = (e: React.FormEvent) => {
     e.preventDefault();
     const emailLower = formaPrijava.email.toLowerCase();
-    const jeOwner = emailLower === "admin@kupko.hr";
-    setKorisnik({ ime: formaPrijava.email.split("@")[0], email: emailLower, isOwner: jeOwner });
+    
+    // Pokrećemo korak verifikacije e-maila prije konačne prijave
+    const slucajniKod = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneriraniKod(slucajniKod);
+    setPrivremeniEmail(emailLower);
+    setPrivremenoIme(emailLower.split("@")[0]);
+    setKorakVerifikacije(true);
     setPrikaziPrijavu(false);
-    setFormaPrijava({ email: "", lozinka: "" });
+    
+    alert(`[Simulacija E-maila]: Na adresu ${emailLower} poslan je verifikacijski kod. Vaš kod za potvrdu je: ${slucajniKod}`);
   };
 
   const rukujRegistracijom = (e: React.FormEvent) => {
     e.preventDefault();
     const emailLower = formaRegistracija.email.toLowerCase();
-    const jeOwner = emailLower === "admin@kupko.hr";
-    setKorisnik({ ime: formaRegistracija.ime, email: emailLower, isOwner: jeOwner });
+    
+    const slucajniKod = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneriraniKod(slucajniKod);
+    setPrivremeniEmail(emailLower);
+    setPrivremenoIme(formaRegistracija.ime);
+    setKorakVerifikacije(true);
     setPrikaziRegistraciju(false);
-    setFormaRegistracija({ ime: "", email: "", lozinka: "" });
+
+    alert(`[Simulacija E-maila]: Na adresu ${emailLower} poslan je verifikacijski kod za potvrdu računa. Vaš kod je: ${slucajniKod}`);
   };
 
-  // Pokretanje procesa prijave preko mreže (otvara prozor za potvrdu)
-  const pokreniPrijavaPrekoMreze = (mreza: string) => {
-    setOdabranaMrezaZaPotvrdu(mreza);
-    setMrezaForma({
-      ime: `${mreza} Korisnik`,
-      email: `korisnik_${mreza.toLowerCase()}@kupko.hr`
-    });
-    setPrikaziPrijavu(false);
-    setPrikaziRegistraciju(false);
-  };
-
-  // Završetak potvrde i stvaranje profila preko mreže
-  const potvrdiPrijavaPrekoMreze = (e: React.FormEvent) => {
+  const potvrdiVerifikacijskiKod = (e: React.FormEvent) => {
     e.preventDefault();
-    const emailLower = mrezaForma.email.toLowerCase();
-    const jeOwner = emailLower === "admin@kupko.hr";
+    if (uneseniKod.trim() !== generiraniKod) {
+      alert("Netočan verifikacijski kod! Molimo unesite ispravan kod koji vam je poslan.");
+      return;
+    }
 
+    const jeOwner = privremeniEmail === "admin@kupko.hr";
     setKorisnik({
-      ime: mrezaForma.ime || "Korisnik",
-      email: emailLower,
+      ime: privremenoIme,
+      email: privremeniEmail,
       isOwner: jeOwner
     });
-    setOdabranaMrezaZaPotvrdu(null);
-    alert(`Uspješno ste se prijavili putem računa!`);
+
+    setKorakVerifikacije(false);
+    setUneseniKod("");
+    alert("E-mail adresa uspješno potvrđena! Prijavljeni ste na sustav.");
   };
 
   const obrisiOglas = (glas: any) => {
@@ -284,8 +289,8 @@ export default function KupkoApp() {
     const datumString = `Objavljeno danas u ${sad.getHours().toString().padStart(2, "0")}:${sad.getMinutes().toString().padStart(2, "0")}`;
 
     const konacniEmail = noviOglas.email.trim() !== "" 
-      ? noviOglas.email 
-      : (korisnik ? korisnik.email : `korisnik_${Date.now()}@kupko.hr`);
+      ? noviOglas.email.trim() 
+      : (korisnik ? korisnik.email : `anonimni_${Date.now()}@kupko.hr`);
 
     const stvoreniOglas = {
       ...noviOglas,
@@ -301,6 +306,12 @@ export default function KupkoApp() {
     const azurirano = stvoreniOglas.promoviran ? [stvoreniOglas, ...oglasi] : [...oglasi, stvoreniOglas];
     spremiOglase(azurirano);
     setPrikaziFormu(false);
+    setNoviOglas({
+      naslov: "", cijena: "", kategorija: "ostalo", podkategorija: "Sve ostalo",
+      zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slika: "", opis: "",
+      prodavac: "", telefon: "", email: "", promoviran: false,
+      godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni"
+    });
     generirajKôd();
   };
 
@@ -675,9 +686,7 @@ export default function KupkoApp() {
               <PlusCircle className="w-7 h-7 text-amber-500" />
               <div>
                 <h2 className="text-2xl font-black text-slate-900">Predaj novi oglas na Kupku</h2>
-                <p className="text-xs text-slate-500">
-                  Brza objava oglasa. Unos e-mail adrese je opcionalan!
-                </p>
+                <p className="text-xs text-slate-500">Brza objava oglasa. E-mail adresa je opcionalna!</p>
               </div>
             </div>
 
@@ -762,7 +771,7 @@ export default function KupkoApp() {
                         placeholder="npr. 2019"
                         value={noviOglas.godiste}
                         onChange={(e) => setNoviOglas({ ...noviOglas, godiste: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-400"
+                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
                       />
                     </div>
                     <div>
@@ -772,7 +781,7 @@ export default function KupkoApp() {
                         placeholder="npr. 150000"
                         value={noviOglas.kilometri}
                         onChange={(e) => setNoviOglas({ ...noviOglas, kilometri: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-400"
+                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
                       />
                     </div>
                   </div>
@@ -785,7 +794,7 @@ export default function KupkoApp() {
                         placeholder="kW"
                         value={noviOglas.snagaKw}
                         onChange={(e) => setNoviOglas({ ...noviOglas, snagaKw: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none focus:ring-2 focus:ring-amber-400"
+                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
                       />
                     </div>
                     <div>
@@ -833,13 +842,13 @@ export default function KupkoApp() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail adresa (Nije obavezno)</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail adresa (Opcionalno)</label>
                 <input 
                   type="email" 
-                  placeholder="Ako nemate e-mail, ostavite prazno!" 
+                  placeholder="Unesite e-mail ako želite (nije obavezno)" 
                   value={noviOglas.email} 
                   onChange={(e) => setNoviOglas({ ...noviOglas, email: e.target.value })} 
-                  className="w-full p-3 rounded-xl border text-sm bg-slate-50" 
+                  className="w-full p-3 rounded-xl border text-sm bg-slate-50 outline-none" 
                 />
               </div>
 
@@ -887,49 +896,36 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: POTVRDA / UREĐIVANJE PODATAKA ZA APPLE/GOOGLE/FACEBOOK */}
-      {odabranaMrezaZaPotvrdu && (
+      {/* MODAL: VERIFIKACIJA KODA POSLANOG NA E-MAIL */}
+      {korakVerifikacije && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl border border-slate-100">
-            <button onClick={() => setOdabranaMrezaZaPotvrdu(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
-              <X className="w-5 h-5" />
-            </button>
-            
-            <div className="flex items-center gap-2 mb-3">
-              <span className="p-2 bg-blue-50 text-blue-700 rounded-xl font-black text-sm">🔒</span>
-              <div>
-                <h2 className="text-xl font-black text-slate-900">Prijava putem {odabranaMrezaZaPotvrdu} računa</h2>
-                <p className="text-xs text-slate-500">Provjerite ili uredite svoje podatke prije završetka:</p>
-              </div>
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl border border-slate-100 text-center space-y-4">
+            <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+              ✉️
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-slate-900">Potvrdite vaš E-mail</h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Poslali smo verifikacijski kod na vašu adresu: <strong className="text-slate-800">{privremeniEmail}</strong>
+              </p>
             </div>
 
-            <form onSubmit={potvrdiPrijavaPrekoMreze} className="space-y-3 mt-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Vaše Ime</label>
-                <input 
-                  type="text" 
-                  required 
-                  value={mrezaForma.ime} 
-                  onChange={(e) => setMrezaForma({ ...mrezaForma, ime: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-blue-600"
-                />
-              </div>
+            <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs text-amber-900">
+              💡 <strong>Savjet za testiranje:</strong> Pogledajte obavijest (alert) koja se maloprije pojavila na ekranu kako biste vidjeli koji je kod generiran!
+            </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail adresa (s računa)</label>
-                <input 
-                  type="email" 
-                  required 
-                  value={mrezaForma.email} 
-                  onChange={(e) => setMrezaForma({ ...mrezaForma, email: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm bg-slate-50 outline-none focus:ring-2 focus:ring-blue-600"
-                />
-              </div>
-
-              <p className="text-[11px] text-slate-400 italic">Ovaj e-mail koristit će se za prepoznavanje vaših oglasa i upravljanje njima.</p>
-
+            <form onSubmit={potvrdiVerifikacijskiKod} className="space-y-3 pt-2">
+              <input 
+                type="text" 
+                required 
+                maxLength={6}
+                placeholder="Unesite 6-znamenkasti kod" 
+                value={uneseniKod} 
+                onChange={(e) => setUneseniKod(e.target.value)}
+                className="w-full p-3 rounded-xl border text-center text-lg tracking-widest font-black outline-none focus:ring-2 focus:ring-blue-600"
+              />
               <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-extrabold py-3 rounded-xl text-sm transition uppercase">
-                Potvrdi i Prijavi se
+                Potvrdi Kod i Prijavi se
               </button>
             </form>
           </div>
@@ -959,7 +955,7 @@ export default function KupkoApp() {
                   type="text" required 
                   value={oglasZaUrediti.naslov} 
                   onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, naslov: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-blue-600"
+                  className="w-full p-3 rounded-xl border text-sm outline-none"
                 />
               </div>
 
@@ -970,7 +966,7 @@ export default function KupkoApp() {
                     type="text" required 
                     value={oglasZaUrediti.cijena} 
                     onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, cijena: e.target.value })}
-                    className="w-full p-3 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full p-3 rounded-xl border text-sm outline-none"
                   />
                 </div>
                 <div>
@@ -1126,9 +1122,6 @@ export default function KupkoApp() {
                 <p className="text-sm text-slate-600 leading-relaxed">
                   Kupko.hr je najbrže rastući besplatni hrvatski oglasnik stvoren s ciljem jednostavnog, sigurnog i brzog povezivanja kupaca i prodavača diljem Hrvatske.
                 </p>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Naša misija je omogućiti svima u Hrvatskoj da bez stresa i napornih procedura prodaju svoje rabljene predmete, vozila ili nekretnine.
-                </p>
               </div>
             )}
 
@@ -1139,14 +1132,6 @@ export default function KupkoApp() {
                   <h2 className="text-2xl font-black text-slate-900">Oglašavanje i Promocija Oglasa</h2>
                 </div>
                 <p className="text-sm text-slate-600">Želite li da se vaš oglas proda i do 5 puta brže? Istaknite ga na vrhu naslovnice!</p>
-                <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 space-y-2">
-                  <h4 className="font-bold text-sm text-slate-900">👑 VIP Promocija na Naslovnici - Samo 5.00 €</h4>
-                  <ul className="text-xs text-slate-600 list-disc pl-4 space-y-1">
-                    <li>Prikaz na samom vrhu u zlatnoj VIP traci na naslovnici.</li>
-                    <li>Istaknuta zlatna značka PROMOVIRANO.</li>
-                    <li>Automatsko pozicioniranje ispred ostalih oglasa.</li>
-                  </ul>
-                </div>
               </div>
             )}
 
@@ -1156,11 +1141,7 @@ export default function KupkoApp() {
                   <FileText className="w-7 h-7 text-amber-500" />
                   <h2 className="text-2xl font-black text-slate-900">Uvjeti i Pravila Korištenja</h2>
                 </div>
-                <div className="text-xs text-slate-600 space-y-2 leading-relaxed max-h-60 overflow-y-auto p-2 bg-slate-50 rounded-xl border">
-                  <p><strong>1. Opće odredbe:</strong> Korištenjem platforme Kupko.hr prihvaćate sva navedena pravila i uvjete.</p>
-                  <p><strong>2. Obveze korisnika:</strong> Korisnik jamči točnost unesenih podataka te odgovara za sadržaj objavljenog oglasa.</p>
-                  <p><strong>3. Zabranjeni sadržaji:</strong> Zabranjeno je objavljivanje ilegalnih predmeta, zlonamjernog sadržaja ili zavaravajućih informacija.</p>
-                </div>
+                <p className="text-xs text-slate-600">Korištenjem platforme Kupko.hr prihvaćate sva navedena pravila i uvjete.</p>
               </div>
             )}
 
@@ -1170,10 +1151,7 @@ export default function KupkoApp() {
                   <Shield className="w-7 h-7 text-emerald-500" />
                   <h2 className="text-2xl font-black text-slate-900">Politika Privatnosti (GDPR)</h2>
                 </div>
-                <p className="text-sm text-slate-600">Vaša privatnost nam je na prvom mjestu. Kupko.hr prikuplja samo najosnovnije podatke nužne za rad oglasnika.</p>
-                <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border">
-                  Ne dijelimo vaše podatke s trećim stranama. Telefonski broj i unosi su vidljivi isključivo u sklopu objavljenog oglasa radi stupanja u kontakt s kupcima.
-                </p>
+                <p className="text-sm text-slate-600">Vaša privatnost nam je na prvom mjestu. Kupko.hr štiti vaše osobne podatke.</p>
               </div>
             )}
 
@@ -1181,19 +1159,9 @@ export default function KupkoApp() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-blue-700">
                   <Cookie className="w-7 h-7 text-amber-500" />
-                  <h2 className="text-2xl font-black text-slate-900">Podešavanje Kolačića (Cookies)</h2>
+                  <h2 className="text-2xl font-black text-slate-900">Podešavanje Kolačića</h2>
                 </div>
-                <p className="text-sm text-slate-600">Kolačići nam pomažu u pružanju boljeg korisničkog iskustva na stranici.</p>
-                <div className="space-y-2">
-                  <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border text-xs font-bold cursor-pointer">
-                    <span>Nužni kolačići (Tehničko funkcioniranje)</span>
-                    <input type="checkbox" checked disabled className="w-4 h-4" />
-                  </label>
-                  <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border text-xs font-bold cursor-pointer">
-                    <span>Analitički kolačići</span>
-                    <input type="checkbox" defaultChecked className="w-4 h-4" />
-                  </label>
-                </div>
+                <p className="text-sm text-slate-600">Kolačići služe za ispravan rad internetske stranice.</p>
               </div>
             )}
 
@@ -1203,13 +1171,7 @@ export default function KupkoApp() {
                   <CreditCard className="w-7 h-7 text-emerald-500" />
                   <h2 className="text-2xl font-black text-slate-900">Sigurni Načini Plaćanja</h2>
                 </div>
-                <p className="text-sm text-slate-600">Za promovirane oglase podržavamo sve najpopularnije načine plaćanja u Hrvatskoj:</p>
-                <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-800">
-                  <div className="p-3 bg-slate-50 border rounded-xl flex items-center gap-2">💳 Kreditne i debitne kartice</div>
-                  <div className="p-3 bg-slate-50 border rounded-xl flex items-center gap-2">📱 KEKS Pay & Aircash</div>
-                  <div className="p-3 bg-slate-50 border rounded-xl flex items-center gap-2">🏦 Opća uplatnica / Internet bankarstvo</div>
-                  <div className="p-3 bg-slate-50 border rounded-xl flex items-center gap-2">🍎 Apple Pay & Google Pay</div>
-                </div>
+                <p className="text-sm text-slate-600">Podržavamo kartice, KEKS Pay, Aircash i opću uplatnicu.</p>
               </div>
             )}
 
@@ -1221,9 +1183,7 @@ export default function KupkoApp() {
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-xs font-bold text-slate-700">
                   {SVE_KATEGORIJE.map((k) => (
-                    <div key={k.id} className="p-2.5 bg-slate-50 border rounded-xl">
-                      {k.ikona} {k.naziv}
-                    </div>
+                    <div key={k.id} className="p-2.5 bg-slate-50 border rounded-xl">{k.ikona} {k.naziv}</div>
                   ))}
                 </div>
               </div>
@@ -1263,65 +1223,9 @@ export default function KupkoApp() {
               <span className="text-3xl font-black text-blue-700">{odabraniOglas.cijena} €</span>
             </div>
 
-            {odabraniOglas.kategorija === "auto-moto" && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                {odabraniOglas.godiste && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-amber-500" />
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">Godište</p>
-                      <p className="text-sm font-bold text-slate-800">{odabraniOglas.godiste}.</p>
-                    </div>
-                  </div>
-                )}
-                {odabraniOglas.kilometri && (
-                  <div className="flex items-center gap-2">
-                    <Gauge className="w-5 h-5 text-amber-500" />
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">Kilometraža</p>
-                      <p className="text-sm font-bold text-slate-800">{Number(odabraniOglas.kilometri).toLocaleString("hr-HR")} km</p>
-                    </div>
-                  </div>
-                )}
-                {odabraniOglas.snagaKw && (
-                  <div className="flex items-center gap-2">
-                    <Cog className="w-5 h-5 text-amber-500" />
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">Snaga (kW / KS)</p>
-                      <p className="text-sm font-bold text-slate-800">{odabraniOglas.snagaKw} kW ({Math.round(Number(odabraniOglas.snagaKw) * 1.36)} KS)</p>
-                    </div>
-                  </div>
-                )}
-                {odabraniOglas.gorivo && (
-                  <div className="flex items-center gap-2">
-                    <Fuel className="w-5 h-5 text-amber-500" />
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">Gorivo / Mjenjač</p>
-                      <p className="text-sm font-bold text-slate-800">{odabraniOglas.gorivo} / {odabraniOglas.mjenjac || "Ručni"}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
             <div className="bg-slate-50 p-4 rounded-2xl border text-sm">
               <h4 className="font-bold text-xs uppercase text-slate-400 mb-1">Opis oglasa</h4>
               <p className="whitespace-pre-line">{odabraniOglas.opis || "Nema opisa."}</p>
-            </div>
-
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-amber-500" />
-                Lokacija oglasa: {odabraniOglas.zupanija}
-              </h3>
-              <div className="w-full h-36 bg-slate-100 rounded-xl relative overflow-hidden flex items-center justify-center border border-slate-200">
-                <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px]"></div>
-                <div className="z-10 text-center p-3 bg-white/90 rounded-xl shadow-md backdrop-blur border border-slate-200">
-                  <MapPin className="w-6 h-6 text-red-500 mx-auto animate-bounce mb-1" />
-                  <p className="font-bold text-slate-800 text-xs">{odabraniOglas.zupanija}</p>
-                  <p className="text-[10px] text-slate-500">Približna lokacija prodavača</p>
-                </div>
-              </div>
             </div>
 
             <div className="bg-gradient-to-r from-blue-900 to-indigo-900 text-white p-5 rounded-2xl flex flex-wrap justify-between items-center gap-4">
@@ -1344,27 +1248,6 @@ export default function KupkoApp() {
                 </button>
               </div>
             </div>
-
-            {slicniOglasi.length > 0 && (
-              <div className="pt-4 border-t border-slate-100 space-y-3">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Slični oglasi</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {slicniOglasi.map((slicni) => (
-                    <div
-                      key={slicni.id}
-                      onClick={() => setOdabraniOglas(slicni)}
-                      className="bg-slate-50 rounded-xl p-2 border border-slate-200 cursor-pointer hover:bg-blue-50 transition flex gap-3 items-center"
-                    >
-                      <img src={slicni.slika} alt={slicni.naslov} className="w-16 h-16 object-cover rounded-lg" />
-                      <div className="min-w-0 flex-1">
-                        <h5 className="font-bold text-xs text-slate-900 truncate">{slicni.naslov}</h5>
-                        <p className="text-blue-700 font-black text-xs mt-1">{slicni.cijena} €</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* GUMBI ZA UPRAVLJANJE OGLASOM (UREĐIVANJE I BRISANJE) */}
             {korisnik && (korisnik.isOwner || (odabraniOglas.autorEmail && odabraniOglas.autorEmail.toLowerCase() === korisnik.email.toLowerCase())) ? (
@@ -1402,52 +1285,8 @@ export default function KupkoApp() {
           <div className="bg-white rounded-3xl max-w-md w-full p-6 relative">
             <button onClick={() => setPrikaziPrijavu(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
             <h2 className="text-2xl font-black mb-1">Prijava na Kupko</h2>
-            <p className="text-xs text-slate-500 mb-4">Prijavite se putem računa ili društvenih mreža:</p>
+            <p className="text-xs text-slate-500 mb-4">Unesite svoj e-mail za slanje verifikacijskog koda:</p>
             
-            <div className="space-y-2 mb-4">
-              <button 
-                type="button" 
-                onClick={() => pokreniPrijavaPrekoMreze("Google")}
-                className="w-full flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.15C3.25 21.3 7.31 24 12 24z"/>
-                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.27C.46 8.2.0 10.05.0 12s.46 3.8 1.27 5.42l4.01-3.15z"/>
-                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.58l4.01 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                </svg>
-                <span>Nastavi s Google (Gmail)</span>
-              </button>
-
-              <button 
-                type="button" 
-                onClick={() => pokreniPrijavaPrekoMreze("Apple")}
-                className="w-full flex items-center justify-center gap-2 bg-black hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.67-.82 1.12-1.97.99-3.12-0.97.04-2.16.65-2.85 1.46-.61.72-1.15 1.89-.99 3.01 1.09.08 2.21-.54 2.85-1.35z"/>
-                </svg>
-                <span>Nastavi s Apple ID</span>
-              </button>
-
-              <button 
-                type="button" 
-                onClick={() => pokreniPrijavaPrekoMreze("Facebook")}
-                className="w-full flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                <span>Nastavi s Facebookom</span>
-              </button>
-            </div>
-
-            <div className="flex items-center my-4">
-              <div className="flex-1 border-t border-slate-200"></div>
-              <span className="px-3 text-[11px] font-bold text-slate-400 uppercase">ili klasično</span>
-              <div className="flex-1 border-t border-slate-200"></div>
-            </div>
-
             <form onSubmit={rukujPrijavom} className="space-y-3">
               <input 
                 type="email" 
@@ -1466,7 +1305,7 @@ export default function KupkoApp() {
                 className="w-full p-3 rounded-xl border text-sm outline-none"
               />
               <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm transition">
-                Prijavi se
+                Pošalji Verifikacijski Kod
               </button>
             </form>
           </div>
@@ -1479,52 +1318,8 @@ export default function KupkoApp() {
           <div className="bg-white rounded-3xl max-w-md w-full p-6 relative">
             <button onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
             <h2 className="text-2xl font-black mb-1">Registracija na Kupko</h2>
-            <p className="text-xs text-slate-500 mb-4">Registrirajte se brzo putem društvenih mreža:</p>
+            <p className="text-xs text-slate-500 mb-4">Kreirajte račun i potvrdite e-mail:</p>
             
-            <div className="space-y-2 mb-4">
-              <button 
-                type="button" 
-                onClick={() => pokreniPrijavaPrekoMreze("Google")}
-                className="w-full flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.15C3.25 21.3 7.31 24 12 24z"/>
-                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.27C.46 8.2.0 10.05.0 12s.46 3.8 1.27 5.42l4.01-3.15z"/>
-                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.58l4.01 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                </svg>
-                <span>Registracija s Google (Gmail)</span>
-              </button>
-
-              <button 
-                type="button" 
-                onClick={() => pokreniPrijavaPrekoMreze("Apple")}
-                className="w-full flex items-center justify-center gap-2 bg-black hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.85c.67-.82 1.12-1.97.99-3.12-0.97.04-2.16.65-2.85 1.46-.61.72-1.15 1.89-.99 3.01 1.09.08 2.21-.54 2.85-1.35z"/>
-                </svg>
-                <span>Registracija s Apple ID</span>
-              </button>
-
-              <button 
-                type="button" 
-                onClick={() => pokreniPrijavaPrekoMreze("Facebook")}
-                className="w-full flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-                <span>Registracija s Facebookom</span>
-              </button>
-            </div>
-
-            <div className="flex items-center my-4">
-              <div className="flex-1 border-t border-slate-200"></div>
-              <span className="px-3 text-[11px] font-bold text-slate-400 uppercase">ili klasično</span>
-              <div className="flex-1 border-t border-slate-200"></div>
-            </div>
-
             <form onSubmit={rukujRegistracijom} className="space-y-3">
               <input 
                 type="text" 
@@ -1551,7 +1346,7 @@ export default function KupkoApp() {
                 className="w-full p-3 rounded-xl border text-sm outline-none"
               />
               <button type="submit" className="w-full bg-amber-400 text-blue-950 font-bold py-3 rounded-xl text-sm hover:bg-amber-300 transition">
-                Registriraj se
+                Nastavi na Verifikaciju
               </button>
             </form>
           </div>
