@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Search, PlusCircle, Heart, MapPin, Grid, List, Phone, X, 
   ShoppingBag, CheckCircle2, Mail, User, Clock, Upload, Image as ImageIcon,
-  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3
+  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent
 } from "lucide-react";
 
 const ZUPANIJE = [
@@ -59,6 +59,9 @@ const POCETNI_OGLASI = [
     id: 1,
     naslov: "BMW Serija 3 320d Automatic M-Sport - Full Oprema",
     cijena: "18.900",
+    staraCijena: "21.500",
+    popustPostotak: "-12%",
+    snizeno: true,
     kategorija: "auto-moto",
     podkategorija: "Osobna vozila",
     zupanija: "Grad Zagreb",
@@ -68,7 +71,7 @@ const POCETNI_OGLASI = [
     top: true,
     promoviran: true,
     datum: "Objavljeno danas u 15:30",
-    opis: "Garažirano vozilo u izvanrednom stanju. Redovito servisiran u ovlaštenom BMW servisu.",
+    opis: "Garažirano vozilo u izvanrednom stanju. Redovito servisiran u ovlaštenom BMW servisu. Cijena je upravo snižena!",
     prodavac: "Ivan Horvat",
     autorEmail: "ivan@gmail.com",
     telefon: "0912345678",
@@ -83,6 +86,9 @@ const POCETNI_OGLASI = [
     id: 2,
     naslov: "Stari Antički Sat i Kolekcionarski Predmeti",
     cijena: "120",
+    staraCijena: "180",
+    popustPostotak: "-33%",
+    snizeno: true,
     kategorija: "ostalo",
     podkategorija: "Kolekcionarstvo i antikviteti",
     zupanija: "Istarska",
@@ -92,11 +98,55 @@ const POCETNI_OGLASI = [
     top: false,
     promoviran: false,
     datum: "Objavljeno jučer",
-    opis: "Stari zidni sat u ispravnom stanju.",
+    opis: "Stari zidni sat u ispravnom stanju. Hitna prodaja, cijena spuštena!",
     prodavac: "Petar Istra",
     autorEmail: "petar@gmail.com",
     telefon: "0981112233",
     email: "petar.pula@gmail.com"
+  },
+  {
+    id: 3,
+    naslov: "PlayStation 5 Konzola + 2 Kontrolera i Igra",
+    cijena: "390",
+    staraCijena: "450",
+    popustPostotak: "-13%",
+    snizeno: true,
+    kategorija: "elektronika",
+    podkategorija: "Konzole i igrice",
+    zupanija: "Splitsko-dalmatinska",
+    grad: "Split",
+    stanje: "Korišteno - Kao novo",
+    slika: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80",
+    top: false,
+    promoviran: true,
+    datum: "Objavljeno prije 2 dana",
+    opis: "Konzola malo korištena, u originalnoj ambalaži.",
+    prodavac: "Marko Split",
+    autorEmail: "marko@gmail.com",
+    telefon: "0954445566",
+    email: "marko.split@gmail.com"
+  },
+  {
+    id: 4,
+    naslov: "Kutna Garnitura na Razvlačenje - Očuvana",
+    cijena: "250",
+    staraCijena: "350",
+    popustPostotak: "-28%",
+    snizeno: true,
+    kategorija: "dom-vrt",
+    podkategorija: "Namještaj",
+    zupanija: "Primorsko-goranska",
+    grad: "Rijeka",
+    stanje: "Korišteno - Dobro",
+    slika: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 3 dana",
+    opis: "Prodajem udobnu kutnu garnituru zbog selidbe. Cijena spuštena sa 350 na 250 eura!",
+    prodavac: "Ana Rijeka",
+    autorEmail: "ana@gmail.com",
+    telefon: "0997778899",
+    email: "ana.rijeka@gmail.com"
   }
 ];
 
@@ -130,12 +180,13 @@ export default function KupkoApp() {
   const [generiraniKod, setGeneriraniKod] = useState("");
   const [zaboravljeniEmailUnos, setZaboravljeniEmailUnos] = useState("");
 
+  // Slajder indeks za snižene artikle
+  const [slajderIndex, setSlajderIndex] = useState(0);
+
   // Modal za Informativne Stranice iz Footera
   const [aktivnaInfoStranica, setAktivnaInfoStranica] = useState<string | null>(null);
 
   const [korisnik, setKorisnik] = useState<{ ime: string; email: string; isOwner: boolean } | null>(null);
-  
-  // Prijava sada koristi korisničko ime i lozinku
   const [formaPrijava, setFormaPrijava] = useState({ korisnickoIme: "", lozinka: "" });
   const [formaRegistracija, setFormaRegistracija] = useState({ ime: "", email: "", lozinka: "" });
 
@@ -283,7 +334,8 @@ export default function KupkoApp() {
   };
 
   const [noviOglas, setNoviOglas] = useState({
-    naslov: "", cijena: "", kategorija: "ostalo", podkategorija: "Sve ostalo",
+    naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
+    kategorija: "ostalo", podkategorija: "Sve ostalo",
     zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slika: "", opis: "",
     prodavac: "", telefon: "", email: "", promoviran: false,
     godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni"
@@ -320,7 +372,8 @@ export default function KupkoApp() {
     spremiOglase(azurirano);
     setPrikaziFormu(false);
     setNoviOglas({
-      naslov: "", cijena: "", kategorija: "ostalo", podkategorija: "Sve ostalo",
+      naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
+      kategorija: "ostalo", podkategorija: "Sve ostalo",
       zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slika: "", opis: "",
       prodavac: "", telefon: "", email: "", promoviran: false,
       godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni"
@@ -353,6 +406,17 @@ export default function KupkoApp() {
   });
 
   const promoviraniOglasi = oglasi.filter((o) => o.promoviran);
+  const snizeniOglasi = oglasi.filter((o) => o.snizeno || o.staraCijena);
+
+  const sljedeciSlajd = () => {
+    if (snizeniOglasi.length === 0) return;
+    setSlajderIndex((prev) => (prev + 1) % snizeniOglasi.length);
+  };
+
+  const prethodniSlajd = () => {
+    if (snizeniOglasi.length === 0) return;
+    setSlajderIndex((prev) => (prev - 1 + snizeniOglasi.length) % snizeniOglasi.length);
+  };
 
   const slicniOglasi = odabraniOglas
     ? oglasi.filter(
@@ -459,32 +523,97 @@ export default function KupkoApp() {
           </div>
         </header>
 
+        {/* SLAJDER: SNIŽENE CIJENE (AKCIJE - MINUS) */}
+        {snizeniOglasi.length > 0 && !prikaziSamoOmiljene && (
+          <section className="bg-gradient-to-r from-red-700 via-rose-600 to-red-800 py-6 text-white shadow-lg border-b-2 border-red-900">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-amber-400 text-slate-900 rounded-xl font-black">
+                    <TrendingDown className="w-5 h-5 stroke-[3]" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black uppercase tracking-wide">Najnovija sniženja cijena</h2>
+                    <p className="text-xs text-red-200">Pregledajte artikle kojima su prodavači spustili cijene!</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={prethodniSlajd}
+                    className="p-2 bg-red-900/80 hover:bg-red-900 rounded-xl border border-red-500/40 transition text-white"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button 
+                    onClick={sljedeciSlajd}
+                    className="p-2 bg-red-900/80 hover:bg-red-900 rounded-xl border border-red-500/40 transition text-white"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* SLAJDER KARTICA */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {snizeniOglasi.slice(slajderIndex, slajderIndex + 3).map((o) => (
+                  <div 
+                    key={o.id}
+                    onClick={() => setOdabraniOglas(o)}
+                    className="bg-white text-slate-900 rounded-2xl p-4 shadow-xl border-2 border-red-500 flex gap-4 cursor-pointer hover:scale-102 transition relative overflow-hidden group"
+                  >
+                    {/* CRVENA MINUS OZNAKA */}
+                    <span className="absolute top-0 right-0 bg-red-600 text-white text-[11px] font-black uppercase px-3 py-1 rounded-bl-xl shadow flex items-center gap-1">
+                      <Percent className="w-3.5 h-3.5" /> {o.popustPostotak || "-15%"}
+                    </span>
+
+                    <img src={o.slika} alt={o.naslov} className="w-28 h-28 object-cover rounded-xl group-hover:scale-105 transition" />
+                    
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 block mb-0.5">📍 {o.zupanija}</span>
+                        <h4 className="font-black text-slate-900 text-sm line-clamp-2">{o.naslov}</h4>
+                      </div>
+
+                      <div className="flex items-baseline gap-2 mt-2">
+                        {o.staraCijena && (
+                          <span className="text-xs text-slate-400 line-through font-bold">{o.staraCijena} €</span>
+                        )}
+                        <span className="text-lg font-black text-red-600">{o.cijena} €</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* BANNER PROMOVIRANI OGLASI */}
         {promoviraniOglasi.length > 0 && !prikaziSamoOmiljene && (
-          <section className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 py-5 border-b border-amber-600 shadow-md">
+          <section className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 py-4 border-b border-amber-600 shadow-md">
             <div className="max-w-7xl mx-auto px-4">
               <div className="flex items-center gap-2 mb-3">
-                <Crown className="w-6 h-6 text-blue-950 fill-blue-950" />
-                <h2 className="text-lg font-black text-blue-950 uppercase tracking-wider">Promovirani Oglasi na Naslovnici</h2>
+                <Crown className="w-5 h-5 text-blue-950 fill-blue-950" />
+                <h2 className="text-sm font-black text-blue-950 uppercase tracking-wider">Promovirani Oglasi na Naslovnici</h2>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {promoviraniOglasi.map((o) => (
                   <div 
                     key={o.id}
                     onClick={() => setOdabraniOglas(o)}
-                    className="bg-white rounded-2xl p-3 shadow-lg border-2 border-blue-700 flex gap-3 cursor-pointer hover:scale-102 transition relative overflow-hidden"
+                    className="bg-white rounded-2xl p-2.5 shadow-lg border-2 border-blue-700 flex gap-3 cursor-pointer hover:scale-102 transition relative overflow-hidden"
                   >
                     <span className="absolute top-0 right-0 bg-blue-700 text-amber-300 text-[9px] font-black uppercase px-2 py-0.5 rounded-bl-lg flex items-center gap-1">
                       <Crown className="w-3 h-3 fill-amber-300" /> TOP
                     </span>
-                    <img src={o.slika} alt={o.naslov} className="w-24 h-24 object-cover rounded-xl" />
+                    <img src={o.slika} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
                         <span className="text-[10px] font-bold text-slate-400 block">{o.zupanija}</span>
-                        <h4 className="font-black text-slate-900 text-sm truncate">{o.naslov}</h4>
+                        <h4 className="font-black text-slate-900 text-xs truncate">{o.naslov}</h4>
                       </div>
-                      <p className="text-base font-black text-blue-700">{o.cijena} €</p>
+                      <p className="text-sm font-black text-blue-700">{o.cijena} €</p>
                     </div>
                   </div>
                 ))}
@@ -559,15 +688,17 @@ export default function KupkoApp() {
                 <div 
                   key={o.id}
                   onClick={() => setOdabraniOglas(o)}
-                  className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition flex flex-col justify-between group cursor-pointer"
+                  className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition flex flex-col justify-between group cursor-pointer relative"
                 >
                   <div className="relative">
                     <img src={o.slika} alt={o.naslov} className="w-full h-52 object-cover group-hover:scale-105 transition" />
-                    {o.promoviran && (
-                      <span className="absolute top-3 left-3 bg-amber-400 text-blue-950 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg shadow flex items-center gap-1">
-                        <Crown className="w-3 h-3 fill-blue-950" /> PROMOVIRANO
+                    
+                    {o.popustPostotak && (
+                      <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg shadow flex items-center gap-1">
+                        <Percent className="w-3 h-3" /> {o.popustPostotak}
                       </span>
                     )}
+
                     <button
                       onClick={(e) => toggleOmiljeni(e, o.id)}
                       className="absolute top-3 right-3 bg-white/90 backdrop-blur p-2.5 rounded-full shadow hover:bg-white transition"
@@ -602,7 +733,13 @@ export default function KupkoApp() {
                     </div>
 
                     <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
-                      <span className="text-xl font-black text-blue-700">{o.cijena} €</span>
+                      <div className="flex items-baseline gap-2">
+                        {o.staraCijena && (
+                          <span className="text-xs text-slate-400 line-through font-bold">{o.staraCijena} €</span>
+                        )}
+                        <span className="text-xl font-black text-blue-700">{o.cijena} €</span>
+                      </div>
+
                       <div className="flex items-center gap-2">
                         <button
                           onClick={(e) => obnoviOglas(e, o.id)}
@@ -1190,7 +1327,12 @@ export default function KupkoApp() {
                 <p className="text-xs text-slate-400 mt-1">📍 {odabraniOglas.zupanija} • Podkategorija: {odabraniOglas.podkategorija || "Ostalo"}</p>
                 <p className="text-[11px] text-blue-600 font-medium mt-0.5">{odabraniOglas.datum}</p>
               </div>
-              <span className="text-3xl font-black text-blue-700">{odabraniOglas.cijena} €</span>
+              <div className="text-right">
+                {odabraniOglas.staraCijena && (
+                  <span className="text-sm text-slate-400 line-through font-bold block">{odabraniOglas.staraCijena} €</span>
+                )}
+                <span className="text-3xl font-black text-blue-700">{odabraniOglas.cijena} €</span>
+              </div>
             </div>
 
             <div className="bg-slate-50 p-4 rounded-2xl border text-sm">
@@ -1249,7 +1391,7 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PRIJAVA (KORISNIČKO IME I LOZINKA + ZABORAVLJENA LOZINKA) */}
+      {/* MODAL: PRIJAVA */}
       {prikaziPrijavu && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 relative">
