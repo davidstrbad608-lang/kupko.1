@@ -122,6 +122,10 @@ export default function KupkoApp() {
   const [prikaziUredivanje, setPrikaziUredivanje] = useState(false);
   const [oglasZaUrediti, setOglasZaUrediti] = useState<any>(null);
 
+  // Stanje za potvrdu prijave putem mreža (Apple/Google/Facebook)
+  const [odabranaMrezaZaPotvrdu, setOdabranaMrezaZaPotvrdu] = useState<string | null>(null);
+  const [mrezaForma, setMrezaForma] = useState({ ime: "", email: "" });
+
   // Modal za Informativne Stranice iz Footera
   const [aktivnaInfoStranica, setAktivnaInfoStranica] = useState<string | null>(null);
 
@@ -197,16 +201,30 @@ export default function KupkoApp() {
     setFormaRegistracija({ ime: "", email: "", lozinka: "" });
   };
 
-  const prijavaPrekoMreze = (mreza: string) => {
-    const simuliraniEmail = `korisnik_${mreza.toLowerCase()}@kupko.hr`;
-    setKorisnik({
+  // Pokretanje procesa prijave preko mreže (otvara prozor za potvrdu)
+  const pokreniPrijavaPrekoMreze = (mreza: string) => {
+    setOdabranaMrezaZaPotvrdu(mreza);
+    setMrezaForma({
       ime: `${mreza} Korisnik`,
-      email: simuliraniEmail,
-      isOwner: false
+      email: `korisnik_${mreza.toLowerCase()}@kupko.hr`
     });
     setPrikaziPrijavu(false);
     setPrikaziRegistraciju(false);
-    alert(`Uspješno ste se prijavili putem ${mreza} računa!`);
+  };
+
+  // Završetak potvrde i stvaranje profila preko mreže
+  const potvrdiPrijavaPrekoMreze = (e: React.FormEvent) => {
+    e.preventDefault();
+    const emailLower = mrezaForma.email.toLowerCase();
+    const jeOwner = emailLower === "admin@kupko.hr";
+
+    setKorisnik({
+      ime: mrezaForma.ime || "Korisnik",
+      email: emailLower,
+      isOwner: jeOwner
+    });
+    setOdabranaMrezaZaPotvrdu(null);
+    alert(`Uspješno ste se prijavili putem računa!`);
   };
 
   const obrisiOglas = (glas: any) => {
@@ -869,6 +887,55 @@ export default function KupkoApp() {
         </div>
       )}
 
+      {/* MODAL: POTVRDA / UREĐIVANJE PODATAKA ZA APPLE/GOOGLE/FACEBOOK */}
+      {odabranaMrezaZaPotvrdu && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl border border-slate-100">
+            <button onClick={() => setOdabranaMrezaZaPotvrdu(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="flex items-center gap-2 mb-3">
+              <span className="p-2 bg-blue-50 text-blue-700 rounded-xl font-black text-sm">🔒</span>
+              <div>
+                <h2 className="text-xl font-black text-slate-900">Prijava putem {odabranaMrezaZaPotvrdu} računa</h2>
+                <p className="text-xs text-slate-500">Provjerite ili uredite svoje podatke prije završetka:</p>
+              </div>
+            </div>
+
+            <form onSubmit={potvrdiPrijavaPrekoMreze} className="space-y-3 mt-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Vaše Ime</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={mrezaForma.ime} 
+                  onChange={(e) => setMrezaForma({ ...mrezaForma, ime: e.target.value })}
+                  className="w-full p-3 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail adresa (s računa)</label>
+                <input 
+                  type="email" 
+                  required 
+                  value={mrezaForma.email} 
+                  onChange={(e) => setMrezaForma({ ...mrezaForma, email: e.target.value })}
+                  className="w-full p-3 rounded-xl border text-sm bg-slate-50 outline-none focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+
+              <p className="text-[11px] text-slate-400 italic">Ovaj e-mail koristit će se za prepoznavanje vaših oglasa i upravljanje njima.</p>
+
+              <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-extrabold py-3 rounded-xl text-sm transition uppercase">
+                Potvrdi i Prijavi se
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* MODAL: UREDI OGLAS */}
       {prikaziUredivanje && oglasZaUrediti && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -1340,7 +1407,7 @@ export default function KupkoApp() {
             <div className="space-y-2 mb-4">
               <button 
                 type="button" 
-                onClick={() => prijavaPrekoMreze("Google")}
+                onClick={() => pokreniPrijavaPrekoMreze("Google")}
                 className="w-full flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -1354,7 +1421,7 @@ export default function KupkoApp() {
 
               <button 
                 type="button" 
-                onClick={() => prijavaPrekoMreze("Apple")}
+                onClick={() => pokreniPrijavaPrekoMreze("Apple")}
                 className="w-full flex items-center justify-center gap-2 bg-black hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -1365,7 +1432,7 @@ export default function KupkoApp() {
 
               <button 
                 type="button" 
-                onClick={() => prijavaPrekoMreze("Facebook")}
+                onClick={() => pokreniPrijavaPrekoMreze("Facebook")}
                 className="w-full flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -1417,7 +1484,7 @@ export default function KupkoApp() {
             <div className="space-y-2 mb-4">
               <button 
                 type="button" 
-                onClick={() => prijavaPrekoMreze("Google")}
+                onClick={() => pokreniPrijavaPrekoMreze("Google")}
                 className="w-full flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -1431,7 +1498,7 @@ export default function KupkoApp() {
 
               <button 
                 type="button" 
-                onClick={() => prijavaPrekoMreze("Apple")}
+                onClick={() => pokreniPrijavaPrekoMreze("Apple")}
                 className="w-full flex items-center justify-center gap-2 bg-black hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -1442,7 +1509,7 @@ export default function KupkoApp() {
 
               <button 
                 type="button" 
-                onClick={() => prijavaPrekoMreze("Facebook")}
+                onClick={() => pokreniPrijavaPrekoMreze("Facebook")}
                 className="w-full flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
