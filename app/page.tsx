@@ -116,23 +116,27 @@ export default function KupkoApp() {
   const [prikaziFormu, setPrikaziFormu] = useState(false);
   const [prikaziPrijavu, setPrikaziPrijavu] = useState(false);
   const [prikaziRegistraciju, setPrikaziRegistraciju] = useState(false);
+  const [prikaziZaboravljeno, setPrikaziZaboravljeno] = useState(false);
 
   // Stanje za uređivanje oglasa
   const [prikaziUredivanje, setPrikaziUredivanje] = useState(false);
   const [oglasZaUrediti, setOglasZaUrediti] = useState<any>(null);
 
-  // Stanje za verifikacijski korak (e-mail verifikacija)
+  // Stanje za verifikacijski korak
   const [korakVerifikacije, setKorakVerifikacije] = useState(false);
   const [privremeniEmail, setPrivremeniEmail] = useState("");
   const [privremenoIme, setPrivremenoIme] = useState("");
   const [uneseniKod, setUneseniKod] = useState("");
   const [generiraniKod, setGeneriraniKod] = useState("");
+  const [zaboravljeniEmailUnos, setZaboravljeniEmailUnos] = useState("");
 
   // Modal za Informativne Stranice iz Footera
   const [aktivnaInfoStranica, setAktivnaInfoStranica] = useState<string | null>(null);
 
   const [korisnik, setKorisnik] = useState<{ ime: string; email: string; isOwner: boolean } | null>(null);
-  const [formaPrijava, setFormaPrijava] = useState({ email: "", lozinka: "" });
+  
+  // Prijava sada koristi korisničko ime i lozinku
+  const [formaPrijava, setFormaPrijava] = useState({ korisnickoIme: "", lozinka: "" });
   const [formaRegistracija, setFormaRegistracija] = useState({ ime: "", email: "", lozinka: "" });
 
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
@@ -186,17 +190,17 @@ export default function KupkoApp() {
 
   const rukujPrijavom = (e: React.FormEvent) => {
     e.preventDefault();
-    const emailLower = formaPrijava.email.toLowerCase();
+    const imeClean = formaPrijava.korisnickoIme.trim();
+    const jeOwner = imeClean.toLowerCase() === "admin";
     
-    // Pokrećemo korak verifikacije e-maila prije konačne prijave
-    const slucajniKod = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneriraniKod(slucajniKod);
-    setPrivremeniEmail(emailLower);
-    setPrivremenoIme(emailLower.split("@")[0]);
-    setKorakVerifikacije(true);
+    setKorisnik({ 
+      ime: imeClean, 
+      email: `${imeClean.toLowerCase()}@kupko.hr`, 
+      isOwner: jeOwner 
+    });
     setPrikaziPrijavu(false);
-    
-    alert(`[Simulacija E-maila]: Na adresu ${emailLower} poslan je verifikacijski kod. Vaš kod za potvrdu je: ${slucajniKod}`);
+    setFormaPrijava({ korisnickoIme: "", lozinka: "" });
+    alert(`Uspješno ste prijavljeni kao korisnik: ${imeClean}`);
   };
 
   const rukujRegistracijom = (e: React.FormEvent) => {
@@ -220,7 +224,7 @@ export default function KupkoApp() {
       return;
     }
 
-    const jeOwner = privremeniEmail === "admin@kupko.hr";
+    const jeOwner = privremenoIme.toLowerCase() === "admin";
     setKorisnik({
       ime: privremenoIme,
       email: privremeniEmail,
@@ -229,7 +233,16 @@ export default function KupkoApp() {
 
     setKorakVerifikacije(false);
     setUneseniKod("");
-    alert("E-mail adresa uspješno potvrđena! Prijavljeni ste na sustav.");
+    alert("Račun je uspješno potvrđen i kreiran!");
+  };
+
+  const rukujZaboravljenimPodacima = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!zaboravljeniEmailUnos.trim()) return;
+    
+    alert(`[Oporavak računa]: Upute i privremeni podaci za oporavak korisničkog imena i lozinke poslani su na: ${zaboravljeniEmailUnos}`);
+    setPrikaziZaboravljeno(false);
+    setZaboravljeniEmailUnos("");
   };
 
   const obrisiOglas = (glas: any) => {
@@ -617,14 +630,14 @@ export default function KupkoApp() {
         </main>
       </div>
 
-      {/* FOOTER U STILU NJUŠKALA */}
+      {/* FOOTER */}
       <footer className="bg-blue-950 text-slate-300 mt-16 border-t-4 border-amber-400 pt-10 pb-8 text-xs">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-1 mb-3">
               <span className="font-black text-2xl tracking-tight text-white">KUP</span>
               <span className="font-black text-2xl tracking-tight text-amber-400">KO</span>
-              <span className="text-amber-400 text-[10px] font-bold bg-amber-400/20 px-1 py-0.5 rounded ml-1 border border-amber-400/30">HR</span>
+              <span className="text-amber-400 text-[10px] font-bold bg-amber-400/20 px-1.5 py-0.5 rounded ml-1 border border-amber-400/30">HR</span>
             </div>
             <p className="text-slate-400 leading-relaxed text-[11px] mb-4">
               Kupko.hr je vodeći hrvatski besplatni oglasnik za brzu i sigurnu kupoprodaju vozila, nekretnina, elektronike i ostalih predmeta.
@@ -925,7 +938,35 @@ export default function KupkoApp() {
                 className="w-full p-3 rounded-xl border text-center text-lg tracking-widest font-black outline-none focus:ring-2 focus:ring-blue-600"
               />
               <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-extrabold py-3 rounded-xl text-sm transition uppercase">
-                Potvrdi Kod i Prijavi se
+                Potvrdi Kod i Dovrši Registraciju
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ZABORAVLJENA LOZINKA ILI KORISNIČKO IME */}
+      {prikaziZaboravljeno && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
+            <button onClick={() => setPrikaziZaboravljeno(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
+            <div className="flex items-center gap-2">
+              <HelpCircle className="w-6 h-6 text-blue-600" />
+              <h2 className="text-xl font-black text-slate-900">Zaboravljeni podaci?</h2>
+            </div>
+            <p className="text-xs text-slate-500">Unesite svoju e-mail adresu s kojom ste registrirani, a mi ćemo vam poslati podatke za oporavak korisničkog imena i lozinke:</p>
+            
+            <form onSubmit={rukujZaboravljenimPodacima} className="space-y-3">
+              <input 
+                type="email" 
+                required 
+                placeholder="Vaša e-mail adresa" 
+                value={zaboravljeniEmailUnos} 
+                onChange={(e) => setZaboravljeniEmailUnos(e.target.value)}
+                className="w-full p-3 rounded-xl border text-sm outline-none"
+              />
+              <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm transition">
+                Pošalji Upute za Oporavak
               </button>
             </form>
           </div>
@@ -990,72 +1031,6 @@ export default function KupkoApp() {
                 </div>
               </div>
 
-              {oglasZaUrediti.kategorija === "auto-moto" && (
-                <div className="bg-amber-50/70 p-4 rounded-2xl border border-amber-200/80 space-y-3">
-                  <p className="text-xs font-black text-amber-900 uppercase tracking-wide flex items-center gap-1.5">
-                    <Car className="w-4 h-4" /> Uredi Specifikacije Vozila
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Godište</label>
-                      <input
-                        type="text"
-                        value={oglasZaUrediti.godiste || ""}
-                        onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, godiste: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Kilometraža (km)</label>
-                      <input
-                        type="number"
-                        value={oglasZaUrediti.kilometri || ""}
-                        onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, kilometri: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Snaga (kW)</label>
-                      <input
-                        type="number"
-                        value={oglasZaUrediti.snagaKw || ""}
-                        onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, snagaKw: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Gorivo</label>
-                      <select
-                        value={oglasZaUrediti.gorivo || "Dizel"}
-                        onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, gorivo: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
-                      >
-                        <option value="Dizel">Dizel</option>
-                        <option value="Benzin">Benzin</option>
-                        <option value="Hibrid">Hibrid</option>
-                        <option value="Električni">Električni</option>
-                        <option value="Plin">Plin</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Mjenjač</label>
-                      <select
-                        value={oglasZaUrediti.mjenjac || "Ručni"}
-                        onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, mjenjac: e.target.value })}
-                        className="w-full border border-slate-300 bg-white rounded-xl p-2.5 text-xs outline-none"
-                      >
-                        <option value="Ručni">Ručni</option>
-                        <option value="Automatski">Automatski</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Slika predmeta</label>
                 {oglasZaUrediti.slika ? (
@@ -1105,11 +1080,6 @@ export default function KupkoApp() {
                   <h2 className="text-2xl font-black text-slate-900">Kontakt i Korisnička Pomoć</h2>
                 </div>
                 <p className="text-sm text-slate-600">Trebate pomoć s objavom oglasa ili imate pitanja za naš tim? Stojimo vam na raspolaganju!</p>
-                <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 space-y-2">
-                  <p className="text-xs font-bold text-slate-800">📧 E-mail podrška: <a href="mailto:podrska@kupko.hr" className="text-blue-700 underline">podrska@kupko.hr</a></p>
-                  <p className="text-xs font-bold text-slate-800">📞 Telefon korisničke službe: 01 2345 678 (Radnim danom 08:00 - 18:00)</p>
-                  <p className="text-xs text-slate-500">Adresa: Kupko Oglasnik d.o.o., Ilica 100, 10000 Zagreb</p>
-                </div>
               </div>
             )}
 
@@ -1249,7 +1219,7 @@ export default function KupkoApp() {
               </div>
             </div>
 
-            {/* GUMBI ZA UPRAVLJANJE OGLASOM (UREĐIVANJE I BRISANJE) */}
+            {/* GUMBI ZA UPRAVLJANJE OGLASOM */}
             {korisnik && (korisnik.isOwner || (odabraniOglas.autorEmail && odabraniOglas.autorEmail.toLowerCase() === korisnik.email.toLowerCase())) ? (
               <div className="pt-3 border-t border-slate-100 flex flex-wrap justify-between items-center gap-2">
                 <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
@@ -1279,33 +1249,50 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PRIJAVA */}
+      {/* MODAL: PRIJAVA (KORISNIČKO IME I LOZINKA + ZABORAVLJENA LOZINKA) */}
       {prikaziPrijavu && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 relative">
             <button onClick={() => setPrikaziPrijavu(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
             <h2 className="text-2xl font-black mb-1">Prijava na Kupko</h2>
-            <p className="text-xs text-slate-500 mb-4">Unesite svoj e-mail za slanje verifikacijskog koda:</p>
+            <p className="text-xs text-slate-500 mb-4">Prijavite se svojim korisničkim imenom i lozinkom:</p>
             
             <form onSubmit={rukujPrijavom} className="space-y-3">
-              <input 
-                type="email" 
-                required 
-                placeholder="E-mail (npr. admin@kupko.hr)" 
-                value={formaPrijava.email} 
-                onChange={(e) => setFormaPrijava({ ...formaPrijava, email: e.target.value })}
-                className="w-full p-3 rounded-xl border text-sm outline-none"
-              />
-              <input 
-                type="password" 
-                required 
-                placeholder="Lozinka" 
-                value={formaPrijava.lozinka} 
-                onChange={(e) => setFormaPrijava({ ...formaPrijava, lozinka: e.target.value })}
-                className="w-full p-3 rounded-xl border text-sm outline-none"
-              />
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">Korisničko ime (npr. admin)</label>
+                <input 
+                  type="text" 
+                  required 
+                  placeholder="Korisničko ime" 
+                  value={formaPrijava.korisnickoIme} 
+                  onChange={(e) => setFormaPrijava({ ...formaPrijava, korisnickoIme: e.target.value })}
+                  className="w-full p-3 rounded-xl border text-sm outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">Lozinka</label>
+                <input 
+                  type="password" 
+                  required 
+                  placeholder="Lozinka" 
+                  value={formaPrijava.lozinka} 
+                  onChange={(e) => setFormaPrijava({ ...formaPrijava, lozinka: e.target.value })}
+                  className="w-full p-3 rounded-xl border text-sm outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button 
+                  type="button" 
+                  onClick={() => { setPrikaziPrijavu(false); setPrikaziZaboravljeno(true); }}
+                  className="text-xs text-blue-600 hover:underline font-bold"
+                >
+                  Zaboravljena lozinka ili korisničko ime?
+                </button>
+              </div>
+
               <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm transition">
-                Pošalji Verifikacijski Kod
+                Prijavi se
               </button>
             </form>
           </div>
