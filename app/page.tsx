@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Search, PlusCircle, MapPin, Phone, Mail, Heart, 
-  RotateCw, Share2, ArrowLeft, Tag, ShieldCheck, User 
+  RotateCw, ArrowLeft, ShieldCheck, User, LogIn, UserPlus, Tag 
 } from "lucide-react";
 
 // Sučelje za Oglas
@@ -21,9 +21,10 @@ interface Oglas {
   email: string;
   isPromoviran?: boolean;
   datumObjave: string;
+  autoreEmail?: string;
 }
 
-// Početni ogledni podaci
+// Početni oglasi
 const POCETNI_OGLASI: Oglas[] = [
   {
     id: 1,
@@ -38,7 +39,8 @@ const POCETNI_OGLASI: Oglas[] = [
     telefon: "091 234 5678",
     email: "ivan@example.com",
     isPromoviran: true,
-    datumObjave: new Date().toISOString()
+    datumObjave: new Date().toISOString(),
+    autoreEmail: "ivan@example.com"
   },
   {
     id: 2,
@@ -53,7 +55,8 @@ const POCETNI_OGLASI: Oglas[] = [
     telefon: "098 765 4321",
     email: "marko@example.com",
     isPromoviran: true,
-    datumObjave: new Date().toISOString()
+    datumObjave: new Date().toISOString(),
+    autoreEmail: "marko@example.com"
   },
   {
     id: 3,
@@ -68,7 +71,8 @@ const POCETNI_OGLASI: Oglas[] = [
     telefon: "095 111 2233",
     email: "petar@example.com",
     isPromoviran: false,
-    datumObjave: new Date().toISOString()
+    datumObjave: new Date().toISOString(),
+    autoreEmail: "petar@example.com"
   }
 ];
 
@@ -78,10 +82,18 @@ export default function KupkoApp() {
   const [odabranaKategorija, setOdabranaKategorija] = useState("Sve");
   const [odabranaZupanija, setOdabranaZupanija] = useState("Sve");
   const [odabraniOglas, setOdabraniOglas] = useState<Oglas | null>(null);
-  
-  // Omiljeni oglasi ID-jevi
+
+  // Omiljeni oglasi
   const [omiljeniIds, setOmiljeniIds] = useState<number[]>([]);
   const [prikaziSamoOmiljene, setPrikaziSamoOmiljene] = useState(false);
+
+  // Prijava i Registracija
+  const [prijavljeniKorisnik, setPrijavljeniKorisnik] = useState<{ ime: string; email: string } | null>(null);
+  const [prikaziPrijavu, setPrikaziPrijavu] = useState(false);
+  const [prikaziRegistraciju, setPrikaziRegistraciju] = useState(false);
+
+  const [formaPrijava, setFormaPrijava] = useState({ email: "", lozinka: "" });
+  const [formaRegistracija, setFormaRegistracija] = useState({ ime: "", email: "", lozinka: "" });
 
   // Forma za novi oglas
   const [prikaziFormu, setPrikaziFormu] = useState(false);
@@ -110,7 +122,7 @@ export default function KupkoApp() {
     }
   }, []);
 
-  // Prebacivanje omiljenog oglasa (Spremanje / Uklanjanje)
+  // Prebacivanje omiljenog oglasa
   const toggleOmiljeni = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     let noviIds: number[];
@@ -133,10 +145,31 @@ export default function KupkoApp() {
           : item
       )
     );
-    alert("Oglas je uspješno obnovljen i vraćen na vrh ponude!");
+    alert("Oglas je uspješno obnovljen i vraćen na sam vrh ponude!");
   };
 
-  // Slanje nove forme
+  // Prijava
+  const rukujPrijavom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formaPrijava.email) {
+      const imeKorisnika = formaPrijava.email.split("@")[0];
+      setPrijavljeniKorisnik({ ime: imeKorisnika, email: formaPrijava.email });
+      setPrikaziPrijavu(false);
+      setFormaPrijava({ email: "", lozinka: "" });
+    }
+  };
+
+  // Registracija
+  const rukujRegistracijom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formaRegistracija.email && formaRegistracija.ime) {
+      setPrijavljeniKorisnik({ ime: formaRegistracija.ime, email: formaRegistracija.email });
+      setPrikaziRegistraciju(false);
+      setFormaRegistracija({ ime: "", email: "", lozinka: "" });
+    }
+  };
+
+  // Slanje novog oglasa
   const rukujPredajom = (e: React.FormEvent) => {
     e.preventDefault();
     const stvoreniOglas: Oglas = {
@@ -148,10 +181,11 @@ export default function KupkoApp() {
       zupanija: noviOglas.zupanija,
       opis: noviOglas.opis,
       slika: noviOglas.slika || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=1000",
-      prodavac: noviOglas.prodavac || "Korisnik",
+      prodavac: prijavljeniKorisnik ? prijavljeniKorisnik.ime : (noviOglas.prodavac || "Korisnik"),
       telefon: noviOglas.telefon,
-      email: noviOglas.email,
-      datumObjave: new Date().toISOString()
+      email: prijavljeniKorisnik ? prijavljeniKorisnik.email : noviOglas.email,
+      datumObjave: new Date().toISOString(),
+      autoreEmail: prijavljeniKorisnik ? prijavljeniKorisnik.email : noviOglas.email
     };
 
     setOglasi([stvoreniOglas, ...oglasi]);
@@ -173,7 +207,7 @@ export default function KupkoApp() {
     return ujedaPretraga && ujedaKat && ujedaZup && ujedaOmiljene;
   });
 
-  // Slični oglasi za detaljni prikaz
+  // Slični oglasi
   const slicniOglasi = odabraniOglas
     ? oglasi.filter(
         (o) =>
@@ -184,6 +218,43 @@ export default function KupkoApp() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-12">
+      {/* VRŠNA TRAKA - PRIJAVA & REGISTRACIJA */}
+      <div className="bg-slate-950 text-slate-400 text-xs py-2 border-b border-slate-800 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <span>Kupko.hr - Hrvatski Marketplace Oglasnik</span>
+          <div className="flex items-center gap-4">
+            {prijavljeniKorisnik ? (
+              <div className="flex items-center gap-3">
+                <span className="text-amber-400 font-bold flex items-center gap-1">
+                  <User className="w-3.5 h-3.5" /> {prijavljeniKorisnik.ime}
+                </span>
+                <button
+                  onClick={() => setPrijavljeniKorisnik(null)}
+                  className="hover:text-white transition underline"
+                >
+                  Odjava
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => setPrikaziPrijavu(true)}
+                  className="hover:text-white transition flex items-center gap-1"
+                >
+                  <LogIn className="w-3.5 h-3.5" /> Prijava
+                </button>
+                <button
+                  onClick={() => setPrikaziRegistraciju(true)}
+                  className="hover:text-white transition flex items-center gap-1"
+                >
+                  <UserPlus className="w-3.5 h-3.5" /> Registracija
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* HEADER / ZAGLAVLJE */}
       <header className="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -300,7 +371,6 @@ export default function KupkoApp() {
                     Lokacija: {odabraniOglas.zupanija}
                   </h3>
                   
-                  {/* Simulacija interaktivne karte */}
                   <div className="w-full h-48 bg-slate-200 rounded-xl relative overflow-hidden flex items-center justify-center border border-slate-300">
                     <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px]"></div>
                     <div className="z-10 text-center p-4 bg-white/90 rounded-xl shadow-md backdrop-blur border border-slate-200">
@@ -311,7 +381,7 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
-                {/* SEKCIJA: SIČNI OGLASI */}
+                {/* SLIČNI OGLASI */}
                 {slicniOglasi.length > 0 && (
                   <div className="space-y-4 mt-8">
                     <h3 className="text-xl font-bold text-slate-900">Slični oglasi</h3>
@@ -363,7 +433,7 @@ export default function KupkoApp() {
                     <Mail className="w-5 h-5" /> Pošalji poruku
                   </a>
 
-                  {/* Gumb za automatsko obnavljanje */}
+                  {/* Gumb za Obnavljanje */}
                   <button
                     onClick={(e) => obnoviOglas(e, odabraniOglas.id)}
                     className="w-full border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm transition"
@@ -411,7 +481,7 @@ export default function KupkoApp() {
               </div>
             </div>
 
-            {/* Mreža kartica oglasa */}
+            {/* Mreža oglasa */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtriraniOglasi.map((o) => (
                 <div
@@ -462,7 +532,6 @@ export default function KupkoApp() {
                         {o.cijena.toLocaleString("hr-HR")} €
                       </span>
 
-                      {/* Gumb za Brzo Obnavljanje na kartici */}
                       <button
                         onClick={(e) => obnoviOglas(e, o.id)}
                         title="Obnovi oglas"
@@ -485,14 +554,81 @@ export default function KupkoApp() {
         )}
       </main>
 
+      {/* MODAL ZA PRIJAVU */}
+      {prikaziPrijavu && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative">
+            <button onClick={() => setPrikaziPrijavu(false)} className="absolute top-4 right-4 text-slate-400">✕</button>
+            <h2 className="text-2xl font-black mb-4">Prijava na Kupko.hr</h2>
+            <form onSubmit={rukujPrijavom} className="space-y-3">
+              <input
+                type="email"
+                required
+                placeholder="E-mail adresa"
+                value={formaPrijava.email}
+                onChange={(e) => setFormaPrijava({ ...formaPrijava, email: e.target.value })}
+                className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
+              />
+              <input
+                type="password"
+                required
+                placeholder="Lozinka"
+                value={formaPrijava.lozinka}
+                onChange={(e) => setFormaPrijava({ ...formaPrijava, lozinka: e.target.value })}
+                className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
+              />
+              <button type="submit" className="w-full bg-amber-400 text-slate-900 font-bold py-3 rounded-xl text-sm">
+                Prijavi se
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ZA REGISTRACIJU */}
+      {prikaziRegistraciju && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative">
+            <button onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400">✕</button>
+            <h2 className="text-2xl font-black mb-4">Registracija</h2>
+            <form onSubmit={rukujRegistracijom} className="space-y-3">
+              <input
+                type="text"
+                required
+                placeholder="Ime / Korisničko ime"
+                value={formaRegistracija.ime}
+                onChange={(e) => setFormaRegistracija({ ...formaRegistracija, ime: e.target.value })}
+                className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
+              />
+              <input
+                type="email"
+                required
+                placeholder="E-mail adresa"
+                value={formaRegistracija.email}
+                onChange={(e) => setFormaRegistracija({ ...formaRegistracija, email: e.target.value })}
+                className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
+              />
+              <input
+                type="password"
+                required
+                placeholder="Lozinka"
+                value={formaRegistracija.lozinka}
+                onChange={(e) => setFormaRegistracija({ ...formaRegistracija, lozinka: e.target.value })}
+                className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
+              />
+              <button type="submit" className="w-full bg-amber-400 text-slate-900 font-bold py-3 rounded-xl text-sm">
+                Registriraj se
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* MODAL ZA PREDAJU OGLASA */}
       {prikaziFormu && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={() => setPrikaziFormu(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold"
-            >
+            <button onClick={() => setPrikaziFormu(false)} className="absolute top-4 right-4 text-slate-400 font-bold">
               ✕
             </button>
             <h2 className="text-xl font-black text-slate-900 mb-4">Predaj novi oglas na Kupko.hr</h2>
@@ -506,7 +642,7 @@ export default function KupkoApp() {
                   placeholder="npr. iPhone 15 Pro Max"
                   value={noviOglas.naslov}
                   onChange={(e) => setNoviOglas({ ...noviOglas, naslov: e.target.value })}
-                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                 />
               </div>
 
@@ -519,7 +655,7 @@ export default function KupkoApp() {
                     placeholder="100"
                     value={noviOglas.cijena}
                     onChange={(e) => setNoviOglas({ ...noviOglas, cijena: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                   />
                 </div>
                 <div>
@@ -527,7 +663,7 @@ export default function KupkoApp() {
                   <select
                     value={noviOglas.kategorija}
                     onChange={(e) => setNoviOglas({ ...noviOglas, kategorija: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                   >
                     <option value="Vozila">Vozila</option>
                     <option value="Elektronika">Elektronika</option>
@@ -541,7 +677,7 @@ export default function KupkoApp() {
                 <select
                   value={noviOglas.zupanija}
                   onChange={(e) => setNoviOglas({ ...noviOglas, zupanija: e.target.value })}
-                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                 >
                   <option value="Grad Zagreb">Grad Zagreb</option>
                   <option value="Splitsko-dalmatinska">Splitsko-dalmatinska</option>
@@ -556,7 +692,7 @@ export default function KupkoApp() {
                   placeholder="https://link-do-slike.com/slika.jpg"
                   value={noviOglas.slika}
                   onChange={(e) => setNoviOglas({ ...noviOglas, slika: e.target.value })}
-                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                 />
               </div>
 
@@ -568,7 +704,7 @@ export default function KupkoApp() {
                   placeholder="Unesite detaljan opis..."
                   value={noviOglas.opis}
                   onChange={(e) => setNoviOglas({ ...noviOglas, opis: e.target.value })}
-                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                 ></textarea>
               </div>
 
@@ -581,7 +717,7 @@ export default function KupkoApp() {
                     placeholder="091 234 567"
                     value={noviOglas.telefon}
                     onChange={(e) => setNoviOglas({ ...noviOglas, telefon: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                   />
                 </div>
                 <div>
@@ -592,7 +728,7 @@ export default function KupkoApp() {
                     placeholder="Petar"
                     value={noviOglas.prodavac}
                     onChange={(e) => setNoviOglas({ ...noviOglas, prodavac: e.target.value })}
-                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full border border-slate-300 rounded-xl p-2.5 text-sm"
                   />
                 </div>
               </div>
