@@ -84,11 +84,53 @@ const POCETNI_OGLASI = [
     snagaKw: "140",
     gorivo: "Dizel",
     mjenjac: "Automatski"
+  },
+  {
+    id: 2,
+    naslov: "Dvosoban stan u novogradnji s garažom",
+    cijena: "145000",
+    kategorija: "nekretnine",
+    podkategorija: "Stanovi - Prodaja",
+    zupanija: "Splitsko-dalmatinska",
+    grad: "Split",
+    stanje: "Novo",
+    slike: [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"
+    ],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "Prekrasan stan u novogradnji, blizina mora i svih sadržaja.",
+    prodavac: "Ana Marić",
+    autorEmail: "ana@kupko.hr",
+    telefon: "0981112223",
+    kvadratura: "55",
+    sobe: "2"
+  },
+  {
+    id: 3,
+    naslov: "iPhone 15 Pro Max 256GB - Zapakiran",
+    cijena: "980",
+    kategorija: "elektronika",
+    podkategorija: "Mobiteli i oprema",
+    zupanija: "Grad Zagreb",
+    grad: "Zagreb",
+    stanje: "Novo",
+    slike: [
+      "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=80"
+    ],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 2 sata",
+    opis: "Mobitel je nekorišten, zapakiran u originalnoj kutiji s garancijom.",
+    prodavac: "Luka Perić",
+    autorEmail: "luka@kupko.hr",
+    telefon: "0953334455"
   }
 ];
 
 export default function KupkoApp() {
-  const [oglasi, setOglasi] = useState(POCETNI_OGLASI);
+  const [oglasi, setOglasi] = useState<any[]>(POCETNI_OGLASI);
   const [registriraniKorisnici, setRegistriraniKorisnici] = useState<any[]>([]);
   const [poruke, setPoruke] = useState<any[]>([]);
   const [recenzije, setRecenzije] = useState<any[]>([]);
@@ -98,7 +140,6 @@ export default function KupkoApp() {
   const [odabranaPodkategorija, setOdabranaPodkategorija] = useState("sve");
   const [odabranaZupanija, setOdabranaZupanija] = useState("sve");
   
-  // Novi napredni filteri
   const [minCijena, setMinCijena] = useState("");
   const [maxCijena, setMaxCijena] = useState("");
   const [odabranoStanje, setOdabranoStanje] = useState("sve");
@@ -123,7 +164,6 @@ export default function KupkoApp() {
   const [tekstNovePoruke, setTekstNovePoruke] = useState("");
   const [prikaziFormuZaSlanjePoruke, setPrikaziFormuZaSlanjePoruke] = useState(false);
 
-  // Nova stanja za recenzije
   const [novaOcjena, setNovaOcjena] = useState(5);
   const [noviKomentar, setNoviKomentar] = useState("");
 
@@ -154,7 +194,7 @@ export default function KupkoApp() {
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
 
   useEffect(() => {
-    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v21");
+    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v23");
     if (lokalniOglasi) { try { setOglasi(JSON.parse(lokalniOglasi)); } catch (e) { console.error(e); } }
     const spremljeniKorisnici = localStorage.getItem("kupko_baza_korisnika");
     if (spremljeniKorisnici) { try { setRegistriraniKorisnici(JSON.parse(spremljeniKorisnici)); } catch (e) { console.error(e); } }
@@ -179,7 +219,7 @@ export default function KupkoApp() {
 
   const spremiOglase = (noviNiz: any) => {
     setOglasi(noviNiz);
-    localStorage.setItem("kupko_oglasi_v21", JSON.stringify(noviNiz));
+    localStorage.setItem("kupko_oglasi_v23", JSON.stringify(noviNiz));
   };
 
   const spremiPoruke = (noviNizPoruka: any) => {
@@ -520,7 +560,6 @@ export default function KupkoApp() {
     }
   };
 
-  // Filtriranje oglasa uključujući napredne filtere po cijenama i stanju
   const filtriraniOglasi = oglasi.filter((o) => {
     const odgovaraTrazilici = o.naslov.toLowerCase().includes(pojamPretrage.toLowerCase());
     const odgovaraKategoriji = odabranaKategorija === "sve" || o.kategorija === odabranaKategorija;
@@ -540,6 +579,10 @@ export default function KupkoApp() {
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
   const snizeniOglasi = oglasi.filter((o) => (o.snizeno || o.staraCijena) && !o.promoviran);
+
+  const preporucenoAutoMoto = oglasi.filter(o => o.kategorija === "auto-moto").slice(0, 3);
+  const preporucenoNekretnine = oglasi.filter(o => o.kategorija === "nekretnine").slice(0, 3);
+  const preporucenoElektronika = oglasi.filter(o => o.kategorija === "elektronika").slice(0, 3);
 
   const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail.toLowerCase() === korisnik.email.toLowerCase()) : [];
 
@@ -734,7 +777,7 @@ export default function KupkoApp() {
                       <Sparkles className="w-3.5 h-3.5" /> PROMO
                     </span>
 
-                    <img src={o.slike ? o.slike[0] : o.slika} alt={o.naslov} className="w-28 h-28 object-cover rounded-xl group-hover:scale-105 transition" />
+                    <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-28 h-28 object-cover rounded-xl group-hover:scale-105 transition" />
                     
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
@@ -788,7 +831,7 @@ export default function KupkoApp() {
                       <Percent className="w-3.5 h-3.5" /> {o.popustPostotak || "SNIŽENO"}
                     </span>
 
-                    <img src={o.slike ? o.slike[0] : o.slika} alt={o.naslov} className="w-28 h-28 object-cover rounded-xl group-hover:scale-105 transition" />
+                    <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-28 h-28 object-cover rounded-xl group-hover:scale-105 transition" />
                     
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
@@ -810,13 +853,12 @@ export default function KupkoApp() {
           </section>
         )}
 
-        {/* MAIN KATEGORIJE SELEKTOR I NAPREDNI FILTERI (CIJENA I STANJE) */}
+        {/* MAIN KATEGORIJE SELEKTOR I NAPREDNI FILTERI */}
         <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
           <section className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex justify-between items-center flex-wrap gap-4">
               <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider">Sve Kategorije na Kupku</h3>
               
-              {/* NAPREDNI FILTERI PO CIJENI I STANJU */}
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-bold text-slate-500 flex items-center gap-1"><SlidersHorizontal className="w-3.5 h-3.5" /> Cijena (€):</span>
                 <input 
@@ -891,6 +933,77 @@ export default function KupkoApp() {
             )}
           </section>
 
+          {/* 3. SEKCIJA: PREPORUČENO PO KATEGORIJAMA */}
+          {!prikaziSamoOmiljene && odabranaKategorija === "sve" && pojamPretrage === "" && (
+            <div className="space-y-6">
+              {preporucenoAutoMoto.length > 0 && (
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                      <span>🚗</span> Preporučeno u kategoriji Auto Moto
+                    </h3>
+                    <button onClick={() => setOdabranaKategorija("auto-moto")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {preporucenoAutoMoto.map(o => (
+                      <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                        <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
+                        <div className="flex flex-col justify-between">
+                          <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
+                          <span className="font-black text-blue-700">{o.cijena} €</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {preporucenoNekretnine.length > 0 && (
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                      <span>🏠</span> Preporučeno u kategoriji Nekretnine
+                    </h3>
+                    <button onClick={() => setOdabranaKategorija("nekretnine")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {preporucenoNekretnine.map(o => (
+                      <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                        <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
+                        <div className="flex flex-col justify-between">
+                          <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
+                          <span className="font-black text-blue-700">{o.cijena} €</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {preporucenoElektronika.length > 0 && (
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                      <span>📱</span> Preporučeno u kategoriji Elektronika
+                    </h3>
+                    <button onClick={() => setOdabranaKategorija("elektronika")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {preporucenoElektronika.map(o => (
+                      <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                        <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
+                        <div className="flex flex-col justify-between">
+                          <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
+                          <span className="font-black text-blue-700">{o.cijena} €</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* LISTA OGLASA */}
           <section>
             <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
@@ -905,7 +1018,7 @@ export default function KupkoApp() {
 
             <div className={prikaz === "grid" ? "grid grid-cols-1 md:grid-cols-3 gap-6" : "flex flex-col gap-4"}>
               {filtriraniOglasi.map((o) => {
-                const glavnaSlika = o.slike && o.slike.length > 0 ? o.slike[0] : (o.slika || "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80");
+                const glavnaSlika = o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80";
                 return (
                   <div 
                     key={o.id}
@@ -1494,7 +1607,7 @@ export default function KupkoApp() {
             <div className="space-y-3">
               <div className="relative rounded-2xl overflow-hidden max-h-80">
                 <img 
-                  src={odabraniOglas.slike && odabraniOglas.slike.length > 0 ? odabraniOglas.slike[0] : (odabraniOglas.slika || "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80")} 
+                  src={odabraniOglas.slike && odabraniOglas.slike.length > 0 ? odabraniOglas.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} 
                   alt={odabraniOglas.naslov} 
                   className="w-full h-80 object-cover" 
                 />
