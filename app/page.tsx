@@ -107,7 +107,6 @@ export default function KupkoApp() {
   const [prikaziRegistraciju, setPrikaziRegistraciju] = useState(false);
   const [prikaziMeniKorisnika, setPrikaziMeniKorisnika] = useState(false);
 
-  // Modal za nedostajuće osobne podatke (poput Njuškalo linka)
   const [prikaziUnosPodatakaModal, setPrikaziUnosPodatakaModal] = useState(false);
   const [korisnickiPodaci, setKorisnickiPodaci] = useState({
     ime: "",
@@ -149,7 +148,7 @@ export default function KupkoApp() {
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
 
   useEffect(() => {
-    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v18");
+    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v19");
     if (lokalniOglasi) {
       try { setOglasi(JSON.parse(lokalniOglasi)); } catch (e) { console.error(e); }
     }
@@ -180,7 +179,7 @@ export default function KupkoApp() {
 
   const spremiOglase = (noviNiz: any) => {
     setOglasi(noviNiz);
-    localStorage.setItem("kupko_oglasi_v18", JSON.stringify(noviNiz));
+    localStorage.setItem("kupko_oglasi_v19", JSON.stringify(noviNiz));
   };
 
   const postaviKorisnika = (podaciKorisnika: { ime: string; email: string; isOwner: boolean } | null) => {
@@ -301,7 +300,9 @@ export default function KupkoApp() {
     setUneseniKod("");
     setFormaRegistracija({ ime: "", email: "", lozinka: "", prihvacenaPrivatnost: false, prihvaceniUvjeti: false });
     
-    // Odmah otvori modal za unos osobnih podataka (poput Njuškalo linka)
+    // SLANJE E-MAILA DOBRODOŠLICE
+    alert(`📧 [Simulacija E-maila za Dobrodošlicu na ${privremeniEmail}]:\n\n"Dobrodošli na Kupko, ${privremenoIme}!\nVaš račun je uspješno kreiran i potvrđen. Nadamo se ugodnom korištenju našeg oglasnika!"`);
+
     setPrikaziUnosPodatakaModal(true);
   };
 
@@ -362,7 +363,10 @@ export default function KupkoApp() {
     spremiOglase(azuriraniNiz);
     setPrikaziPlacanjePromo(false);
     setOglasZaPromociju(null);
-    alert(`Uspješna uplata! Oglas je sada istaknut kao PLAĆENI PROMO.`);
+    
+    // SLANJE E-MAIL POTVRDE NAKON UPLATE
+    const ciljaniMail = korisnik ? korisnik.email : "korisnik@kupko.hr";
+    alert(`📧 [Simulacija E-mail Potvrde o Uplati na ${ciljaniMail}]:\n\n"Uspješno ste izvršili uplatu od 5.00 € za promidžbu Vašeg oglasa '${oglasZaPromociju.naslov}'. Oglas je sada istaknut na vrhu pretrage. Hvala Vam!"`);
   };
 
   const rukujSpremanjemUredivanja = (e: React.FormEvent) => {
@@ -504,7 +508,7 @@ export default function KupkoApp() {
                     <span className="text-[10px] bg-amber-400 text-blue-950 px-1 rounded font-black">▼</span>
                   </button>
 
-                  {/* PADAJUĆI IZBORNIK "MOJE KUPKO" (SVE TRAŽENE OPCIJE) */}
+                  {/* PADAJUĆI IZBORNIK "MOJE KUPKO" */}
                   {prikaziMeniKorisnika && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-2">
                       <div className="px-4 py-2 border-b bg-slate-50">
@@ -937,7 +941,7 @@ export default function KupkoApp() {
         </div>
       </footer>
 
-      {/* MODAL: MOJI PODACI (POPUP NAKON REGISTRACIJE ILI IZ POSTAVKI) */}
+      {/* MODAL: MOJI PODACI */}
       {prikaziUnosPodatakaModal && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
