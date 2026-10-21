@@ -74,7 +74,7 @@ const POCETNI_OGLASI = [
     top: true,
     promoviran: true,
     datum: "Objavljeno danas u 15:30",
-    opis: "Garažirano vozilo u izvanrednom stanju. Redovito servisiran u ovlaštenom BMW servisu.",
+    opis: "Garažirano vozilo u izvanrednom stanju. Redovito servisiran u ovlaštenom BMW servisu. M-sport paket opreme, kožna sjedala, navigacija, panoramski krov.",
     prodavac: "Ivan Horvat",
     autorEmail: "ivan@kupko.hr",
     telefon: "0912345678",
@@ -87,20 +87,21 @@ const POCETNI_OGLASI = [
   },
   {
     id: 2,
-    naslov: "Dvosoban stan u novogradnji s garažom",
+    naslov: "Dvosoban luksuzan stan u novogradnji s garažom",
     cijena: "145000",
     kategorija: "nekretnine",
     podkategorija: "Stanovi - Prodaja",
     zupanija: "Splitsko-dalmatinska",
-    grad: "Split",
+    grad: "Split - Žnjan",
     stanje: "Novo",
     slike: [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"
     ],
     top: false,
     promoviran: false,
     datum: "Objavljeno jučer",
-    opis: "Prekrasan stan u novogradnji, blizina mora i svih sadržaja.",
+    opis: "Prekrasan stan u novogradnji, 55 m2, blizina mora i svih sadržaja. Sadrži podno grijanje, klima uređaj u svakoj sobi i osigurano garažno parkirno mjesto.",
     prodavac: "Ana Marić",
     autorEmail: "ana@kupko.hr",
     telefon: "0981112223",
@@ -109,12 +110,15 @@ const POCETNI_OGLASI = [
   },
   {
     id: 3,
-    naslov: "iPhone 15 Pro Max 256GB - Zapakiran",
+    naslov: "iPhone 15 Pro Max 256GB - Zapakiran s garancijom",
     cijena: "980",
+    staraCijena: "1150",
+    popustPostotak: "-15%",
+    snizeno: true,
     kategorija: "elektronika",
     podkategorija: "Mobiteli i oprema",
     zupanija: "Grad Zagreb",
-    grad: "Zagreb",
+    grad: "Zagreb - Centar",
     stanje: "Novo",
     slike: [
       "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=80"
@@ -122,10 +126,73 @@ const POCETNI_OGLASI = [
     top: false,
     promoviran: false,
     datum: "Objavljeno prije 2 sata",
-    opis: "Mobitel je nekorišten, zapakiran u originalnoj kutiji s garancijom.",
+    opis: "Mobitel je nekorišten, zapakiran u originalnoj kutiji s 2 godine službene garancije. Boja: Natural Titanium.",
     prodavac: "Luka Perić",
     autorEmail: "luka@kupko.hr",
     telefon: "0953334455"
+  },
+  {
+    id: 4,
+    naslov: "Kutna garnitura na razvlačenje - Moderna",
+    cijena: "450",
+    kategorija: "dom-vrt",
+    podkategorija: "Namještaj",
+    zupanija: "Primorsko-goranska",
+    grad: "Rijeka",
+    stanje: "Korišteno - Kao novo",
+    slike: [
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80"
+    ],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 3 dana",
+    opis: "Prodajem udobnu kutnu garnituru dimenzija 280x180 cm. Korištena svega par mjeseci, kao nova, bez oštećenja.",
+    prodavac: "Martina Kovač",
+    autorEmail: "martina@kupko.hr",
+    telefon: "0997778899"
+  },
+  {
+    id: 5,
+    naslov: "Cannondale brdski bicikl MTB 29'",
+    cijena: "650",
+    kategorija: "sport",
+    podkategorija: "Bicikli i oprema",
+    zupanija: "Istarska",
+    grad: "Pula",
+    stanje: "Korišteno",
+    slike: [
+      "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=800&q=80"
+    ],
+    top: false,
+    promoviran: true,
+    datum: "Objavljeno danas",
+    opis: "Vrhunski bicikl s aluminijskim okvirom, Shimano oprema, hidraulične disk kočnice. Redovito servisiran.",
+    prodavac: "Davor Jurić",
+    autorEmail: "davor@kupko.hr",
+    telefon: "0915556677"
+  },
+  {
+    id: 6,
+    naslov: "PlayStation 5 Konzola + 2 kontrolera + 3 igre",
+    cijena: "420",
+    staraCijena: "490",
+    popustPostotak: "-14%",
+    snizeno: true,
+    kategorija: "elektronika",
+    podkategorija: "Konzole i igrice",
+    zupanija: "Osječko-baranjska",
+    grad: "Osijek",
+    stanje: "Korišteno - Kao novo",
+    slike: [
+      "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80"
+    ],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "PS5 Disc izdanje u savršenom stanju. Uz konzolu dolaze dva DualSense kontrolera i tri hit igre (EA Sports FC 24, Spider-Man 2, God of War Ragnarok).",
+    prodavac: "Marko Stipić",
+    autorEmail: "marko@kupko.hr",
+    telefon: "0984445566"
   }
 ];
 
@@ -194,7 +261,7 @@ export default function KupkoApp() {
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
 
   useEffect(() => {
-    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v23");
+    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v24");
     if (lokalniOglasi) { try { setOglasi(JSON.parse(lokalniOglasi)); } catch (e) { console.error(e); } }
     const spremljeniKorisnici = localStorage.getItem("kupko_baza_korisnika");
     if (spremljeniKorisnici) { try { setRegistriraniKorisnici(JSON.parse(spremljeniKorisnici)); } catch (e) { console.error(e); } }
@@ -219,7 +286,7 @@ export default function KupkoApp() {
 
   const spremiOglase = (noviNiz: any) => {
     setOglasi(noviNiz);
-    localStorage.setItem("kupko_oglasi_v23", JSON.stringify(noviNiz));
+    localStorage.setItem("kupko_oglasi_v24", JSON.stringify(noviNiz));
   };
 
   const spremiPoruke = (noviNizPoruka: any) => {
@@ -482,22 +549,6 @@ export default function KupkoApp() {
     kvadratura: "", sobe: ""
   });
 
-  const izracunajAiProcjenuZaOglas = (glas: any) => {
-    const filtriraniKat = oglasi.filter(o => o.kategorija === glas.kategorija && o.cijena);
-    if (filtriraniKat.length <= 1) return "Tržište je stabilno. Cijena je unutar očekivanih okvira za ovu kategoriju.";
-    const zbroj = filtriraniKat.reduce((acc, curr) => acc + parseFloat(curr.cijena || "0"), 0);
-    const prosjek = Math.round(zbroj / filtriraniKat.length);
-    const trenutna = parseFloat(glas.cijena || "0");
-
-    if (trenutna < prosjek * 0.85) {
-      return `🔥 Izuzetna prilika! Ova cijena je ${Math.round(prosjek - trenutna)} € niža od prosjeka kategorije (${prosjek} €).`;
-    } else if (trenutna > prosjek * 1.15) {
-      return `⚠️ Cijena je nešto viša od prosjeka ove kategorije (${prosjek} €). Preporučuje se pregovaranje.`;
-    } else {
-      return `✅ Fer cijena! Usklađena je s prosjekom tržišta za ovu kategoriju (~${prosjek} €).`;
-    }
-  };
-
   const rukujDodavanjemOglasa = (e: React.FormEvent) => {
     e.preventDefault();
     if (!noviOglas.naslov || !noviOglas.cijena) return;
@@ -616,7 +667,6 @@ export default function KupkoApp() {
                     <span className="text-[10px] bg-amber-400 text-blue-950 px-1 rounded font-black">▼</span>
                   </button>
 
-                  {/* PADAJUĆI IZBORNIK "MOJE KUPKO" */}
                   {prikaziMeniKorisnika && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-2">
                       <div className="px-4 py-2 border-b bg-slate-50">
@@ -702,7 +752,7 @@ export default function KupkoApp() {
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Pretraži ponudu (npr. BMW, Stan, Antikviteti...)"
+                  placeholder="Pretraži ponudu (npr. BMW, Stan, iPhone...)"
                   value={pojamPretrage}
                   onChange={(e) => setPojamPretrage(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl text-slate-900 bg-white shadow-inner text-sm font-medium outline-none focus:ring-2 focus:ring-amber-400"
