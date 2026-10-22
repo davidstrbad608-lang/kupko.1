@@ -556,7 +556,7 @@ export default function KupkoApp() {
   const [omiljeniIds, setOmiljeniIds] = useState<number[]>([]);
   const [prikaziSamoOmiljene, setPrikaziSamoOmiljene] = useState(false);
 
-  // TikTok / Reels / Tinder mod stanje
+  // TikTok / Reels / Swipe mod stanje
   const [prikaziReelsMod, setPrikaziReelsMod] = useState(false);
   const [reelsIndex, setReelsIndex] = useState(0);
 
@@ -963,12 +963,17 @@ export default function KupkoApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 font-sans flex flex-col justify-between">
-      <div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-slate-100 font-sans flex flex-col justify-between relative overflow-x-hidden">
+      {/* UKRASNI POZADINSKI SVJETLEĆI EFEKTI (AMBIENT GLOW) */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/3 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-1/4 left-10 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="relative z-10">
         {/* TOP KORISNIČKA TRAKA */}
-        <div className="bg-blue-950 text-blue-200 text-xs py-1.5 px-4 border-b border-blue-900 relative">
+        <div className="bg-blue-950/80 backdrop-blur border-b border-blue-900/50 text-blue-200 text-xs py-1.5 px-4 relative">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 font-semibold">
               <Shield className="w-3.5 h-3.5 text-emerald-400" />
               🇭🇷 Kupko.hr - Sigurni Hrvatski Oglasnik
             </span>
@@ -977,7 +982,7 @@ export default function KupkoApp() {
                 <div className="relative">
                   <button 
                     onClick={() => setPrikaziMeniKorisnika(!prikaziMeniKorisnika)}
-                    className="text-amber-400 font-bold flex items-center gap-1.5 bg-blue-900/80 px-3 py-1 rounded-xl border border-blue-500/40 hover:bg-blue-900 transition"
+                    className="text-amber-400 font-bold flex items-center gap-1.5 bg-blue-900/90 px-3 py-1 rounded-xl border border-blue-500/40 hover:bg-blue-900 transition"
                   >
                     <User className="w-3.5 h-3.5" /> 
                     <span>Moje Kupko ({korisnik.ime})</span>
@@ -985,45 +990,45 @@ export default function KupkoApp() {
                   </button>
 
                   {prikaziMeniKorisnika && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-2">
-                      <div className="px-4 py-2 border-b bg-slate-50">
+                    <div className="absolute right-0 mt-2 w-64 bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 text-slate-200 z-50 overflow-hidden py-2">
+                      <div className="px-4 py-2 border-b border-slate-800 bg-slate-950/50">
                         <span className="text-[10px] text-slate-400 uppercase font-bold">Prijavljeni korisnik</span>
-                        <p className="font-black text-slate-900 text-sm">{korisnik.ime}</p>
-                        <p className="text-[11px] text-blue-600">{korisnik.email}</p>
+                        <p className="font-black text-white text-sm">{korisnik.ime}</p>
+                        <p className="text-[11px] text-blue-400">{korisnik.email}</p>
                       </div>
 
                       <div className="py-1">
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSamoOmiljene(false); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center gap-2">
-                          <Package className="w-4 h-4 text-blue-700" /> Moji oglasi
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSamoOmiljene(false); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center gap-2">
+                          <Package className="w-4 h-4 text-blue-400" /> Moji oglasi
                         </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("PayProtect: Sigurna kupoprodaja preko Kupka uz escrow zaštitu sredstava."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center gap-2">
-                          <ShieldCheck className="w-4 h-4 text-emerald-600" /> PayProtect
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("PayProtect: Sigurna kupoprodaja preko Kupka uz escrow zaštitu sredstava."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center gap-2">
+                          <ShieldCheck className="w-4 h-4 text-emerald-400" /> PayProtect
                         </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSamoOmiljene(true); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center gap-2">
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSamoOmiljene(true); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center gap-2">
                           <Heart className="w-4 h-4 text-red-500" /> Spremljeno ({omiljeniIds.length})
                         </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSanducicPoruka(true); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center justify-between">
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSanducicPoruka(true); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center justify-between">
                           <span className="flex items-center gap-2">
-                            <MessageSquare className="w-4 h-4 text-indigo-600" /> Poruke
+                            <MessageSquare className="w-4 h-4 text-indigo-400" /> Poruke
                           </span>
                           <span className="bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black">{mojePoruke.length}</span>
                         </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("Financije: Stanje Vašeg Kupko novčanika je 0.00 €."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center gap-2">
-                          <Wallet className="w-4 h-4 text-amber-600" /> Financije
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("Financije: Stanje Vašeg Kupko novčanika je 0.00 €."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center gap-2">
+                          <Wallet className="w-4 h-4 text-amber-400" /> Financije
                         </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziUnosPodatakaModal(true); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center gap-2">
-                          <Settings className="w-4 h-4 text-slate-600" /> Postavke (Moji podaci)
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziUnosPodatakaModal(true); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center gap-2">
+                          <Settings className="w-4 h-4 text-slate-400" /> Postavke (Moji podaci)
                         </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("Nemate novih obavijesti sustava."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-rose-600" /> Obavijesti
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("Nemate novih obavijesti sustava."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-rose-400" /> Obavijesti
                         </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("Česta pitanja: Kako predati oglas? Kako kupiti putem PayProtecta? Slobodno nas kontaktirajte."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-100 flex items-center gap-2">
-                          <HelpCircle className="w-4 h-4 text-blue-500" /> Česta pitanja
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); alert("Česta pitanja: Kako predati oglas? Kako kupiti putem PayProtecta? Slobodno nas kontaktirajte."); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-slate-800 flex items-center gap-2">
+                          <HelpCircle className="w-4 h-4 text-blue-400" /> Česta pitanja
                         </button>
                       </div>
 
-                      <div className="border-t pt-1">
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); postaviKorisnika(null); }} className="w-full text-left px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2">
+                      <div className="border-t border-slate-800 pt-1">
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); postaviKorisnika(null); }} className="w-full text-left px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-950/40 flex items-center gap-2">
                           <LogIn className="w-4 h-4" /> Odjavi se
                         </button>
                       </div>
@@ -1046,7 +1051,7 @@ export default function KupkoApp() {
         </div>
 
         {/* HEADER */}
-        <header className="bg-gradient-to-r from-blue-800 via-blue-700 to-indigo-800 text-white shadow-xl sticky top-0 z-40 border-b border-blue-600">
+        <header className="bg-slate-900/90 backdrop-blur-md text-white shadow-xl sticky top-0 z-40 border-b border-blue-900/60">
           <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
             <div 
               className="flex items-center gap-3 cursor-pointer group"
@@ -1080,15 +1085,15 @@ export default function KupkoApp() {
               <select
                 value={odabranaZupanija}
                 onChange={(e) => setOdabranaZupanija(e.target.value)}
-                className="px-3 py-2.5 rounded-xl bg-blue-900/80 text-white border border-blue-500/50 text-xs font-bold outline-none cursor-pointer"
+                className="px-3 py-2.5 rounded-xl bg-slate-800 text-white border border-blue-500/50 text-xs font-bold outline-none cursor-pointer"
               >
                 <option value="sve">🇭🇷 Cijela Hrvatska</option>
-                {ZUPANIJE.map((z) => <option key={z} value={z} className="bg-slate-800">{z}</option>)}
+                {ZUPANIJE.map((z) => <option key={z} value={z} className="bg-slate-900">{z}</option>)}
               </select>
             </div>
 
             <div className="flex items-center gap-2 w-full md:w-auto">
-              {/* TIKTOK / REELS MOD GUMB */}
+              {/* SWIPE / REELS MOD GUMB */}
               <button
                 onClick={() => { setPrikaziReelsMod(true); setReelsIndex(0); }}
                 className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg transition text-xs tracking-wider uppercase animate-pulse"
@@ -1100,7 +1105,7 @@ export default function KupkoApp() {
               <button
                 onClick={() => { setPrikaziSamoOmiljene(!prikaziSamoOmiljene); setPrikaziReelsMod(false); }}
                 className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition shadow ${
-                  prikaziSamoOmiljene ? "bg-red-500 text-white" : "bg-blue-900 text-slate-200 hover:bg-blue-800 border border-blue-500/40"
+                  prikaziSamoOmiljene ? "bg-red-500 text-white" : "bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700"
                 }`}
               >
                 <Heart className={`w-4 h-4 ${prikaziSamoOmiljene ? "fill-white" : "text-red-400"}`} />
@@ -1244,25 +1249,25 @@ export default function KupkoApp() {
             </div>
           ) : (
             <>
-              <section className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <section className="bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-slate-800 shadow-xl space-y-4">
                 <div className="flex justify-between items-center flex-wrap gap-4">
                   <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider">Sve Kategorije na Kupku</h3>
                   
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-slate-500 flex items-center gap-1"><SlidersHorizontal className="w-3.5 h-3.5" /> Cijena (€):</span>
+                    <span className="text-xs font-bold text-slate-300 flex items-center gap-1"><SlidersHorizontal className="w-3.5 h-3.5" /> Cijena (€):</span>
                     <input 
                       type="number" placeholder="Min" value={minCijena} onChange={(e) => setMinCijena(e.target.value)}
-                      className="w-20 p-1.5 rounded-lg border text-xs bg-slate-50"
+                      className="w-20 p-1.5 rounded-lg border border-slate-700 text-xs bg-slate-800 text-white"
                     />
                     <span className="text-slate-400">-</span>
                     <input 
                       type="number" placeholder="Max" value={maxCijena} onChange={(e) => setMaxCijena(e.target.value)}
-                      className="w-20 p-1.5 rounded-lg border text-xs bg-slate-50"
+                      className="w-20 p-1.5 rounded-lg border border-slate-700 text-xs bg-slate-800 text-white"
                     />
 
                     <select 
                       value={odabranoStanje} onChange={(e) => setOdabranoStanje(e.target.value)}
-                      className="p-1.5 rounded-lg border text-xs bg-slate-50 font-bold"
+                      className="p-1.5 rounded-lg border border-slate-700 text-xs bg-slate-800 text-white font-bold"
                     >
                       <option value="sve">Sva stanja</option>
                       <option value="novo">Novo / Kao novo</option>
@@ -1270,7 +1275,7 @@ export default function KupkoApp() {
                     </select>
 
                     {(minCijena || maxCijena || odabranoStanje !== "sve") && (
-                      <button onClick={() => { setMinCijena(""); setMaxCijena(""); setOdabranoStanje("sve"); }} className="text-xs text-red-600 font-bold hover:underline ml-1">
+                      <button onClick={() => { setMinCijena(""); setMaxCijena(""); setOdabranoStanje("sve"); }} className="text-xs text-red-400 font-bold hover:underline ml-1">
                         Resetiraj
                       </button>
                     )}
@@ -1280,7 +1285,7 @@ export default function KupkoApp() {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); }}
-                    className={`px-4 py-2 rounded-xl text-xs font-extrabold transition ${odabranaKategorija === "sve" ? "bg-blue-700 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
+                    className={`px-4 py-2 rounded-xl text-xs font-extrabold transition ${odabranaKategorija === "sve" ? "bg-blue-600 text-white shadow-lg" : "bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"}`}
                   >
                     Svi Oglasi
                   </button>
@@ -1288,7 +1293,7 @@ export default function KupkoApp() {
                     <button
                       key={kat.id}
                       onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); }}
-                      className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition ${odabranaKategorija === kat.id ? "bg-blue-700 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
+                      className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition ${odabranaKategorija === kat.id ? "bg-blue-600 text-white shadow-lg" : "bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"}`}
                     >
                       <span>{kat.ikona}</span>
                       <span>{kat.naziv}</span>
@@ -1297,14 +1302,14 @@ export default function KupkoApp() {
                 </div>
 
                 {odabranaKategorija !== "sve" && (
-                  <div className="mt-4 pt-4 border-t border-slate-100">
-                    <h4 className="text-xs font-bold text-blue-900 uppercase mb-2">
+                  <div className="mt-4 pt-4 border-t border-slate-800">
+                    <h4 className="text-xs font-bold text-blue-400 uppercase mb-2">
                       Podkategorije za {SVE_KATEGORIJE.find((k) => k.id === odabranaKategorija)?.naziv}:
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setOdabranaPodkategorija("sve")}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === "sve" ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700"}`}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === "sve" ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 border border-slate-700"}`}
                       >
                         Sve podkategorije
                       </button>
@@ -1312,7 +1317,7 @@ export default function KupkoApp() {
                         <button
                           key={pod}
                           onClick={() => setOdabranaPodkategorija(pod)}
-                          className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === pod ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700 hover:bg-blue-50"}`}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === pod ? "bg-blue-600 text-white" : "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"}`}
                         >
                           {pod}
                         </button>
@@ -1326,20 +1331,20 @@ export default function KupkoApp() {
               {!prikaziSamoOmiljene && odabranaKategorija === "sve" && pojamPretrage === "" && (
                 <div className="space-y-6">
                   {preporucenoLjubimci.length > 0 && (
-                    <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                    <div className="bg-slate-900/80 backdrop-blur-md p-5 rounded-3xl border border-slate-800 shadow-xl">
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                        <h3 className="font-black text-base text-white flex items-center gap-2">
                           <span>🐾</span> Kućni ljubimci
                         </h3>
-                        <button onClick={() => setOdabranaKategorija("kucni-ljubimci")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                        <button onClick={() => setOdabranaKategorija("kucni-ljubimci")} className="text-xs font-bold text-blue-400 hover:underline">Pogledaj sve →</button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {preporucenoLjubimci.map(o => (
-                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 flex gap-3 cursor-pointer hover:bg-slate-800 transition">
                             <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
                             <div className="flex flex-col justify-between">
-                              <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
-                              <span className="font-black text-blue-700">{o.cijena} €</span>
+                              <h4 className="font-bold text-xs line-clamp-2 text-white">{o.naslov}</h4>
+                              <span className="font-black text-amber-400">{o.cijena} €</span>
                             </div>
                           </div>
                         ))}
@@ -1348,20 +1353,20 @@ export default function KupkoApp() {
                   )}
 
                   {preporucenoAutoMoto.length > 0 && (
-                    <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                    <div className="bg-slate-900/80 backdrop-blur-md p-5 rounded-3xl border border-slate-800 shadow-xl">
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                        <h3 className="font-black text-base text-white flex items-center gap-2">
                           <span>🚗</span> Preporučeno u kategoriji Auto Moto
                         </h3>
-                        <button onClick={() => setOdabranaKategorija("auto-moto")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                        <button onClick={() => setOdabranaKategorija("auto-moto")} className="text-xs font-bold text-blue-400 hover:underline">Pogledaj sve →</button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {preporucenoAutoMoto.map(o => (
-                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 flex gap-3 cursor-pointer hover:bg-slate-800 transition">
                             <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
                             <div className="flex flex-col justify-between">
-                              <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
-                              <span className="font-black text-blue-700">{o.cijena} €</span>
+                              <h4 className="font-bold text-xs line-clamp-2 text-white">{o.naslov}</h4>
+                              <span className="font-black text-amber-400">{o.cijena} €</span>
                             </div>
                           </div>
                         ))}
@@ -1370,20 +1375,20 @@ export default function KupkoApp() {
                   )}
 
                   {preporucenoNekretnine.length > 0 && (
-                    <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                    <div className="bg-slate-900/80 backdrop-blur-md p-5 rounded-3xl border border-slate-800 shadow-xl">
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                        <h3 className="font-black text-base text-white flex items-center gap-2">
                           <span>🏠</span> Preporučeno u kategoriji Nekretnine
                         </h3>
-                        <button onClick={() => setOdabranaKategorija("nekretnine")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                        <button onClick={() => setOdabranaKategorija("nekretnine")} className="text-xs font-bold text-blue-400 hover:underline">Pogledaj sve →</button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {preporucenoNekretnine.map(o => (
-                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 flex gap-3 cursor-pointer hover:bg-slate-800 transition">
                             <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
                             <div className="flex flex-col justify-between">
-                              <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
-                              <span className="font-black text-blue-700">{o.cijena} €</span>
+                              <h4 className="font-bold text-xs line-clamp-2 text-white">{o.naslov}</h4>
+                              <span className="font-black text-amber-400">{o.cijena} €</span>
                             </div>
                           </div>
                         ))}
@@ -1395,13 +1400,13 @@ export default function KupkoApp() {
 
               {/* LISTA OGLASA */}
               <section>
-                <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                  <h3 className="text-lg font-extrabold text-slate-900">
+                <div className="flex justify-between items-center mb-6 bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-800">
+                  <h3 className="text-lg font-extrabold text-white">
                     {prikaziSamoOmiljene ? "Vaši omiljeni oglasi" : "Aktivni Oglasi"} ({filtriraniOglasi.length})
                   </h3>
-                  <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
-                    <button onClick={() => setPrikaz("grid")} className={`p-2 rounded-lg ${prikaz === "grid" ? "bg-white text-blue-700 shadow" : "text-slate-500"}`}><Grid className="w-4 h-4" /></button>
-                    <button onClick={() => setPrikaz("list")} className={`p-2 rounded-lg ${prikaz === "list" ? "bg-white text-blue-700 shadow" : "text-slate-500"}`}><List className="w-4 h-4" /></button>
+                  <div className="flex gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                    <button onClick={() => setPrikaz("grid")} className={`p-2 rounded-lg ${prikaz === "grid" ? "bg-blue-600 text-white shadow" : "text-slate-400"}`}><Grid className="w-4 h-4" /></button>
+                    <button onClick={() => setPrikaz("list")} className={`p-2 rounded-lg ${prikaz === "list" ? "bg-blue-600 text-white shadow" : "text-slate-400"}`}><List className="w-4 h-4" /></button>
                   </div>
                 </div>
 
@@ -1412,7 +1417,7 @@ export default function KupkoApp() {
                       <div 
                         key={o.id}
                         onClick={() => setOdabraniOglas(o)}
-                        className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition flex flex-col justify-between group cursor-pointer relative"
+                        className="bg-slate-900/90 backdrop-blur-md rounded-2xl shadow-xl border border-slate-800 overflow-hidden hover:border-slate-700 transition flex flex-col justify-between group cursor-pointer relative"
                       >
                         <div className="relative">
                           <img src={glavnaSlika} alt={o.naslov} className="w-full h-52 object-cover group-hover:scale-105 transition" />
@@ -1425,13 +1430,13 @@ export default function KupkoApp() {
 
                           <button
                             onClick={(e) => toggleOmiljeni(e, o.id)}
-                            className="absolute top-3 right-3 bg-white/90 backdrop-blur p-2.5 rounded-full shadow hover:bg-white transition"
+                            className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur p-2.5 rounded-full shadow hover:bg-slate-800 transition"
                           >
                             <Heart
                               className={`w-5 h-5 ${
                                 omiljeniIds.includes(o.id)
                                   ? "fill-red-500 text-red-500"
-                                  : "text-slate-600"
+                                  : "text-slate-300"
                               }`}
                             />
                           </button>
@@ -1439,27 +1444,27 @@ export default function KupkoApp() {
 
                         <div className="p-4 flex-1 flex flex-col justify-between">
                           <div>
-                            <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                            <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                               <span className="flex items-center gap-1">
-                                <MapPin className="w-3.5 h-3.5 text-blue-600" /> {o.zupanija} {o.grad ? `(${o.grad})` : ""}
+                                <MapPin className="w-3.5 h-3.5 text-blue-400" /> {o.zupanija} {o.grad ? `(${o.grad})` : ""}
                               </span>
                               <span>{o.datum}</span>
                             </div>
-                            <h4 className="font-bold text-slate-900 text-base mb-1 line-clamp-2 hover:text-blue-700">
+                            <h4 className="font-bold text-white text-base mb-1 line-clamp-2 hover:text-blue-400">
                               {o.naslov}
                             </h4>
                           </div>
 
-                          <div className="pt-3 border-t border-slate-100 flex justify-between items-center mt-2">
+                          <div className="pt-3 border-t border-slate-800 flex justify-between items-center mt-2">
                             <div className="flex items-baseline gap-2">
-                              <span className="text-xl font-black text-blue-700">{o.cijena} €</span>
+                              <span className="text-xl font-black text-amber-400">{o.cijena} €</span>
                             </div>
 
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={(e) => obnoviOglas(e, o.id)}
                                 title="Obnovi oglas"
-                                className="p-2 bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-700 rounded-xl transition"
+                                className="p-2 bg-slate-800 hover:bg-amber-950 text-slate-300 hover:text-amber-400 rounded-xl transition"
                               >
                                 <RotateCw className="w-4 h-4" />
                               </button>
@@ -1467,7 +1472,7 @@ export default function KupkoApp() {
                           </div>
 
                           {mozeUreditiIliBrisati(o) && (
-                            <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
+                            <div className="mt-3 pt-3 border-t border-slate-800 flex flex-col gap-2">
                               {!o.promoviran && (
                                 <button
                                   onClick={(e) => pokreniPromociju(e, o)}
@@ -1479,13 +1484,13 @@ export default function KupkoApp() {
                               <div className="flex gap-2">
                                 <button
                                   onClick={(e) => pokreniUredivanje(e, o)}
-                                  className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1"
+                                  className="flex-1 bg-slate-800 hover:bg-blue-600 text-blue-300 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 border border-slate-700"
                                 >
                                   <Edit3 className="w-3.5 h-3.5" /> Uredi
                                 </button>
                                 <button
                                   onClick={(e) => obrisiOglas(e, o)}
-                                  className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1"
+                                  className="flex-1 bg-slate-800 hover:bg-red-600 text-red-300 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1 border border-slate-700"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" /> Izbriši
                                 </button>
@@ -1504,7 +1509,7 @@ export default function KupkoApp() {
       </div>
 
       {/* FOOTER */}
-      <footer className="bg-blue-950 text-slate-300 mt-16 border-t-4 border-amber-400 pt-10 pb-8 text-xs">
+      <footer className="bg-slate-950 text-slate-300 mt-16 border-t-4 border-amber-400 pt-10 pb-8 text-xs relative z-10">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-1 mb-3">
@@ -1544,33 +1549,33 @@ export default function KupkoApp() {
 
       {/* MODAL: SANDUČIĆ PORUKA */}
       {prikaziSanducicPoruka && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setPrikaziSanducicPoruka(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
-            <div className="flex items-center gap-2 mb-4 text-indigo-600">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onClick={() => setPrikaziSanducicPoruka(false)} className="absolute top-5 right-5 text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+            <div className="flex items-center gap-2 mb-4 text-indigo-400">
               <MessageSquare className="w-6 h-6" />
-              <h2 className="text-2xl font-black text-slate-900">Vaš sandučić poruka</h2>
+              <h2 className="text-2xl font-black text-white">Vaš sandučić poruka</h2>
             </div>
-            <p className="text-xs text-slate-500 mb-6">Pregledajte upite vezane uz vaše oglase ili poslane poruke prodavačima.</p>
+            <p className="text-xs text-slate-400 mb-6">Pregledajte upite vezane uz vaše oglase ili poslane poruke prodavačima.</p>
 
             {mojePoruke.length === 0 ? (
-              <div className="text-center py-12 bg-slate-50 rounded-2xl border">
-                <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-                <p className="text-sm font-bold text-slate-600">Nemate nijednu poruku u sandučiću.</p>
-                <p className="text-xs text-slate-400 mt-1">Pošaljite upit s nekog oglasa da započnete razgovor.</p>
+              <div className="text-center py-12 bg-slate-950/50 rounded-2xl border border-slate-800">
+                <MessageSquare className="w-12 h-12 text-slate-600 mx-auto mb-2" />
+                <p className="text-sm font-bold text-slate-300">Nemate nijednu poruku u sandučiću.</p>
+                <p className="text-xs text-slate-500 mt-1">Pošaljite upit s nekog oglasa da započnete razgovor.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {mojePoruke.map((p) => (
-                  <div key={p.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                  <div key={p.id} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
                     <div className="flex justify-between items-start text-xs">
                       <div>
-                        <span className="font-black text-indigo-900 block">{p.oglasNaslov}</span>
-                        <span className="text-slate-500">Pošiljatelj: <strong>{p.posiljateljIme}</strong> ({p.posiljateljEmail})</span>
+                        <span className="font-black text-indigo-400 block">{p.oglasNaslov}</span>
+                        <span className="text-slate-400">Pošiljatelj: <strong>{p.posiljateljIme}</strong> ({p.posiljateljEmail})</span>
                       </div>
-                      <span className="text-[10px] text-slate-400">{p.datum}</span>
+                      <span className="text-[10px] text-slate-500">{p.datum}</span>
                     </div>
-                    <div className="bg-white p-3 rounded-xl border text-sm text-slate-800">
+                    <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 text-sm text-slate-200">
                       <p>{p.tekst}</p>
                     </div>
                   </div>
@@ -1583,46 +1588,46 @@ export default function KupkoApp() {
 
       {/* MODAL: MOJI PODACI */}
       {prikaziUnosPodatakaModal && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziUnosPodatakaModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
-            <h2 className="text-2xl font-black mb-2 text-slate-900">Moji osobni podaci</h2>
-            <p className="text-xs text-slate-500 mb-6">Molimo unesite vaše osobne podatke kako biste mogli predavati oglase i koristiti PayProtect uslugu.</p>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
+            <button onClick={() => setPrikaziUnosPodatakaModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+            <h2 className="text-2xl font-black mb-2 text-white">Moji osobni podaci</h2>
+            <p className="text-xs text-slate-400 mb-6">Molimo unesite vaše osobne podatke kako biste mogli predavati oglase i koristiti PayProtect uslugu.</p>
 
             <form onSubmit={spremiOsobnePodatke} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Ime *</label>
-                  <input type="text" required placeholder="Ime" value={korisnickiPodaci.ime} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, ime: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Ime *</label>
+                  <input type="text" required placeholder="Ime" value={korisnickiPodaci.ime} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, ime: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Prezime *</label>
-                  <input type="text" required placeholder="Prezime" value={korisnickiPodaci.prezime} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, prezime: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Prezime *</label>
+                  <input type="text" required placeholder="Prezime" value={korisnickiPodaci.prezime} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, prezime: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Ulica i kućni broj *</label>
-                <input type="text" required placeholder="npr. Ilica 10" value={korisnickiPodaci.adresa} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, adresa: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Ulica i kućni broj *</label>
+                <input type="text" required placeholder="npr. Ilica 10" value={korisnickiPodaci.adresa} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, adresa: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Grad *</label>
-                  <input type="text" required placeholder="Grad" value={korisnickiPodaci.grad} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, grad: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Grad *</label>
+                  <input type="text" required placeholder="Grad" value={korisnickiPodaci.grad} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, grad: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Poštanski broj *</label>
-                  <input type="text" required placeholder="10000" value={korisnickiPodaci.postanskiBroj} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, postanskiBroj: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Poštanski broj *</label>
+                  <input type="text" required placeholder="10000" value={korisnickiPodaci.postanskiBroj} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, postanskiBroj: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Broj telefona / mobitela *</label>
-                <input type="text" required placeholder="0912345678" value={korisnickiPodaci.telefon} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, telefon: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Broj telefona / mobitela *</label>
+                <input type="text" required placeholder="0912345678" value={korisnickiPodaci.telefon} onChange={(e) => setKorisnickiPodaci({ ...korisnickiPodaci, telefon: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
               </div>
 
-              <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-extrabold py-3.5 rounded-xl uppercase tracking-wider shadow-lg">
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl uppercase tracking-wider shadow-lg">
                 Spremi podatke i nastavi
               </button>
             </form>
@@ -1632,50 +1637,50 @@ export default function KupkoApp() {
 
       {/* MODAL: ODABIR NAČINA PLAĆANJA PROMO OGLASA */}
       {prikaziPlacanjePromo && oglasZaPromociju && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
-            <button onClick={() => setPrikaziPlacanjePromo(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
-            <div className="flex items-center gap-2 text-amber-600">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
+            <button onClick={() => setPrikaziPlacanjePromo(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+            <div className="flex items-center gap-2 text-amber-400">
               <Sparkles className="w-6 h-6" />
-              <h2 className="text-xl font-black text-slate-900">Plaćanje Promo Oglasa</h2>
+              <h2 className="text-xl font-black text-white">Plaćanje Promo Oglasa</h2>
             </div>
-            <p className="text-xs text-slate-500">Istaknite oglas na sam vrh: <strong>{oglasZaPromociju.naslov}</strong></p>
-            <p className="text-sm font-bold text-blue-700 bg-blue-50 p-3 rounded-xl border border-blue-100">Cijena promocije: <strong>5.00 €</strong> (vrijedi 7 dana)</p>
+            <p className="text-xs text-slate-400">Istaknite oglas na sam vrh: <strong>{oglasZaPromociju.naslov}</strong></p>
+            <p className="text-sm font-bold text-amber-400 bg-amber-950/40 p-3 rounded-xl border border-amber-900/60">Cijena promocije: <strong>5.00 €</strong> (vrijedi 7 dana)</p>
 
             <form onSubmit={potvrdiUplatuPromo} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Odaberite način plaćanja:</label>
+                <label className="block text-xs font-bold text-slate-300 uppercase mb-2">Odaberite način plaćanja:</label>
                 <div className="space-y-2">
-                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${odabraniNacinPlacanja === 'kartica' ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200'}`}>
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${odabraniNacinPlacanja === 'kartica' ? 'border-blue-500 bg-blue-950/40' : 'border-slate-800 bg-slate-950'}`}>
                     <input type="radio" name="placanje" value="kartica" checked={odabraniNacinPlacanja === 'kartica'} onChange={(e) => setOdabraniNacinPlacanja(e.target.value)} />
-                    <CreditCard className="w-5 h-5 text-blue-700" />
+                    <CreditCard className="w-5 h-5 text-blue-400" />
                     <div>
-                      <span className="block text-xs font-bold">Kreditna / Debitna kartica</span>
+                      <span className="block text-xs font-bold text-white">Kreditna / Debitna kartica</span>
                       <span className="text-[10px] text-slate-400">Visa, Mastercard, Maestro</span>
                     </div>
                   </label>
 
-                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${odabraniNacinPlacanja === 'paypal' ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200'}`}>
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${odabraniNacinPlacanja === 'paypal' ? 'border-blue-500 bg-blue-950/40' : 'border-slate-800 bg-slate-950'}`}>
                     <input type="radio" name="placanje" value="paypal" checked={odabraniNacinPlacanja === 'paypal'} onChange={(e) => setOdabraniNacinPlacanja(e.target.value)} />
-                    <ShoppingBag className="w-5 h-5 text-blue-500" />
+                    <ShoppingBag className="w-5 h-5 text-blue-400" />
                     <div>
-                      <span className="block text-xs font-bold">PayPal</span>
+                      <span className="block text-xs font-bold text-white">PayPal</span>
                       <span className="text-[10px] text-slate-400">Brzo i sigurno online plaćanje</span>
                     </div>
                   </label>
 
-                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${odabraniNacinPlacanja === 'sms' ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200'}`}>
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${odabraniNacinPlacanja === 'sms' ? 'border-blue-500 bg-blue-950/40' : 'border-slate-800 bg-slate-950'}`}>
                     <input type="radio" name="placanje" value="sms" checked={odabraniNacinPlacanja === 'sms'} onChange={(e) => setOdabraniNacinPlacanja(e.target.value)} />
-                    <Phone className="w-5 h-5 text-emerald-600" />
+                    <Phone className="w-5 h-5 text-emerald-400" />
                     <div>
-                      <span className="block text-xs font-bold">SMS Poruka</span>
+                      <span className="block text-xs font-bold text-white">SMS Poruka</span>
                       <span className="text-[10px] text-slate-400">Pošaljite KUPKO na 12345 (5.00 €)</span>
                     </div>
                   </label>
                 </div>
               </div>
 
-              <button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-blue-950 font-extrabold py-3.5 rounded-xl uppercase tracking-wider shadow-lg">
+              <button type="submit" className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-extrabold py-3.5 rounded-xl uppercase tracking-wider shadow-lg">
                 Plati 5.00 € i Aktiviraj Promo
               </button>
             </form>
@@ -1685,33 +1690,33 @@ export default function KupkoApp() {
 
       {/* MODAL: PREDAJ OGLAS */}
       {prikaziFormu && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziFormu(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
+            <button onClick={() => setPrikaziFormu(false)} className="absolute top-5 right-5 text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
             
-            <h2 className="text-2xl font-black text-slate-900 mb-4">Predaj novi oglas na Kupku</h2>
+            <h2 className="text-2xl font-black text-white mb-4">Predaj novi oglas na Kupku</h2>
 
             <form onSubmit={rukujDodavanjemOglasa} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Naslov oglasa *</label>
+                <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Naslov oglasa *</label>
                 <input 
                   type="text" required placeholder="Npr. Štenci zlatnog retrivera, Auto, Stan..."
                   value={noviOglas.naslov} onChange={(e) => setNoviOglas({ ...noviOglas, naslov: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm outline-none"
+                  className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Cijena (€) *</label>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Cijena (€) *</label>
                   <input 
                     type="text" required placeholder="npr. 120"
                     value={noviOglas.cijena} onChange={(e) => setNoviOglas({ ...noviOglas, cijena: e.target.value })}
-                    className="w-full p-3 rounded-xl border text-sm outline-none"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Glavna Kategorija</label>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Glavna Kategorija</label>
                   <select 
                     value={noviOglas.kategorija} 
                     onChange={(e) => {
@@ -1719,7 +1724,7 @@ export default function KupkoApp() {
                       const prvaPod = SVE_KATEGORIJE.find((k) => k.id === novaKat)?.podkategorije[0] || "";
                       setNoviOglas({ ...noviOglas, kategorija: novaKat, podkategorija: prvaPod });
                     }}
-                    className="w-full p-3 rounded-xl border text-sm bg-white font-bold"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm font-bold"
                   >
                     {SVE_KATEGORIJE.map((k) => (
                       <option key={k.id} value={k.id}>{k.ikona} {k.naziv}</option>
@@ -1727,10 +1732,10 @@ export default function KupkoApp() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Podkategorija</label>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Podkategorija</label>
                   <select 
                     value={noviOglas.podkategorija} onChange={(e) => setNoviOglas({ ...noviOglas, podkategorija: e.target.value })}
-                    className="w-full p-3 rounded-xl border text-sm bg-white"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm"
                   >
                     {SVE_KATEGORIJE.find((k) => k.id === noviOglas.kategorija)?.podkategorije.map((p) => (
                       <option key={p} value={p}>{p}</option>
@@ -1741,8 +1746,8 @@ export default function KupkoApp() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Stanje artikla</label>
-                  <select value={noviOglas.stanje} onChange={(e) => setNoviOglas({ ...noviOglas, stanje: e.target.value })} className="w-full p-3 rounded-xl border text-sm bg-white font-bold">
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Stanje artikla</label>
+                  <select value={noviOglas.stanje} onChange={(e) => setNoviOglas({ ...noviOglas, stanje: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm font-bold">
                     <option value="Novo">Novo</option>
                     <option value="Korišteno - Kao novo">Korišteno - Kao novo</option>
                     <option value="Korišteno">Korišteno</option>
@@ -1752,26 +1757,26 @@ export default function KupkoApp() {
               </div>
 
               {noviOglas.kategorija === "auto-moto" && (
-                <div className="bg-amber-50/70 p-4 rounded-2xl border border-amber-200/80 space-y-3">
-                  <p className="text-xs font-black text-amber-900 uppercase tracking-wide flex items-center gap-1.5">
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                  <p className="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center gap-1.5">
                     <Car className="w-4 h-4" /> Detaljne specifikacije vozila (Godište, Kilometri, Snaga, Gorivo, Mjenjač)
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Godište</label>
-                      <input type="text" placeholder="npr. 2019" value={noviOglas.godiste} onChange={(e) => setNoviOglas({ ...noviOglas, godiste: e.target.value })} className="w-full border rounded-xl p-2.5 text-xs bg-white" />
+                      <label className="block text-[11px] font-bold text-slate-300 mb-1">Godište</label>
+                      <input type="text" placeholder="npr. 2019" value={noviOglas.godiste} onChange={(e) => setNoviOglas({ ...noviOglas, godiste: e.target.value })} className="w-full border border-slate-700 rounded-xl p-2.5 text-xs bg-slate-900 text-white" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Kilometraža (km)</label>
-                      <input type="number" placeholder="npr. 145000" value={noviOglas.kilometri} onChange={(e) => setNoviOglas({ ...noviOglas, kilometri: e.target.value })} className="w-full border rounded-xl p-2.5 text-xs bg-white" />
+                      <label className="block text-[11px] font-bold text-slate-300 mb-1">Kilometraža (km)</label>
+                      <input type="number" placeholder="npr. 145000" value={noviOglas.kilometri} onChange={(e) => setNoviOglas({ ...noviOglas, kilometri: e.target.value })} className="w-full border border-slate-700 rounded-xl p-2.5 text-xs bg-slate-900 text-white" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Snaga (kW)</label>
-                      <input type="number" placeholder="npr. 140" value={noviOglas.snagaKw} onChange={(e) => setNoviOglas({ ...noviOglas, snagaKw: e.target.value })} className="w-full border rounded-xl p-2.5 text-xs bg-white" />
+                      <label className="block text-[11px] font-bold text-slate-300 mb-1">Snaga (kW)</label>
+                      <input type="number" placeholder="npr. 140" value={noviOglas.snagaKw} onChange={(e) => setNoviOglas({ ...noviOglas, snagaKw: e.target.value })} className="w-full border border-slate-700 rounded-xl p-2.5 text-xs bg-slate-900 text-white" />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Gorivo</label>
-                      <select value={noviOglas.gorivo} onChange={(e) => setNoviOglas({ ...noviOglas, gorivo: e.target.value })} className="w-full border rounded-xl p-2.5 text-xs bg-white font-bold">
+                      <label className="block text-[11px] font-bold text-slate-300 mb-1">Gorivo</label>
+                      <select value={noviOglas.gorivo} onChange={(e) => setNoviOglas({ ...noviOglas, gorivo: e.target.value })} className="w-full border border-slate-700 rounded-xl p-2.5 text-xs bg-slate-900 text-white font-bold">
                         <option value="Dizel">Dizel</option>
                         <option value="Benzin">Benzin</option>
                         <option value="Hibrid">Hibrid</option>
@@ -1780,8 +1785,8 @@ export default function KupkoApp() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">Mjenjač</label>
-                      <select value={noviOglas.mjenjac} onChange={(e) => setNoviOglas({ ...noviOglas, mjenjac: e.target.value })} className="w-full border rounded-xl p-2.5 text-xs bg-white font-bold">
+                      <label className="block text-[11px] font-bold text-slate-300 mb-1">Mjenjač</label>
+                      <select value={noviOglas.mjenjac} onChange={(e) => setNoviOglas({ ...noviOglas, mjenjac: e.target.value })} className="w-full border border-slate-700 rounded-xl p-2.5 text-xs bg-slate-900 text-white font-bold">
                         <option value="Ručni">Ručni</option>
                         <option value="Automatski">Automatski</option>
                         <option value="Poluautomatski">Poluautomatski</option>
@@ -1793,37 +1798,37 @@ export default function KupkoApp() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Županija</label>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Županija</label>
                   <select
                     value={noviOglas.zupanija}
                     onChange={(e) => setNoviOglas({ ...noviOglas, zupanija: e.target.value })}
-                    className="w-full p-3 rounded-xl border text-sm bg-white font-bold"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm font-bold"
                   >
                     {ZUPANIJE.map((z) => <option key={z} value={z}>{z}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Grad / Mjesto</label>
-                  <input type="text" placeholder="Npr. Zagreb - Maksimir" value={noviOglas.grad} onChange={(e) => setNoviOglas({ ...noviOglas, grad: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Grad / Mjesto</label>
+                  <input type="text" placeholder="Npr. Zagreb - Maksimir" value={noviOglas.grad} onChange={(e) => setNoviOglas({ ...noviOglas, grad: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Broj Mobitela *</label>
-                  <input type="text" placeholder="091..." required value={noviOglas.telefon} onChange={(e) => setNoviOglas({ ...noviOglas, telefon: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Broj Mobitela *</label>
+                  <input type="text" placeholder="091..." required value={noviOglas.telefon} onChange={(e) => setNoviOglas({ ...noviOglas, telefon: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border">
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Galerija slika</label>
-                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-2xl p-6 bg-white cursor-pointer relative mb-3">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                <label className="block text-xs font-bold text-slate-300 uppercase mb-2">Galerija slika</label>
+                <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-700 rounded-2xl p-6 bg-slate-900 cursor-pointer relative mb-3">
                   <input type="file" accept="image/*" multiple onChange={(e) => rukujVisestrukimUcitavanjemSlika(e, false)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
-                  <Upload className="w-8 h-8 text-blue-600 mb-2" />
-                  <p className="text-sm font-bold">Odaberite slike s uređaja</p>
+                  <Upload className="w-8 h-8 text-blue-400 mb-2" />
+                  <p className="text-sm font-bold text-white">Odaberite slike s uređaja</p>
                 </div>
 
                 {noviOglas.slike.length > 0 && (
                   <div className="grid grid-cols-4 gap-2">
                     {noviOglas.slike.map((s, idx) => (
-                      <div key={idx} className="relative rounded-xl overflow-hidden border h-20">
+                      <div key={idx} className="relative rounded-xl overflow-hidden border border-slate-700 h-20">
                         <img src={s} alt="Upload" className="w-full h-full object-cover" />
                         <button type="button" onClick={() => setNoviOglas({ ...noviOglas, slike: noviOglas.slike.filter((_, i) => i !== idx) })} className="absolute top-1 right-1 bg-red-600 text-white p-0.5 rounded-full"><X className="w-3 h-3" /></button>
                       </div>
@@ -1832,21 +1837,21 @@ export default function KupkoApp() {
                 )}
               </div>
 
-              <textarea rows={3} placeholder="Opis oglasa..." value={noviOglas.opis} onChange={(e) => setNoviOglas({ ...noviOglas, opis: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+              <textarea rows={3} placeholder="Opis oglasa..." value={noviOglas.opis} onChange={(e) => setNoviOglas({ ...noviOglas, opis: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
 
-              <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 flex items-center justify-between gap-3">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-3">
                 <div>
-                  <h5 className="font-bold text-xs text-slate-800">Anti-Spam Provjera</h5>
-                  <p className="text-[11px] text-slate-500">Koliko je: <strong>{sigurnosniKod.a} + {sigurnosniKod.b} = ?</strong></p>
+                  <h5 className="font-bold text-xs text-white">Anti-Spam Provjera</h5>
+                  <p className="text-[11px] text-slate-400">Koliko je: <strong>{sigurnosniKod.a} + {sigurnosniKod.b} = ?</strong></p>
                 </div>
                 <input
                   type="number" required placeholder="Rezultat"
                   value={sigurnosniKod.unos} onChange={(e) => setSigurnosniKod({ ...sigurnosniKod, unos: e.target.value })}
-                  className="w-32 p-2 rounded-xl border text-center font-bold text-sm bg-white"
+                  className="w-32 p-2 rounded-xl border border-slate-700 text-center font-bold text-sm bg-slate-900 text-white"
                 />
               </div>
 
-              <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-extrabold py-3.5 rounded-xl uppercase">
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl uppercase">
                 Objavi Oglas
               </button>
             </form>
@@ -1856,17 +1861,17 @@ export default function KupkoApp() {
 
       {/* MODAL: VERIFIKACIJA KODA */}
       {korakVerifikacije && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
-            <h2 className="text-xl font-black text-slate-900">Potvrdite vaš E-mail</h2>
-            <p className="text-xs text-slate-500">Poslali smo verifikacijski kod na: <strong>{privremeniEmail}</strong></p>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
+            <h2 className="text-xl font-black text-white">Potvrdite vaš E-mail</h2>
+            <p className="text-xs text-slate-400">Poslali smo verifikacijski kod na: <strong>{privremeniEmail}</strong></p>
             <form onSubmit={potvrdiVerifikacijskiKod} className="space-y-3">
               <input 
                 type="text" required maxLength={6} placeholder="Unesite kod" 
                 value={uneseniKod} onChange={(e) => setUneseniKod(e.target.value)}
-                className="w-full p-3 rounded-xl border text-center text-lg tracking-widest font-black"
+                className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-center text-lg tracking-widest font-black"
               />
-              <button type="submit" className="w-full bg-blue-700 text-white font-extrabold py-3 rounded-xl uppercase">
+              <button type="submit" className="w-full bg-blue-600 text-white font-extrabold py-3 rounded-xl uppercase">
                 Potvrdi Kod i Dovrši Registraciju
               </button>
             </form>
@@ -1876,32 +1881,32 @@ export default function KupkoApp() {
 
       {/* MODAL: UREDI OGLAS */}
       {prikaziUredivanje && oglasZaUrediti && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziUredivanje(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
-            <h2 className="text-2xl font-black mb-4 text-slate-900">Uredi oglas i specifikacije</h2>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
+            <button onClick={() => setPrikaziUredivanje(false)} className="absolute top-5 right-5 text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
+            <h2 className="text-2xl font-black mb-4 text-white">Uredi oglas i specifikacije</h2>
 
             <form onSubmit={rukujSpremanjemUredivanja} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Naslov oglasa *</label>
+                <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Naslov oglasa *</label>
                 <input 
                   type="text" required 
                   value={oglasZaUrediti.naslov} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, naslov: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm outline-none"
+                  className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Cijena (€) *</label>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Cijena (€) *</label>
                   <input 
                     type="text" required 
                     value={oglasZaUrediti.cijena} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, cijena: e.target.value })}
-                    className="w-full p-3 rounded-xl border text-sm outline-none"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Glavna Kategorija</label>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Glavna Kategorija</label>
                   <select 
                     value={oglasZaUrediti.kategorija} 
                     onChange={(e) => {
@@ -1909,7 +1914,7 @@ export default function KupkoApp() {
                       const prvaPod = SVE_KATEGORIJE.find((k) => k.id === novaKat)?.podkategorije[0] || "";
                       setOglasZaUrediti({ ...oglasZaUrediti, kategorija: novaKat, podkategorija: prvaPod });
                     }}
-                    className="w-full p-3 rounded-xl border text-sm bg-white font-bold"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm font-bold"
                   >
                     {SVE_KATEGORIJE.map((k) => (
                       <option key={k.id} value={k.id}>{k.ikona} {k.naziv}</option>
@@ -1920,31 +1925,31 @@ export default function KupkoApp() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Županija</label>
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Županija</label>
                   <select
                     value={oglasZaUrediti.zupanija}
                     onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, zupanija: e.target.value })}
-                    className="w-full p-3 rounded-xl border text-sm bg-white font-bold"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm font-bold"
                   >
                     {ZUPANIJE.map((z) => <option key={z} value={z}>{z}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Grad / Mjesto</label>
-                  <input type="text" value={oglasZaUrediti.grad || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, grad: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Grad / Mjesto</label>
+                  <input type="text" value={oglasZaUrediti.grad || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, grad: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Mobitel</label>
-                  <input type="text" value={oglasZaUrediti.telefon || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, telefon: e.target.value })} className="w-full p-3 rounded-xl border text-sm" />
+                  <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Mobitel</label>
+                  <input type="text" value={oglasZaUrediti.telefon || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, telefon: e.target.value })} className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Opis oglasa</label>
+                <label className="block text-xs font-bold text-slate-300 uppercase mb-1">Opis oglasa</label>
                 <textarea 
                   rows={4} 
                   value={oglasZaUrediti.opis || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, opis: e.target.value })} 
-                  className="w-full p-3 rounded-xl border text-sm" 
+                  className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm" 
                 />
               </div>
 
@@ -1958,12 +1963,12 @@ export default function KupkoApp() {
 
       {/* MODAL: DETALJI OGLASA */}
       {odabraniOglas && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 relative shadow-2xl space-y-6">
-            <button onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }} className="absolute top-4 right-4 bg-slate-100 text-slate-500 p-2 rounded-full z-10"><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 relative shadow-2xl space-y-6">
+            <button onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }} className="absolute top-4 right-4 bg-slate-800 text-slate-300 p-2 rounded-full z-10 hover:bg-slate-700"><X className="w-5 h-5" /></button>
             
             <div className="space-y-3">
-              <div className="relative rounded-2xl overflow-hidden max-h-80 bg-slate-900 flex items-center justify-center">
+              <div className="relative rounded-2xl overflow-hidden max-h-80 bg-black flex items-center justify-center">
                 <img 
                   src={odabraniOglas.slike && odabraniOglas.slike.length > 0 ? odabraniOglas.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} 
                   alt={odabraniOglas.naslov} 
@@ -1972,18 +1977,18 @@ export default function KupkoApp() {
               </div>
             </div>
             
-            <div className="flex justify-between items-start border-b pb-4">
+            <div className="flex justify-between items-start border-b border-slate-800 pb-4">
               <div>
-                <span className="text-[10px] bg-blue-100 text-blue-800 font-extrabold px-2 py-0.5 rounded uppercase tracking-wider mb-1 inline-block">
+                <span className="text-[10px] bg-blue-950 text-blue-300 font-extrabold px-2 py-0.5 rounded uppercase tracking-wider mb-1 inline-block border border-blue-800">
                   {odabraniOglas.kategorija} • {odabraniOglas.podkategorija}
                 </span>
-                <h2 className="text-2xl font-black text-slate-900">{odabraniOglas.naslov}</h2>
+                <h2 className="text-2xl font-black text-white">{odabraniOglas.naslov}</h2>
                 <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-blue-600" /> {odabraniOglas.zupanija} {odabraniOglas.grad ? `- ${odabraniOglas.grad}` : ""} • {odabraniOglas.datum}
+                  <MapPin className="w-3.5 h-3.5 text-blue-400" /> {odabraniOglas.zupanija} {odabraniOglas.grad ? `- ${odabraniOglas.grad}` : ""} • {odabraniOglas.datum}
                 </p>
               </div>
               <div className="text-right">
-                <span className="text-3xl font-black text-blue-700 block">{odabraniOglas.cijena} €</span>
+                <span className="text-3xl font-black text-amber-400 block">{odabraniOglas.cijena} €</span>
               </div>
             </div>
 
@@ -2000,52 +2005,52 @@ export default function KupkoApp() {
             {/* SPECIFIKACIJE */}
             <div className="space-y-2">
               <h4 className="font-black text-xs uppercase text-slate-400 tracking-wider">Detaljne specifikacije artikla</h4>
-              <div className="bg-slate-50 p-4 rounded-2xl border grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
                 {odabraniOglas.godiste && (
-                  <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                  <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Godište</span>
-                    <span className="font-black text-slate-800">{odabraniOglas.godiste} godište</span>
+                    <span className="font-black text-white">{odabraniOglas.godiste} godište</span>
                   </div>
                 )}
                 {odabraniOglas.kilometri && (
-                  <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                  <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Kilometraža</span>
-                    <span className="font-black text-slate-800">{odabraniOglas.kilometri} km</span>
+                    <span className="font-black text-white">{odabraniOglas.kilometri} km</span>
                   </div>
                 )}
                 {odabraniOglas.gorivo && (
-                  <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                  <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Gorivo</span>
-                    <span className="font-black text-slate-800">{odabraniOglas.gorivo}</span>
+                    <span className="font-black text-white">{odabraniOglas.gorivo}</span>
                   </div>
                 )}
                 {odabraniOglas.mjenjac && (
-                  <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                  <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Mjenjač</span>
-                    <span className="font-black text-slate-800">{odabraniOglas.mjenjac}</span>
+                    <span className="font-black text-white">{odabraniOglas.mjenjac}</span>
                   </div>
                 )}
                 {odabraniOglas.snagaKw && (
-                  <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                  <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Snaga motora</span>
-                    <span className="font-black text-slate-800">{odabraniOglas.snagaKw} kW</span>
+                    <span className="font-black text-white">{odabraniOglas.snagaKw} kW</span>
                   </div>
                 )}
                 {odabraniOglas.kvadratura && (
-                  <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                  <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Stambena površina</span>
-                    <span className="font-black text-slate-800">{odabraniOglas.kvadratura} m²</span>
+                    <span className="font-black text-white">{odabraniOglas.kvadratura} m²</span>
                   </div>
                 )}
                 {odabraniOglas.sobe && (
-                  <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                  <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Broj soba</span>
-                    <span className="font-black text-slate-800">{odabraniOglas.sobe} soban</span>
+                    <span className="font-black text-white">{odabraniOglas.sobe} soban</span>
                   </div>
                 )}
-                <div className="bg-white p-2.5 rounded-xl border shadow-xs">
+                <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
                   <span className="text-slate-400 block text-[10px] uppercase font-bold">Stanje</span>
-                  <span className="font-black text-slate-800">{odabraniOglas.stanje || "Novo"}</span>
+                  <span className="font-black text-white">{odabraniOglas.stanje || "Novo"}</span>
                 </div>
               </div>
             </div>
@@ -2053,30 +2058,30 @@ export default function KupkoApp() {
             {/* OPIS OGLASA */}
             <div className="space-y-2">
               <h4 className="font-black text-xs uppercase text-slate-400 tracking-wider">Opis oglasnika / prodavača</h4>
-              <div className="bg-slate-50 p-4 rounded-2xl border text-sm leading-relaxed text-slate-700">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-sm leading-relaxed text-slate-300">
                 <p className="whitespace-pre-line">{odabraniOglas.opis || "Nema unesenog opisa za ovaj artikl."}</p>
               </div>
             </div>
 
             {/* KARTICA PRODAVAČA */}
-            <div className="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 flex items-center justify-between">
+            <div className="bg-blue-950/50 p-4 rounded-2xl border border-blue-900 flex items-center justify-between">
               <div>
-                <span className="text-[10px] text-blue-500 uppercase font-bold block">Oglašivač</span>
-                <p className="font-black text-sm text-blue-950 flex items-center gap-1.5 mt-0.5">
-                  <User className="w-4 h-4 text-blue-600" /> {odabraniOglas.prodavac || "Korisnik"}
+                <span className="text-[10px] text-blue-400 uppercase font-bold block">Oglašivač</span>
+                <p className="font-black text-sm text-white flex items-center gap-1.5 mt-0.5">
+                  <User className="w-4 h-4 text-blue-400" /> {odabraniOglas.prodavac || "Korisnik"}
                 </p>
               </div>
-              <div className="text-right text-xs text-slate-500 font-medium">
+              <div className="text-right text-xs text-slate-300 font-medium">
                 <span>📞 Tel: <strong>{odabraniOglas.telefon || "Dostupan na upit"}</strong></span>
               </div>
             </div>
 
             {/* SEKCIJA ZA SLANJE PORUKE PRODAVAČU */}
-            <div className="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl space-y-3">
+            <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-3">
               <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2 text-indigo-900">
-                  <MessageSquare className="w-5 h-5 text-indigo-600" />
-                  <h4 className="font-black text-sm uppercase tracking-wide">Pošaljite poruku prodavaču</h4>
+                <div className="flex items-center gap-2 text-indigo-400">
+                  <MessageSquare className="w-5 h-5 text-indigo-400" />
+                  <h4 className="font-black text-sm uppercase tracking-wide text-white">Pošaljite poruku prodavaču</h4>
                 </div>
                 <button 
                   onClick={() => setPrikaziFormuZaSlanjePoruke(!prikaziFormuZaSlanjePoruke)}
@@ -2087,12 +2092,12 @@ export default function KupkoApp() {
               </div>
 
               {prikaziFormuZaSlanjePoruke && (
-                <form onSubmit={posaljiPorukuProdavacu} className="space-y-3 pt-2 border-t border-indigo-200">
+                <form onSubmit={posaljiPorukuProdavacu} className="space-y-3 pt-2 border-t border-slate-800">
                   <textarea 
                     rows={3} required
                     placeholder="Poštovani, zainteresiran sam za Vaš oglas. Je li još uvijek dostupno?"
                     value={tekstNovePoruke} onChange={(e) => setTekstNovePoruke(e.target.value)}
-                    className="w-full p-3 rounded-xl border bg-white text-xs text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full p-3 rounded-xl border border-slate-700 bg-slate-900 text-xs text-white outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   <button type="submit" className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-2.5 rounded-xl uppercase text-xs tracking-wider shadow">
                     Pošalji poruku prodavaču
@@ -2106,22 +2111,22 @@ export default function KupkoApp() {
 
       {/* MODAL: PRIJAVA */}
       {prikaziPrijavu && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl">
-            <button onClick={() => setPrikaziPrijavu(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
-            <h2 className="text-2xl font-black mb-4">Prijava na Kupko</h2>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl">
+            <button onClick={() => setPrikaziPrijavu(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+            <h2 className="text-2xl font-black mb-4 text-white">Prijava na Kupko</h2>
             <form onSubmit={rukujPrijavom} className="space-y-3">
               <input 
                 type="text" required placeholder="Korisničko ime (npr. admin)" 
                 value={formaPrijava.korisnickoIme} onChange={(e) => setFormaPrijava({ ...formaPrijava, korisnickoIme: e.target.value })}
-                className="w-full p-3 rounded-xl border text-sm"
+                className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm"
               />
               <input 
                 type="password" required placeholder="Lozinka" 
                 value={formaPrijava.lozinka} onChange={(e) => setFormaPrijava({ ...formaPrijava, lozinka: e.target.value })}
-                className="w-full p-3 rounded-xl border text-sm"
+                className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm"
               />
-              <button type="submit" className="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Prijavi se</button>
+              <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">Prijavi se</button>
             </form>
           </div>
         </div>
@@ -2129,56 +2134,56 @@ export default function KupkoApp() {
 
       {/* MODAL: REGISTRACIJA */}
       {prikaziRegistraciju && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
-            <h2 className="text-2xl font-black mb-4">Registracija na Kupko</h2>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 text-white rounded-3xl max-w-md w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
+            <button onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+            <h2 className="text-2xl font-black mb-4 text-white">Registracija na Kupko</h2>
             
             <form onSubmit={rukujRegistracijom} className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Jedinstveno korisničko ime *</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">Jedinstveno korisničko ime *</label>
                 <input 
                   type="text" required placeholder="npr. ivan_zg" 
                   value={formaRegistracija.ime} onChange={(e) => setFormaRegistracija({ ...formaRegistracija, ime: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm"
+                  className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">E-mail adresa (Obavezno) *</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">E-mail adresa (Obavezno) *</label>
                 <input 
                   type="email" required placeholder="vas.email@gmail.com" 
                   value={formaRegistracija.email} onChange={(e) => setFormaRegistracija({ ...formaRegistracija, email: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm"
+                  className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Lozinka *</label>
+                <label className="block text-xs font-bold text-slate-300 mb-1">Lozinka *</label>
                 <input 
                   type="password" required placeholder="Lozinka" 
                   value={formaRegistracija.lozinka} onChange={(e) => setFormaRegistracija({ ...formaRegistracija, lozinka: e.target.value })}
-                  className="w-full p-3 rounded-xl border text-sm"
+                  className="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm"
                 />
               </div>
 
-              <div className="space-y-2.5 pt-2 border-t text-xs">
-                <label className="flex items-start gap-2 cursor-pointer">
+              <div className="space-y-2.5 pt-2 border-t border-slate-800 text-xs">
+                <label className="flex items-start gap-2 cursor-pointer text-slate-300">
                   <input 
                     type="checkbox" required
                     checked={formaRegistracija.prihvacenaPrivatnost} 
                     onChange={(e) => setFormaRegistracija({ ...formaRegistracija, prihvacenaPrivatnost: e.target.checked })}
-                    className="mt-0.5 rounded text-blue-700"
+                    className="mt-0.5 rounded text-blue-600 bg-slate-800 border-slate-700"
                   />
                   <span>Pročitao sam Politiku privatnosti *</span>
                 </label>
 
-                <label className="flex items-start gap-2 cursor-pointer">
+                <label className="flex items-start gap-2 cursor-pointer text-slate-300">
                   <input 
                     type="checkbox" required
                     checked={formaRegistracija.prihvaceniUvjeti} 
                     onChange={(e) => setFormaRegistracija({ ...formaRegistracija, prihvaceniUvjeti: e.target.checked })}
-                    className="mt-0.5 rounded text-blue-700"
+                    className="mt-0.5 rounded text-blue-600 bg-slate-800 border-slate-700"
                   />
                   <span>Potvrđujem da imam više od 16 godina te prihvaćam Uvjete i pravila korištenja *</span>
                 </label>
