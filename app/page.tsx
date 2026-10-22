@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Search, PlusCircle, Heart, MapPin, Grid, List, Phone, X, 
   ShoppingBag, CheckCircle2, Mail, User, Clock, Upload, Image as ImageIcon,
-  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent, Check, AlertCircle, Send, ShieldAlert, SlidersHorizontal, Eye, Bot, Navigation, MessageSquare, Wallet, Bell, Settings
+  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent, Check, AlertCircle, Send, ShieldAlert, SlidersHorizontal, Eye, Bot, Navigation, MessageSquare, Wallet, Bell, Settings, Flame, Play
 } from "lucide-react";
 
 const ZUPANIJE = [
@@ -16,6 +16,12 @@ const ZUPANIJE = [
 ];
 
 const SVE_KATEGORIJE = [
+  {
+    id: "kucni-ljubimci",
+    naziv: "Kućni ljubimci",
+    ikona: "🐾",
+    podkategorije: ["Psi", "Mačke", "Ptice", "Akvaristika i ribice", "Glodavci", "Oprema za ljubimce", "Ostalo - Kućni ljubimci"]
+  },
   {
     id: "auto-moto",
     naziv: "Auto Moto",
@@ -50,11 +56,31 @@ const SVE_KATEGORIJE = [
     id: "ostalo",
     naziv: "Ostalo / Razno",
     ikona: "📦",
-    podkategorije: ["Kolekcionarstvo i antikviteti", "Knjige i literatura", "Glazbeni instrumenti", "Dječja oprema i igračke", "Kućni ljubimci i oprema", "Sve ostalo"]
+    podkategorije: ["Kolekcionarstvo i antikviteti", "Knjige i literatura", "Glazbeni instrumenti", "Dječja oprema i igračke", "Sve ostalo"]
   }
 ];
 
 const POCETNI_OGLASI = [
+  {
+    id: 10,
+    naslov: "Prekrasni štenci zlatnog retrivera - cijepljeni i čipirani",
+    cijena: "450",
+    kategorija: "kucni-ljubimci",
+    podkategorija: "Psi",
+    zupanija: "Zagrebačka",
+    grad: "Velika Gorica",
+    stanje: "Novo",
+    slike: [
+      "https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&q=80"
+    ],
+    top: true,
+    promoviran: true,
+    datum: "Objavljeno danas u 11:00",
+    opis: "U ponudi su prekrasni štenci zlatnog retrivera, očišćeni od parazita, cijepljeni, čipirani i s rodovnicom. Spremni za preuzimanje u novi dom.",
+    prodavac: "Petra Horvat",
+    autorEmail: "petra@kupko.hr",
+    telefon: "0919988776"
+  },
   {
     id: 1,
     naslov: "BMW Serija 3 320d Automatic M-Sport - Full Oprema",
@@ -95,8 +121,7 @@ const POCETNI_OGLASI = [
     grad: "Split - Žnjan",
     stanje: "Novo",
     slike: [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"
     ],
     top: false,
     promoviran: false,
@@ -127,46 +152,6 @@ const POCETNI_OGLASI = [
     prodavac: "Luka Perić",
     autorEmail: "luka@kupko.hr",
     telefon: "0953334455"
-  },
-  {
-    id: 4,
-    naslov: "Kutna garnitura na razvlačenje - Moderna",
-    cijena: "450",
-    kategorija: "dom-vrt",
-    podkategorija: "Namještaj",
-    zupanija: "Primorsko-goranska",
-    grad: "Rijeka",
-    stanje: "Korišteno - Kao novo",
-    slike: [
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80"
-    ],
-    top: false,
-    promoviran: false,
-    datum: "Objavljeno prije 3 dana",
-    opis: "Prodajem udobnu kutnu garnituru dimenzija 280x180 cm. Korištena svega par mjeseci, kao nova, bez oštećenja.",
-    prodavac: "Martina Kovač",
-    autorEmail: "martina@kupko.hr",
-    telefon: "0997778899"
-  },
-  {
-    id: 5,
-    naslov: "Cannondale brdski bicikl MTB 29'",
-    cijena: "650",
-    kategorija: "sport",
-    podkategorija: "Bicikli i oprema",
-    zupanija: "Istarska",
-    grad: "Pula",
-    stanje: "Korišteno",
-    slike: [
-      "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=800&q=80"
-    ],
-    top: false,
-    promoviran: true,
-    datum: "Objavljeno danas",
-    opis: "Vrhunski bicikl s aluminijskim okvirom, Shimano oprema, hidraulične disk kočnice. Redovito servisiran.",
-    prodavac: "Davor Jurić",
-    autorEmail: "davor@kupko.hr",
-    telefon: "0915556677"
   }
 ];
 
@@ -186,6 +171,10 @@ export default function KupkoApp() {
 
   const [omiljeniIds, setOmiljeniIds] = useState<number[]>([]);
   const [prikaziSamoOmiljene, setPrikaziSamoOmiljene] = useState(false);
+
+  // TikTok / Reels / Tinder mod stanje
+  const [prikaziReelsMod, setPrikaziReelsMod] = useState(false);
+  const [reelsIndex, setReelsIndex] = useState(0);
 
   const [prikaz, setPrikaz] = useState("grid");
   const [odabraniOglas, setOdabraniOglas] = useState<any>(null);
@@ -230,7 +219,7 @@ export default function KupkoApp() {
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
 
   useEffect(() => {
-    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v25");
+    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v26");
     if (lokalniOglasi) { try { setOglasi(JSON.parse(lokalniOglasi)); } catch (e) { console.error(e); } }
     const spremljeniKorisnici = localStorage.getItem("kupko_baza_korisnika");
     if (spremljeniKorisnici) { try { setRegistriraniKorisnici(JSON.parse(spremljeniKorisnici)); } catch (e) { console.error(e); } }
@@ -253,7 +242,7 @@ export default function KupkoApp() {
 
   const spremiOglase = (noviNiz: any) => {
     setOglasi(noviNiz);
-    localStorage.setItem("kupko_oglasi_v25", JSON.stringify(noviNiz));
+    localStorage.setItem("kupko_oglasi_v26", JSON.stringify(noviNiz));
   };
 
   const spremiPoruke = (noviNizPoruka: any) => {
@@ -577,7 +566,7 @@ export default function KupkoApp() {
 
   const preporucenoAutoMoto = oglasi.filter(o => o.kategorija === "auto-moto").slice(0, 3);
   const preporucenoNekretnine = oglasi.filter(o => o.kategorija === "nekretnine").slice(0, 3);
-  const preporucenoElektronika = oglasi.filter(o => o.kategorija === "elektronika").slice(0, 3);
+  const preporucenoLjubimci = oglasi.filter(o => o.kategorija === "kucni-ljubimci").slice(0, 3);
 
   const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail.toLowerCase() === korisnik.email.toLowerCase()) : [];
 
@@ -677,7 +666,7 @@ export default function KupkoApp() {
           <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
             <div 
               className="flex items-center gap-3 cursor-pointer group"
-              onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); setPojamPretrage(""); setPrikaziSamoOmiljene(false); setOdabraniOglas(null); }}
+              onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); setPojamPretrage(""); setPrikaziSamoOmiljene(false); setOdabraniOglas(null); setPrikaziReelsMod(false); }}
             >
               <div className="relative bg-amber-400 p-2.5 rounded-2xl text-blue-950 shadow-lg group-hover:scale-105 transition">
                 <ShoppingBag className="w-7 h-7 stroke-[2.5]" />
@@ -696,7 +685,7 @@ export default function KupkoApp() {
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Pretraži ponudu (npr. BMW, Stan, iPhone...)"
+                  placeholder="Pretraži ponudu (npr. Zlatni retriver, BMW, Stan...)"
                   value={pojamPretrage}
                   onChange={(e) => setPojamPretrage(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl text-slate-900 bg-white shadow-inner text-sm font-medium outline-none focus:ring-2 focus:ring-amber-400"
@@ -715,29 +704,38 @@ export default function KupkoApp() {
             </div>
 
             <div className="flex items-center gap-2 w-full md:w-auto">
+              {/* TIKTOK / TINDER REELS MOD GUMB */}
               <button
-                onClick={() => setPrikaziSamoOmiljene(!prikaziSamoOmiljene)}
-                className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition shadow ${
+                onClick={() => { setPrikaziReelsMod(true); setReelsIndex(0); }}
+                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg transition text-xs tracking-wider uppercase animate-pulse"
+              >
+                <Flame className="w-4 h-4 fill-white" />
+                <span>Kupko Reels 🔥</span>
+              </button>
+
+              <button
+                onClick={() => { setPrikaziSamoOmiljene(!prikaziSamoOmiljene); setPrikaziReelsMod(false); }}
+                className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition shadow ${
                   prikaziSamoOmiljene ? "bg-red-500 text-white" : "bg-blue-900 text-slate-200 hover:bg-blue-800 border border-blue-500/40"
                 }`}
               >
                 <Heart className={`w-4 h-4 ${prikaziSamoOmiljene ? "fill-white" : "text-red-400"}`} />
-                <span>Omiljeni ({omiljeniIds.length})</span>
+                <span className="hidden sm:inline">({omiljeniIds.length})</span>
               </button>
 
               <button 
                 onClick={() => setPrikaziFormu(true)}
-                className="flex-1 md:flex-none bg-amber-400 hover:bg-amber-300 text-blue-950 font-black px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition text-sm uppercase tracking-wider"
+                className="bg-amber-400 hover:bg-amber-300 text-blue-950 font-black px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-lg transition text-xs uppercase tracking-wider"
               >
-                <PlusCircle className="w-5 h-5 stroke-[2.5]" />
-                <span>Predaj oglas</span>
+                <PlusCircle className="w-4 h-4 stroke-[2.5]" />
+                <span className="hidden sm:inline">Predaj oglas</span>
               </button>
             </div>
           </div>
         </header>
 
         {/* 1. SEKTOR: PLAĆENI PROMO OGLASI */}
-        {!prikaziSamoOmiljene && promoOglasi.length > 0 && (
+        {!prikaziSamoOmiljene && !prikaziReelsMod && promoOglasi.length > 0 && (
           <section className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 py-6 text-blue-950 shadow-xl border-b-2 border-amber-700">
             <div className="max-w-7xl mx-auto px-4">
               <div className="flex items-center justify-between mb-4">
@@ -792,260 +790,333 @@ export default function KupkoApp() {
 
         {/* MAIN KATEGORIJE SELEKTOR I NAPREDNI FILTERI */}
         <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-          <section className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex justify-between items-center flex-wrap gap-4">
-              <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider">Sve Kategorije na Kupku</h3>
-              
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-slate-500 flex items-center gap-1"><SlidersHorizontal className="w-3.5 h-3.5" /> Cijena (€):</span>
-                <input 
-                  type="number" placeholder="Min" value={minCijena} onChange={(e) => setMinCijena(e.target.value)}
-                  className="w-20 p-1.5 rounded-lg border text-xs bg-slate-50"
-                />
-                <span className="text-slate-400">-</span>
-                <input 
-                  type="number" placeholder="Max" value={maxCijena} onChange={(e) => setMaxCijena(e.target.value)}
-                  className="w-20 p-1.5 rounded-lg border text-xs bg-slate-50"
-                />
-
-                <select 
-                  value={odabranoStanje} onChange={(e) => setOdabranoStanje(e.target.value)}
-                  className="p-1.5 rounded-lg border text-xs bg-slate-50 font-bold"
+          {/* AKO JE UKLJUČEN TIKTOK / TINDER REELS MOD */}
+          {prikaziReelsMod ? (
+            <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-2xl max-w-xl mx-auto relative border border-slate-700 overflow-hidden">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2 text-rose-400 font-black">
+                  <Flame className="w-6 h-6 animate-bounce" />
+                  <span className="text-lg uppercase tracking-wider">Kupko Reels & Swipe Mode</span>
+                </div>
+                <button 
+                  onClick={() => setPrikaziReelsMod(false)}
+                  className="bg-slate-800 hover:bg-slate-700 text-white p-2 rounded-full text-xs font-bold"
                 >
-                  <option value="sve">Sva stanja</option>
-                  <option value="novo">Novo / Kao novo</option>
-                  <option value="korišteno">Korišteno</option>
-                </select>
-
-                {(minCijena || maxCijena || odabranoStanje !== "sve") && (
-                  <button onClick={() => { setMinCijena(""); setMaxCijena(""); setOdabranoStanje("sve"); }} className="text-xs text-red-600 font-bold hover:underline ml-1">
-                    Resetiraj
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); }}
-                className={`px-4 py-2 rounded-xl text-xs font-extrabold transition ${odabranaKategorija === "sve" ? "bg-blue-700 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
-              >
-                Svi Oglasi
-              </button>
-              {SVE_KATEGORIJE.map((kat) => (
-                <button
-                  key={kat.id}
-                  onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); }}
-                  className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition ${odabranaKategorija === kat.id ? "bg-blue-700 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
-                >
-                  <span>{kat.ikona}</span>
-                  <span>{kat.naziv}</span>
+                  ✕ Zatvori Reels
                 </button>
-              ))}
-            </div>
-
-            {odabranaKategorija !== "sve" && (
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <h4 className="text-xs font-bold text-blue-900 uppercase mb-2">
-                  Podkategorije za {SVE_KATEGORIJE.find((k) => k.id === odabranaKategorija)?.naziv}:
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setOdabranaPodkategorija("sve")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === "sve" ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700"}`}
-                  >
-                    Sve podkategorije
-                  </button>
-                  {SVE_KATEGORIJE.find((k) => k.id === odabranaKategorija)?.podkategorije.map((pod) => (
-                    <button
-                      key={pod}
-                      onClick={() => setOdabranaPodkategorija(pod)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === pod ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700 hover:bg-blue-50"}`}
-                    >
-                      {pod}
-                    </button>
-                  ))}
-                </div>
               </div>
-            )}
-          </section>
 
-          {/* 3. SEKCIJA: PREPORUČENO PO KATEGORIJAMA */}
-          {!prikaziSamoOmiljene && odabranaKategorija === "sve" && pojamPretrage === "" && (
-            <div className="space-y-6">
-              {preporucenoAutoMoto.length > 0 && (
-                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
-                      <span>🚗</span> Preporučeno u kategoriji Auto Moto
-                    </h3>
-                    <button onClick={() => setOdabranaKategorija("auto-moto")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {preporucenoAutoMoto.map(o => (
-                      <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
-                        <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
-                        <div className="flex flex-col justify-between">
-                          <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
-                          <span className="font-black text-blue-700">{o.cijena} €</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {preporucenoNekretnine.length > 0 && (
-                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
-                      <span>🏠</span> Preporučeno u kategoriji Nekretnine
-                    </h3>
-                    <button onClick={() => setOdabranaKategorija("nekretnine")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {preporucenoNekretnine.map(o => (
-                      <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
-                        <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
-                        <div className="flex flex-col justify-between">
-                          <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
-                          <span className="font-black text-blue-700">{o.cijena} €</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {preporucenoElektronika.length > 0 && (
-                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
-                      <span>📱</span> Preporučeno u kategoriji Elektronika
-                    </h3>
-                    <button onClick={() => setOdabranaKategorija("elektronika")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {preporucenoElektronika.map(o => (
-                      <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
-                        <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
-                        <div className="flex flex-col justify-between">
-                          <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
-                          <span className="font-black text-blue-700">{o.cijena} €</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* LISTA OGLASA */}
-          <section>
-            <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-              <h3 className="text-lg font-extrabold text-slate-900">
-                {prikaziSamoOmiljene ? "Vaši omiljeni oglasi" : "Aktivni Oglasi"} ({filtriraniOglasi.length})
-              </h3>
-              <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
-                <button onClick={() => setPrikaz("grid")} className={`p-2 rounded-lg ${prikaz === "grid" ? "bg-white text-blue-700 shadow" : "text-slate-500"}`}><Grid className="w-4 h-4" /></button>
-                <button onClick={() => setPrikaz("list")} className={`p-2 rounded-lg ${prikaz === "list" ? "bg-white text-blue-700 shadow" : "text-slate-500"}`}><List className="w-4 h-4" /></button>
-              </div>
-            </div>
-
-            <div className={prikaz === "grid" ? "grid grid-cols-1 md:grid-cols-3 gap-6" : "flex flex-col gap-4"}>
-              {filtriraniOglasi.map((o) => {
-                const glavnaSlika = o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80";
-                return (
-                  <div 
-                    key={o.id}
-                    onClick={() => setOdabraniOglas(o)}
-                    className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition flex flex-col justify-between group cursor-pointer relative"
-                  >
-                    <div className="relative">
-                      <img src={glavnaSlika} alt={o.naslov} className="w-full h-52 object-cover group-hover:scale-105 transition" />
-                      
-                      {o.promoviran && (
-                        <span className="absolute top-3 left-3 bg-amber-400 text-blue-950 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg shadow flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" /> PROMO
-                        </span>
-                      )}
-
-                      <button
-                        onClick={(e) => toggleOmiljeni(e, o.id)}
-                        className="absolute top-3 right-3 bg-white/90 backdrop-blur p-2.5 rounded-full shadow hover:bg-white transition"
-                      >
-                        <Heart
-                          className={`w-5 h-5 ${
-                            omiljeniIds.includes(o.id)
-                              ? "fill-red-500 text-red-500"
-                              : "text-slate-600"
-                          }`}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="p-4 flex-1 flex flex-col justify-between">
+              {oglasi.length === 0 ? (
+                <p className="text-center py-20 text-slate-400">Nema oglasa za prikaz.</p>
+              ) : (
+                <div className="relative bg-slate-950 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col">
+                  {/* Trenutni oglas u reels prikazu */}
+                  {(() => {
+                    const currentOglas = oglasi[reelsIndex % oglasi.length];
+                    const slika = currentOglas.slike && currentOglas.slike.length > 0 ? currentOglas.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80";
+                    return (
                       <div>
-                        <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5 text-blue-600" /> {o.zupanija} {o.grad ? `(${o.grad})` : ""}
+                        <div className="relative h-96 w-full bg-black">
+                          <img src={slika} alt={currentOglas.naslov} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40"></div>
+                          
+                          <span className="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs uppercase px-3 py-1 rounded-full shadow">
+                            📍 {currentOglas.zupanija}
                           </span>
-                          <span>{o.datum}</span>
-                        </div>
-                        <h4 className="font-bold text-slate-900 text-base mb-1 line-clamp-2 hover:text-blue-700">
-                          {o.naslov}
-                        </h4>
-                      </div>
 
-                      <div className="pt-3 border-t border-slate-100 flex justify-between items-center mt-2">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-xl font-black text-blue-700">{o.cijena} €</span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
                           <button
-                            onClick={(e) => obnoviOglas(e, o.id)}
-                            title="Obnovi oglas"
-                            className="p-2 bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-700 rounded-xl transition"
+                            onClick={(e) => toggleOmiljeni(e, currentOglas.id)}
+                            className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur p-3 rounded-full shadow hover:bg-slate-800 transition"
                           >
-                            <RotateCw className="w-4 h-4" />
+                            <Heart className={`w-6 h-6 ${omiljeniIds.includes(currentOglas.id) ? "fill-red-500 text-red-500" : "text-white"}`} />
+                          </button>
+
+                          <div className="absolute bottom-4 left-4 right-4 space-y-2">
+                            <span className="text-2xl font-black text-amber-400">{currentOglas.cijena} €</span>
+                            <h3 className="text-lg font-extrabold text-white leading-snug line-clamp-2">{currentOglas.naslov}</h3>
+                            <p className="text-xs text-slate-300 line-clamp-2">{currentOglas.opis}</p>
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-slate-900 flex gap-3">
+                          <button
+                            onClick={() => setOdabraniOglas(currentOglas)}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow"
+                          >
+                            Pogledaj detalje
+                          </button>
+                          
+                          <button
+                            onClick={() => setReelsIndex((prev) => prev + 1)}
+                            className="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1.5"
+                          >
+                            <span>Sljedeći oglas ⏭️</span>
                           </button>
                         </div>
                       </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <section className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div className="flex justify-between items-center flex-wrap gap-4">
+                  <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider">Sve Kategorije na Kupku</h3>
+                  
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold text-slate-500 flex items-center gap-1"><SlidersHorizontal className="w-3.5 h-3.5" /> Cijena (€):</span>
+                    <input 
+                      type="number" placeholder="Min" value={minCijena} onChange={(e) => setMinCijena(e.target.value)}
+                      className="w-20 p-1.5 rounded-lg border text-xs bg-slate-50"
+                    />
+                    <span className="text-slate-400">-</span>
+                    <input 
+                      type="number" placeholder="Max" value={maxCijena} onChange={(e) => setMaxCijena(e.target.value)}
+                      className="w-20 p-1.5 rounded-lg border text-xs bg-slate-50"
+                    />
 
-                      {mozeUreditiIliBrisati(o) && (
-                        <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
-                          {!o.promoviran && (
-                            <button
-                              onClick={(e) => pokreniPromociju(e, o)}
-                              className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-extrabold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow"
-                            >
-                              <Sparkles className="w-4 h-4" /> Plati Promo Oglas (5 €)
-                            </button>
-                          )}
-                          <div className="flex gap-2">
-                            <button
-                              onClick={(e) => pokreniUredivanje(e, o)}
-                              className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1"
-                            >
-                              <Edit3 className="w-3.5 h-3.5" /> Uredi
-                            </button>
-                            <button
-                              onClick={(e) => obrisiOglas(e, o)}
-                              className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" /> Izbriši
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                    <select 
+                      value={odabranoStanje} onChange={(e) => setOdabranoStanje(e.target.value)}
+                      className="p-1.5 rounded-lg border text-xs bg-slate-50 font-bold"
+                    >
+                      <option value="sve">Sva stanja</option>
+                      <option value="novo">Novo / Kao novo</option>
+                      <option value="korišteno">Korišteno</option>
+                    </select>
+
+                    {(minCijena || maxCijena || odabranoStanje !== "sve") && (
+                      <button onClick={() => { setMinCijena(""); setMaxCijena(""); setOdabranoStanje("sve"); }} className="text-xs text-red-600 font-bold hover:underline ml-1">
+                        Resetiraj
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); }}
+                    className={`px-4 py-2 rounded-xl text-xs font-extrabold transition ${odabranaKategorija === "sve" ? "bg-blue-700 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
+                  >
+                    Svi Oglasi
+                  </button>
+                  {SVE_KATEGORIJE.map((kat) => (
+                    <button
+                      key={kat.id}
+                      onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); }}
+                      className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition ${odabranaKategorija === kat.id ? "bg-blue-700 text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-700"}`}
+                    >
+                      <span>{kat.ikona}</span>
+                      <span>{kat.naziv}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {odabranaKategorija !== "sve" && (
+                  <div className="mt-4 pt-4 border-t border-slate-100">
+                    <h4 className="text-xs font-bold text-blue-900 uppercase mb-2">
+                      Podkategorije za {SVE_KATEGORIJE.find((k) => k.id === odabranaKategorija)?.naziv}:
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setOdabranaPodkategorija("sve")}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === "sve" ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700"}`}
+                      >
+                        Sve podkategorije
+                      </button>
+                      {SVE_KATEGORIJE.find((k) => k.id === odabranaKategorija)?.podkategorije.map((pod) => (
+                        <button
+                          key={pod}
+                          onClick={() => setOdabranaPodkategorija(pod)}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition ${odabranaPodkategorija === pod ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700 hover:bg-blue-50"}`}
+                        >
+                          {pod}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </section>
+                )}
+              </section>
+
+              {/* 3. SEKCIJA: PREPORUČENO PO KATEGORIJAMA */}
+              {!prikaziSamoOmiljene && odabranaKategorija === "sve" && pojamPretrage === "" && (
+                <div className="space-y-6">
+                  {preporucenoLjubimci.length > 0 && (
+                    <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                          <span>🐾</span> Kućni ljubimci
+                        </h3>
+                        <button onClick={() => setOdabranaKategorija("kucni-ljubimci")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {preporucenoLjubimci.map(o => (
+                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                            <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
+                            <div className="flex flex-col justify-between">
+                              <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
+                              <span className="font-black text-blue-700">{o.cijena} €</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {preporucenoAutoMoto.length > 0 && (
+                    <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                          <span>🚗</span> Preporučeno u kategoriji Auto Moto
+                        </h3>
+                        <button onClick={() => setOdabranaKategorija("auto-moto")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {preporucenoAutoMoto.map(o => (
+                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                            <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
+                            <div className="flex flex-col justify-between">
+                              <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
+                              <span className="font-black text-blue-700">{o.cijena} €</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {preporucenoNekretnine.length > 0 && (
+                    <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-black text-base text-slate-900 flex items-center gap-2">
+                          <span>🏠</span> Preporučeno u kategoriji Nekretnine
+                        </h3>
+                        <button onClick={() => setOdabranaKategorija("nekretnine")} className="text-xs font-bold text-blue-700 hover:underline">Pogledaj sve →</button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {preporucenoNekretnine.map(o => (
+                          <div key={o.id} onClick={() => setOdabraniOglas(o)} className="border rounded-2xl p-3 flex gap-3 cursor-pointer hover:shadow-md transition">
+                            <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-20 h-20 object-cover rounded-xl" />
+                            <div className="flex flex-col justify-between">
+                              <h4 className="font-bold text-xs line-clamp-2">{o.naslov}</h4>
+                              <span className="font-black text-blue-700">{o.cijena} €</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* LISTA OGLASA */}
+              <section>
+                <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                  <h3 className="text-lg font-extrabold text-slate-900">
+                    {prikaziSamoOmiljene ? "Vaši omiljeni oglasi" : "Aktivni Oglasi"} ({filtriraniOglasi.length})
+                  </h3>
+                  <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+                    <button onClick={() => setPrikaz("grid")} className={`p-2 rounded-lg ${prikaz === "grid" ? "bg-white text-blue-700 shadow" : "text-slate-500"}`}><Grid className="w-4 h-4" /></button>
+                    <button onClick={() => setPrikaz("list")} className={`p-2 rounded-lg ${prikaz === "list" ? "bg-white text-blue-700 shadow" : "text-slate-500"}`}><List className="w-4 h-4" /></button>
+                  </div>
+                </div>
+
+                <div className={prikaz === "grid" ? "grid grid-cols-1 md:grid-cols-3 gap-6" : "flex flex-col gap-4"}>
+                  {filtriraniOglasi.map((o) => {
+                    const glavnaSlika = o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80";
+                    return (
+                      <div 
+                        key={o.id}
+                        onClick={() => setOdabraniOglas(o)}
+                        className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition flex flex-col justify-between group cursor-pointer relative"
+                      >
+                        <div className="relative">
+                          <img src={glavnaSlika} alt={o.naslov} className="w-full h-52 object-cover group-hover:scale-105 transition" />
+                          
+                          {o.promoviran && (
+                            <span className="absolute top-3 left-3 bg-amber-400 text-blue-950 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg shadow flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" /> PROMO
+                            </span>
+                          )}
+
+                          <button
+                            onClick={(e) => toggleOmiljeni(e, o.id)}
+                            className="absolute top-3 right-3 bg-white/90 backdrop-blur p-2.5 rounded-full shadow hover:bg-white transition"
+                          >
+                            <Heart
+                              className={`w-5 h-5 ${
+                                omiljeniIds.includes(o.id)
+                                  ? "fill-red-500 text-red-500"
+                                  : "text-slate-600"
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5 text-blue-600" /> {o.zupanija} {o.grad ? `(${o.grad})` : ""}
+                              </span>
+                              <span>{o.datum}</span>
+                            </div>
+                            <h4 className="font-bold text-slate-900 text-base mb-1 line-clamp-2 hover:text-blue-700">
+                              {o.naslov}
+                            </h4>
+                          </div>
+
+                          <div className="pt-3 border-t border-slate-100 flex justify-between items-center mt-2">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-xl font-black text-blue-700">{o.cijena} €</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => obnoviOglas(e, o.id)}
+                                title="Obnovi oglas"
+                                className="p-2 bg-slate-100 hover:bg-amber-100 text-slate-600 hover:text-amber-700 rounded-xl transition"
+                              >
+                                <RotateCw className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {mozeUreditiIliBrisati(o) && (
+                            <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
+                              {!o.promoviran && (
+                                <button
+                                  onClick={(e) => pokreniPromociju(e, o)}
+                                  className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-extrabold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow"
+                                >
+                                  <Sparkles className="w-4 h-4" /> Plati Promo Oglas (5 €)
+                                </button>
+                              )}
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={(e) => pokreniUredivanje(e, o)}
+                                  className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" /> Uredi
+                                </button>
+                                <button
+                                  onClick={(e) => obrisiOglas(e, o)}
+                                  className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-1.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Izbriši
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            </>
+          )}
         </main>
       </div>
 
@@ -1241,7 +1312,7 @@ export default function KupkoApp() {
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Naslov oglasa *</label>
                 <input 
-                  type="text" required placeholder="Npr. BMW 320d, Stan, mobitel..."
+                  type="text" required placeholder="Npr. Štenci zlatnog retrivera, Auto, Stan..."
                   value={noviOglas.naslov} onChange={(e) => setNoviOglas({ ...noviOglas, naslov: e.target.value })}
                   className="w-full p-3 rounded-xl border text-sm outline-none"
                 />
@@ -1502,7 +1573,7 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: DETALJI OGLASA (NJUŠKALO STIL + AI PROCJENA) */}
+      {/* MODAL: DETALJI OGLASA */}
       {odabraniOglas && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 relative shadow-2xl space-y-6">
@@ -1533,7 +1604,7 @@ export default function KupkoApp() {
               </div>
             </div>
 
-            {/* KUPKO AI TRŽIŠNA ANALIZA (NA SVAKOM OGLASU) */}
+            {/* KUPKO AI TRŽIŠNA ANALIZA */}
             <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-white p-4 rounded-2xl shadow-md space-y-1.5 border border-blue-800">
               <div className="flex items-center gap-2 text-amber-400 font-black text-xs uppercase tracking-wider">
                 <Bot className="w-4 h-4" /> Kupko AI Procjena Cijene i Tržišta
@@ -1543,7 +1614,7 @@ export default function KupkoApp() {
               </p>
             </div>
 
-            {/* NJUŠKALO STIL - SPECIFIKACIJE / KARAKTERISTIKE */}
+            {/* SPECIFIKACIJE */}
             <div className="space-y-2">
               <h4 className="font-black text-xs uppercase text-slate-400 tracking-wider">Detaljne specifikacije artikla</h4>
               <div className="bg-slate-50 p-4 rounded-2xl border grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
