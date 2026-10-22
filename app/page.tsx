@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Search, PlusCircle, Heart, MapPin, Grid, List, Phone, X, 
   ShoppingBag, CheckCircle2, Mail, User, Clock, Upload, Image as ImageIcon,
-  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent, Check, AlertCircle, Send, ShieldAlert, SlidersHorizontal, Eye, Bot, Navigation, MessageSquare, Wallet, Bell, Settings, Flame, Play
+  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent, Check, AlertCircle, Send, ShieldAlert, SlidersHorizontal, Eye, Bot, Navigation, MessageSquare, Wallet, Bell, Settings, Flame, Play, KeyRound
 } from "lucide-react";
 
 const ZUPANIJE = [
@@ -568,6 +568,14 @@ export default function KupkoApp() {
   const [prikaziRegistraciju, setPrikaziRegistraciju] = useState(false);
   const [prikaziMeniKorisnika, setPrikaziMeniKorisnika] = useState(false);
 
+  // Stanje za zaboravljenu lozinku
+  const [prikaziZaboravljenuLozinku, setPrikaziZaboravljenuLozinku] = useState(false);
+  const [zaboravljeniEmail, setZaboravljeniEmail] = useState("");
+  const [korakResetiranja, setKorakResetiranja] = useState(1); // 1: unos emaila, 2: unos koda i nove lozinke
+  const [kodResetiranja, setKodResetiranja] = useState("");
+  const [uneseniKodReset, setUneseniKodReset] = useState("");
+  const [novaLozinka, setNovaLozinka] = useState("");
+
   const [prikaziUnosPodatakaModal, setPrikaziUnosPodatakaModal] = useState(false);
   const [korisnickiPodaci, setKorisnickiPodaci] = useState({
     ime: "", prezime: "", adresa: "", grad: "", postanskiBroj: "", telefon: ""
@@ -782,6 +790,60 @@ export default function KupkoApp() {
     setPrikaziUnosPodatakaModal(true);
   };
 
+  // Funkcije za zaboravljenu lozinku
+  const pokreniZaboravljenuLozinku = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mailClean = zaboravljeniEmail.trim().toLowerCase();
+    const postoji = registriraniKorisnici.find(k => k.email.toLowerCase() === mailClean);
+
+    if (!postoji && mailClean !== "admin@kupko.hr") {
+      alert("Uneseni e-mail ne postoji u našoj bazi korisnika!");
+      return;
+    }
+
+    const kod = Math.floor(100000 + Math.random() * 900000).toString();
+    setKodResetiranja(kod);
+    setKorakResetiranja(2);
+    alert(`📧 [Simulacija E-maila za Oporavak Lozinke]:\nNa adresu ${mailClean} poslan je kod za promjenu lozinke. Vaš kod je: ${kod}`);
+  };
+
+  const potvrdiResetLozinke = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (uneseniKodReset.trim() !== kodResetiranja) {
+      alert("Netočan kod za potvrdu!");
+      return;
+    }
+
+    const mailClean = zaboravljeniEmail.trim().toLowerCase();
+    if (mailClean === "admin@kupko.hr") {
+      alert("Admin lozinka se ne može mijenjati ovim putem.");
+      setPrikaziZaboravljenuLozinku(false);
+      setKorakResetiranja(1);
+      setZaboravljeniEmail("");
+      setUneseniKodReset("");
+      setNovaLozinka("");
+      return;
+    }
+
+    const azuriraniKorisnici = registriraniKorisnici.map(k => {
+      if (k.email.toLowerCase() === mailClean) {
+        return { ...k, lozinka: novaLozinka };
+      }
+      return k;
+    });
+
+    setRegistriraniKorisnici(azuriraniKorisnici);
+    localStorage.setItem("kupko_baza_korisnika", JSON.stringify(azuriraniKorisnici));
+
+    alert("Lozinka je uspješno promijenjena! Sada se možete prijaviti s novom lozinkom.");
+    setPrikaziZaboravljenuLozinku(false);
+    setKorakResetiranja(1);
+    setZaboravljeniEmail("");
+    setUneseniKodReset("");
+    setNovaLozinka("");
+    setPrikaziPrijavu(true);
+  };
+
   const spremiOsobnePodatke = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("kupko_osobni_podaci", JSON.stringify(korisnickiPodaci));
@@ -794,18 +856,21 @@ export default function KupkoApp() {
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
     const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
                     (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
-    if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti!"); return; }
+    if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti brisati tuđi oglas!"); return; }
     if (confirm("Jeste li sigurni da želite obrisati oglas?")) {
       const noviOglasi = oglasi.filter((o) => o.id !== glas.id);
       spremiOglase(noviOglasi);
       setOdabraniOglas(null);
-      alert("Oglas obrisan.");
+      alert("Oglas uspješno obrisan.");
     }
   };
 
   const pokreniUredivanje = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
+    const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
+                    (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
+    if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti uređivati tuđi oglas!"); return; }
     setOglasZaUrediti({ ...glas });
     setPrikaziUredivanje(true);
   };
@@ -813,6 +878,9 @@ export default function KupkoApp() {
   const pokreniPromociju = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
+    const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
+                    (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
+    if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti!"); return; }
     setOglasZaPromociju(glas);
     setPrikaziPlacanjePromo(true);
   };
@@ -1908,6 +1976,59 @@ export default function KupkoApp() {
         </div>
       )}
 
+      {/* MODAL: ZABORAVLJENA LOZINKA */}
+      {prikaziZaboravljenuLozinku && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
+            <button onClick={() => { setPrikaziZaboravljenuLozinku(false); setKorakResetiranja(1); }} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <div className="flex items-center gap-2 text-blue-700">
+              <KeyRound className="w-6 h-6" />
+              <h2 className="text-xl font-black text-slate-900">Oporavak lozinke</h2>
+            </div>
+
+            {korakResetiranja === 1 ? (
+              <form onSubmit={pokreniZaboravljenuLozinku} className="space-y-4">
+                <p className="text-xs text-slate-600 font-medium">Unesite e-mail adresu s kojom ste se registrirali. Poslat ćemo vam kod za provjeru.</p>
+                <div>
+                  <label className="block text-xs font-black text-slate-700 mb-1">E-mail adresa *</label>
+                  <input 
+                    type="email" required placeholder="vas.email@gmail.com"
+                    value={zaboravljeniEmail} onChange={(e) => setZaboravljeniEmail(e.target.value)}
+                    className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold"
+                  />
+                </div>
+                <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-black py-3.5 rounded-2xl uppercase tracking-wider text-sm shadow-md">
+                  Pošalji kod za oporavak
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={potvrdiResetLozinke} className="space-y-4">
+                <p className="text-xs text-slate-600 font-medium">Unesite 6-znamenkasti kod koji vam je poslan na <strong>{zaboravljeniEmail}</strong> i novu lozinku.</p>
+                <div>
+                  <label className="block text-xs font-black text-slate-700 mb-1">Verifikacijski kod *</label>
+                  <input 
+                    type="text" required maxLength={6} placeholder="123456"
+                    value={uneseniKodReset} onChange={(e) => setUneseniKodReset(e.target.value)}
+                    className="w-full p-3 rounded-2xl border border-slate-300 text-center tracking-widest font-black text-lg bg-slate-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-700 mb-1">Nova lozinka *</label>
+                  <input 
+                    type="password" required placeholder="Nova lozinka"
+                    value={novaLozinka} onChange={(e) => setNovaLozinka(e.target.value)}
+                    className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold"
+                  />
+                </div>
+                <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-2xl uppercase tracking-wider text-sm shadow-md">
+                  Spremi novu lozinku
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* MODAL: UREDI OGLAS */}
       {prikaziUredivanje && oglasZaUrediti && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -2155,7 +2276,16 @@ export default function KupkoApp() {
                 value={formaPrijava.lozinka} onChange={(e) => setFormaPrijava({ ...formaPrijava, lozinka: e.target.value })}
                 className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold"
               />
-              <button type="submit" className="w-full bg-blue-700 text-white font-black py-3.5 rounded-2xl text-sm shadow-md">Prijavi se</button>
+              <div className="flex justify-between items-center text-xs pt-1">
+                <button 
+                  type="button" 
+                  onClick={() => { setPrikaziPrijavu(false); setPrikaziZaboravljenuLozinku(true); }}
+                  className="text-blue-700 font-bold hover:underline"
+                >
+                  Zaboravili ste lozinku?
+                </button>
+              </div>
+              <button type="submit" className="w-full bg-blue-700 text-white font-black py-3.5 rounded-2xl text-sm shadow-md mt-2">Prijavi se</button>
             </form>
           </div>
         </div>
