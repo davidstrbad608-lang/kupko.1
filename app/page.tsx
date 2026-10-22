@@ -487,12 +487,10 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
+  // 🌟 OVDJE JE OMOGUĆENO DA BILO KOJI PRIJAVLJENI KORISNIK (NPR. TI SVOJEM PRIJATELJU) MOŽE BOOSTATI OGLAS SVOJIM KREDITIMA!
   const pokreniPromociju = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
-    if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
-    const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
-                    (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
-    if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti!"); return; }
+    if (!korisnik) { alert("Morate biti prijavljeni da biste mogli promovirati oglas!"); return; }
     setOglasZaPromociju(glas);
     setPrikaziPlacanjePromo(true);
   };
@@ -1212,30 +1210,33 @@ export default function KupkoApp() {
                               </div>
                             </div>
 
+                            {/* GUMB ZA PROMO VIDLJIV SVAKOM PRIJAVLJENOM KORISNIKU (NPR. ZA POMOĆ PRIJATELJU) */}
+                            {korisnik && !o.promoviran && (
+                              <div className="mt-4 pt-4 border-t border-slate-100">
+                                <button
+                                  onClick={(e) => pokreniPromociju(e, o)}
+                                  className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-2.5 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md uppercase tracking-wider"
+                                >
+                                  <Sparkles className="w-4 h-4" /> Boostaj oglas (Iskoristi Promo)
+                                </button>
+                              </div>
+                            )}
+
+                            {/* UREĐIVANJE I BRISANJE SAMO ZA AUTORA ILI ADMINA */}
                             {mozeUreditiIliBrisati(o) && (
-                              <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col gap-2.5">
-                                {!o.promoviran && (
-                                  <button
-                                    onClick={(e) => pokreniPromociju(e, o)}
-                                    className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-2.5 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md uppercase tracking-wider"
-                                  >
-                                    <Sparkles className="w-4 h-4" /> Plati / Iskoristi Promo
-                                  </button>
-                                )}
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={(e) => pokreniUredivanje(e, o)}
-                                    className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
-                                  >
-                                    <Edit3 className="w-4 h-4" /> Uredi
-                                  </button>
-                                  <button
-                                    onClick={(e) => obrisiOglas(e, o)}
-                                    className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
-                                  >
-                                    <Trash2 className="w-4 h-4" /> Izbriši
-                                  </button>
-                                </div>
+                              <div className="mt-2 pt-2 flex gap-2">
+                                <button
+                                  onClick={(e) => pokreniUredivanje(e, o)}
+                                  className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
+                                >
+                                  <Edit3 className="w-4 h-4" /> Uredi
+                                </button>
+                                <button
+                                  onClick={(e) => obrisiOglas(e, o)}
+                                  className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
+                                >
+                                  <Trash2 className="w-4 h-4" /> Izbriši
+                                </button>
                               </div>
                             )}
                           </div>
@@ -1690,7 +1691,7 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: DETALJI OGLASA (SA OMOGUĆENIM ZATVARANJEM KLIKOM IZVAN PROZORA) */}
+      {/* MODAL: DETALJI OGLASA */}
       {odabraniOglas && (
         <div 
           onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }}
