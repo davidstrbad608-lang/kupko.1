@@ -56,13 +56,14 @@ const SVE_KATEGORIJE = [
     id: "ostalo",
     naziv: "Ostalo / Razno",
     ikona: "📦",
-    podkategorije: ["Kolekcionarstvo i antikviteti", "Knjige i literatura", "Glazbeni instrumenti", "Dječja oprema i igračke", "Sve ostalo"]
+    podkategorije: ["Kolekcionarstvo i antikviteti", "Knjige i literatura", "Glazbeni instrumenti", "Dječja oprema i igračke", "Kućni ljubimci i oprema", "Sve ostalo"]
   }
 ];
 
 const POCETNI_OGLASI = [
+  // KUĆNI LJUBIMCI
   {
-    id: 10,
+    id: 101,
     naslov: "Prekrasni štenci zlatnog retrivera - cijepljeni i čipirani",
     cijena: "450",
     kategorija: "kucni-ljubimci",
@@ -70,24 +71,75 @@ const POCETNI_OGLASI = [
     zupanija: "Zagrebačka",
     grad: "Velika Gorica",
     stanje: "Novo",
-    slike: [
-      "https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&q=80"
-    ],
+    slike: ["https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&q=80"],
     top: true,
     promoviran: true,
     datum: "Objavljeno danas u 11:00",
-    opis: "U ponudi su prekrasni štenci zlatnog retrivera, očišćeni od parazita, cijepljeni, čipirani i s rodovnicom. Spremni za preuzimanje u novi dom.",
+    opis: "U ponudi su prekrasni štenci zlatnog retrivera, očišćeni od parazita, cijepljeni, čipirani i s rodovnicom.",
     prodavac: "Petra Horvat",
     autorEmail: "petra@kupko.hr",
     telefon: "0919988776"
   },
   {
+    id: 102,
+    naslov: "Maine Coon mačići s rodovnicom",
+    cijena: "700",
+    kategorija: "kucni-ljubimci",
+    podkategorija: "Mačke",
+    zupanija: "Grad Zagreb",
+    grad: "Zagreb",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "Vrhunski Maine Coon mačići spremni za novi dom. Naučeni na pijesak, druželjubivi i razigrani.",
+    prodavac: "Ivana Kovač",
+    autorEmail: "ivana@kupko.hr",
+    telefon: "0984433221"
+  },
+  {
+    id: 103,
+    naslov: "Akvarij 120L s opremom i ribicama",
+    cijena: "150",
+    kategorija: "kucni-ljubimci",
+    podkategorija: "Akvaristika i ribice",
+    zupanija: "Primorsko-goranska",
+    grad: "Rijeka",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 2 dana",
+    opis: "Prodajem kompletno opremljen akvarij 120 litara s LED rasvjetom, filterom, grijačem i ribicama.",
+    prodavac: "Marko Brkić",
+    autorEmail: "marko@kupko.hr",
+    telefon: "0951122334"
+  },
+  {
+    id: 104,
+    naslov: "Patuljasti zečići i kavez",
+    cijena: "50",
+    kategorija: "kucni-ljubimci",
+    podkategorija: "Glodavci",
+    zupanija: "Splitsko-dalmatinska",
+    grad: "Split",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno danas",
+    opis: "Preslatki patuljasti zečići s velikim kavezom, hranom i pojilicom.",
+    prodavac: "Maja Delić",
+    autorEmail: "maja@kupko.hr",
+    telefon: "0917766554"
+  },
+
+  // AUTO MOTO
+  {
     id: 1,
     naslov: "BMW Serija 3 320d Automatic M-Sport - Full Oprema",
     cijena: "18900",
-    staraCijena: "21500",
-    popustPostotak: "-12%",
-    snizeno: true,
     kategorija: "auto-moto",
     podkategorija: "Osobna vozila",
     zupanija: "Grad Zagreb",
@@ -100,17 +152,84 @@ const POCETNI_OGLASI = [
     top: true,
     promoviran: true,
     datum: "Objavljeno danas u 15:30",
-    opis: "Garažirano vozilo u izvanrednom stanju. Redovito servisiran u ovlaštenom BMW servisu. M-sport paket opreme, kožna sjedala, navigacija, panoramski krov.",
+    opis: "Garažirano vozilo u izvanrednom stanju. Redovito servisiran u ovlaštenom BMW servisu.",
     prodavac: "Ivan Horvat",
     autorEmail: "ivan@kupko.hr",
     telefon: "0912345678",
-    email: "ivan.zagreb@gmail.com",
     godiste: "2019",
     kilometri: "145000",
     snagaKw: "140",
     gorivo: "Dizel",
     mjenjac: "Automatski"
   },
+  {
+    id: 105,
+    naslov: "Audi A4 2.0 TDI S-Line",
+    cijena: "15500",
+    kategorija: "auto-moto",
+    podkategorija: "Osobna vozila",
+    zupanija: "Istarska",
+    grad: "Pula",
+    stanje: "Korišteno",
+    slike: ["https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "Odličan Audi A4, S-line interijer i exterijer, navigacija, Matrix svjetla.",
+    prodavac: "Dino Radić",
+    autorEmail: "dino@kupko.hr",
+    telefon: "0923334455",
+    godiste: "2018",
+    kilometri: "165000",
+    snagaKw: "110",
+    gorivo: "Dizel",
+    mjenjac: "Ručni"
+  },
+  {
+    id: 106,
+    naslov: "Yamaha MT-07 Motocikl",
+    cijena: "6200",
+    kategorija: "auto-moto",
+    podkategorija: "Motocikli i skuteri",
+    zupanija: "Splitsko-dalmatinska",
+    grad: "Split",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 3 dana",
+    opis: "Yamaha MT-07 u savršenom stanju, nove gume, Akrapovič auspuh.",
+    prodavac: "Luka Vukušić",
+    autorEmail: "luka.v@kupko.hr",
+    telefon: "0989988776",
+    godiste: "2021",
+    kilometri: "12000"
+  },
+  {
+    id: 107,
+    naslov: "VW Golf VII 1.6 TDI Bluemotion",
+    cijena: "10900",
+    kategorija: "auto-moto",
+    podkategorija: "Osobna vozila",
+    zupanija: "Varaždinska",
+    grad: "Varaždin",
+    stanje: "Korišteno",
+    slike: ["https://images.unsplash.com/photo-1541899481282-d53bffe3c351?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno danas",
+    opis: "Mali potrošač, registriran cijelu godinu, servisna knjižica.",
+    prodavac: "Stjepan Horvat",
+    autorEmail: "stjepan@kupko.hr",
+    telefon: "0915544332",
+    godiste: "2016",
+    kilometri: "189000",
+    snagaKw: "81",
+    gorivo: "Dizel",
+    mjenjac: "Ručni"
+  },
+
+  // NEKRETNINE
   {
     id: 2,
     naslov: "Dvosoban luksuzan stan u novogradnji s garažom",
@@ -121,18 +240,80 @@ const POCETNI_OGLASI = [
     grad: "Split - Žnjan",
     stanje: "Novo",
     slike: [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"
     ],
     top: false,
     promoviran: false,
     datum: "Objavljeno jučer",
-    opis: "Prekrasan stan u novogradnji, 55 m2, blizina mora i svih sadržaja. Sadrži podno grijanje, klima uređaj u svakoj sobi i osigurano garažno parkirno mjesto.",
+    opis: "Prekrasan stan u novogradnji, 55 m2, blizina mora i svih sadržaja.",
     prodavac: "Ana Marić",
     autorEmail: "ana@kupko.hr",
     telefon: "0981112223",
     kvadratura: "55",
     sobe: "2"
   },
+  {
+    id: 108,
+    naslov: "Moderan trosoban stan u centru Zagreba",
+    cijena: "230000",
+    kategorija: "nekretnine",
+    podkategorija: "Stanovi - Prodaja",
+    zupanija: "Grad Zagreb",
+    grad: "Zagreb - Centar",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"],
+    top: false,
+    promoviran: true,
+    datum: "Objavljeno prije 2 dana",
+    opis: "Vrhunski uređen stan u strogom centru, visoki stropovi, etažno plinsko grijanje.",
+    prodavac: "Zoran Babić",
+    autorEmail: "zoran@kupko.hr",
+    telefon: "0912233445",
+    kvadratura: "78",
+    sobe: "3"
+  },
+  {
+    id: 109,
+    naslov: "Kuća s bazenom i pogledom na more - Opatija",
+    cijena: "450000",
+    kategorija: "nekretnine",
+    podkategorija: "Kuće - Prodaja",
+    zupanija: "Primorsko-goranska",
+    grad: "Opatija",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80"],
+    top: true,
+    promoviran: true,
+    datum: "Objavljeno danas",
+    opis: "Ekskluzivna kuća s grijanim bazenom, uređenom okućnicom i panoramskim pogledom.",
+    prodavac: "Karmen Jurić",
+    autorEmail: "karmen@kupko.hr",
+    telefon: "0998877665",
+    kvadratura: "220",
+    sobe: "5"
+  },
+  {
+    id: 110,
+    naslov: "Zemljište za gradnju obiteljske kuće - Samobor",
+    cijena: "65000",
+    kategorija: "nekretnine",
+    podkategorija: "Zemljišta",
+    zupanija: "Zagrebačka",
+    grad: "Samobor",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 4 dana",
+    opis: "Ravna građevinska parcela s pristupnim putem i svim priključcima uz rub parcele.",
+    prodavac: "Branko Novak",
+    autorEmail: "branko@kupko.hr",
+    telefon: "0956677889",
+    kvadratura: "850"
+  },
+
+  // ELEKTRONIKA
   {
     id: 3,
     naslov: "iPhone 15 Pro Max 256GB - Zapakiran s garancijom",
@@ -142,16 +323,219 @@ const POCETNI_OGLASI = [
     zupanija: "Grad Zagreb",
     grad: "Zagreb - Centar",
     stanje: "Novo",
-    slike: [
-      "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=80"
-    ],
+    slike: ["https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=80"],
     top: false,
     promoviran: false,
     datum: "Objavljeno prije 2 sata",
-    opis: "Mobitel je nekorišten, zapakiran u originalnoj kutiji s 2 godine službene garancije. Boja: Natural Titanium.",
+    opis: "Mobitel je nekorišten, zapakiran u originalnoj kutiji s 2 godine službene garancije.",
     prodavac: "Luka Perić",
     autorEmail: "luka@kupko.hr",
     telefon: "0953334455"
+  },
+  {
+    id: 111,
+    naslov: "Samsung Galaxy S24 Ultra 512GB",
+    cijena: "890",
+    kategorija: "elektronika",
+    podkategorija: "Mobiteli i oprema",
+    zupanija: "Splitsko-dalmatinska",
+    grad: "Split",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "Kao nov, bez tragova korištenja, zaštitno staklo i maskica od prvog dana.",
+    prodavac: "Josip Milić",
+    autorEmail: "josip@kupko.hr",
+    telefon: "0912211334"
+  },
+  {
+    id: 112,
+    naslov: "Gaming PC i7 RTX 4070 Ti 32GB RAM",
+    cijena: "1450",
+    kategorija: "elektronika",
+    podkategorija: "Računala i komponente",
+    zupanija: "Grad Zagreb",
+    grad: "Zagreb",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&q=80"],
+    top: true,
+    promoviran: true,
+    datum: "Objavljeno danas",
+    opis: "Vrhunsko moćno računalo za igranje najnovijih igara u 4K rezoluciji i rad u zahtjevnim programima.",
+    prodavac: "Goran Šimić",
+    autorEmail: "goran@kupko.hr",
+    telefon: "0983322119"
+  },
+  {
+    id: 113,
+    naslov: "Sony PlayStation 5 Slim + 2 Kontrolera",
+    cijena: "440",
+    kategorija: "elektronika",
+    podkategorija: "Konzole i igrice",
+    zupanija: "Osječko-baranjska",
+    grad: "Osijek",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "Konzola je nova, zapakirana s računom i garancijom.",
+    prodavac: "Filip Varga",
+    autorEmail: "filip@kupko.hr",
+    telefon: "0994455667"
+  },
+
+  // DOM I VRT
+  {
+    id: 4,
+    naslov: "Kutna garnitura na razvlačenje - Moderna",
+    cijena: "450",
+    kategorija: "dom-vrt",
+    podkategorija: "Namještaj",
+    zupanija: "Primorsko-goranska",
+    grad: "Rijeka",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 3 dana",
+    opis: "Prodajem udobnu kutnu garnituru dimenzija 280x180 cm. Korištena svega par mjeseci.",
+    prodavac: "Martina Kovač",
+    autorEmail: "martina@kupko.hr",
+    telefon: "0997778899"
+  },
+  {
+    id: 114,
+    naslov: "Masivni drveni blagovaonski stol i 6 stolica",
+    cijena: "380",
+    kategorija: "dom-vrt",
+    podkategorija: "Namještaj",
+    zupanija: "Zagrebačka",
+    grad: "Zaprešić",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno danas",
+    opis: "Ručni rad, hrastovo drvo. Stol se može razvući.",
+    prodavac: "Zvonimir Kralj",
+    autorEmail: "zvonimir@kupko.hr",
+    telefon: "0918899001",
+    kvadratura: ""
+  },
+  {
+    id: 115,
+    naslov: "Robot usisavač Roborock S8 Pro Ultra",
+    cijena: "680",
+    kategorija: "dom-vrt",
+    podkategorija: "Kućanski aparati",
+    zupanija: "Grad Zagreb",
+    grad: "Zagreb",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 1 dan",
+    opis: "Najbolji robot usisavač s automatskim pražnjenjem i pranjem krpa.",
+    prodavac: "Sanja Pavić",
+    autorEmail: "sanja@kupko.hr",
+    telefon: "0958877665"
+  },
+
+  // SPORT I OPREMA
+  {
+    id: 5,
+    naslov: "Cannondale brdski bicikl MTB 29'",
+    cijena: "650",
+    kategorija: "sport",
+    podkategorija: "Bicikli i oprema",
+    zupanija: "Istarska",
+    grad: "Pula",
+    stanje: "Korišteno",
+    slike: ["https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=800&q=80"],
+    top: false,
+    promoviran: true,
+    datum: "Objavljeno danas",
+    opis: "Vrhunski bicikl s aluminijskim okvirom, Shimano oprema, hidraulične disk kočnice.",
+    prodavac: "Davor Jurić",
+    autorEmail: "davor@kupko.hr",
+    telefon: "0915556677"
+  },
+  {
+    id: 116,
+    naslov: "Električni romobil Xiaomi Pro 2",
+    cijena: "320",
+    kategorija: "sport",
+    podkategorija: "Bicikli i oprema",
+    zupanija: "Grad Zagreb",
+    grad: "Zagreb",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "Romobil u odličnom stanju, domet do 45 km, očuvan i mažen.",
+    prodavac: "Karlo Lončar",
+    autorEmail: "karlo@kupko.hr",
+    telefon: "0983344556"
+  },
+  {
+    id: 117,
+    naslov: "Set bućica i olimpijska šipka s utezima 100kg",
+    cijena: "290",
+    kategorija: "sport",
+    podkategorija: "Fitness i teretana",
+    zupanija: "Splitsko-dalmatinska",
+    grad: "Split",
+    stanje: "Novo",
+    slike: ["https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno prije 3 dana",
+    opis: "Kompletna oprema za kućnu teretanu, gumirani utezi visoke kvalitete.",
+    prodavac: "Bruno Blažević",
+    autorEmail: "bruno@kupko.hr",
+    telefon: "0916655443"
+  },
+
+  // OSTALO
+  {
+    id: 118,
+    naslov: "Akustična gitara Fender s torbom i stalkom",
+    cijena: "210",
+    kategorija: "ostalo",
+    podkategorija: "Glazbeni instrumenti",
+    zupanija: "Zadarska",
+    grad: "Zadar",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno danas",
+    opis: "Odlična gitara za početnike i napredne svirače, top zvuk.",
+    prodavac: "Nenad Šarić",
+    autorEmail: "nenad@kupko.hr",
+    telefon: "0952211443"
+  },
+  {
+    id: 119,
+    naslov: "Dječja kolica 3u1 Peg Perego",
+    cijena: "350",
+    kategorija: "ostalo",
+    podkategorija: "Dječja oprema i igračke",
+    zupanija: "Grad Zagreb",
+    grad: "Zagreb",
+    stanje: "Korišteno - Kao novo",
+    slike: ["https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&q=80"],
+    top: false,
+    promoviran: false,
+    datum: "Objavljeno jučer",
+    opis: "Kvalitetna talijanska kolica 3u1 (košara, autosjedalica, sportski dio) s torbom.",
+    prodavac: "Martina Novak",
+    autorEmail: "martina.n@kupko.hr",
+    telefon: "0914433221"
   }
 ];
 
@@ -219,7 +603,7 @@ export default function KupkoApp() {
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
 
   useEffect(() => {
-    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v26");
+    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v27");
     if (lokalniOglasi) { try { setOglasi(JSON.parse(lokalniOglasi)); } catch (e) { console.error(e); } }
     const spremljeniKorisnici = localStorage.getItem("kupko_baza_korisnika");
     if (spremljeniKorisnici) { try { setRegistriraniKorisnici(JSON.parse(spremljeniKorisnici)); } catch (e) { console.error(e); } }
@@ -242,7 +626,7 @@ export default function KupkoApp() {
 
   const spremiOglase = (noviNiz: any) => {
     setOglasi(noviNiz);
-    localStorage.setItem("kupko_oglasi_v26", JSON.stringify(noviNiz));
+    localStorage.setItem("kupko_oglasi_v27", JSON.stringify(noviNiz));
   };
 
   const spremiPoruke = (noviNizPoruka: any) => {
@@ -564,9 +948,9 @@ export default function KupkoApp() {
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
 
+  const preporucenoLjubimci = oglasi.filter(o => o.kategorija === "kucni-ljubimci").slice(0, 3);
   const preporucenoAutoMoto = oglasi.filter(o => o.kategorija === "auto-moto").slice(0, 3);
   const preporucenoNekretnine = oglasi.filter(o => o.kategorija === "nekretnine").slice(0, 3);
-  const preporucenoLjubimci = oglasi.filter(o => o.kategorija === "kucni-ljubimci").slice(0, 3);
 
   const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail.toLowerCase() === korisnik.email.toLowerCase()) : [];
 
@@ -704,7 +1088,7 @@ export default function KupkoApp() {
             </div>
 
             <div className="flex items-center gap-2 w-full md:w-auto">
-              {/* TIKTOK / TINDER REELS MOD GUMB */}
+              {/* TIKTOK / REELS MOD GUMB */}
               <button
                 onClick={() => { setPrikaziReelsMod(true); setReelsIndex(0); }}
                 className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg transition text-xs tracking-wider uppercase animate-pulse"
@@ -790,7 +1174,7 @@ export default function KupkoApp() {
 
         {/* MAIN KATEGORIJE SELEKTOR I NAPREDNI FILTERI */}
         <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-          {/* AKO JE UKLJUČEN TIKTOK / TINDER REELS MOD */}
+          {/* AKO JE UKLJUČEN TIKTOK / REELS MOD */}
           {prikaziReelsMod ? (
             <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-2xl max-w-xl mx-auto relative border border-slate-700 overflow-hidden">
               <div className="flex justify-between items-center mb-4">
@@ -810,7 +1194,6 @@ export default function KupkoApp() {
                 <p className="text-center py-20 text-slate-400">Nema oglasa za prikaz.</p>
               ) : (
                 <div className="relative bg-slate-950 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col">
-                  {/* Trenutni oglas u reels prikazu */}
                   {(() => {
                     const currentOglas = oglasi[reelsIndex % oglasi.length];
                     const slika = currentOglas.slike && currentOglas.slike.length > 0 ? currentOglas.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80";
