@@ -568,6 +568,11 @@ export default function KupkoApp() {
   const [prikaziRegistraciju, setPrikaziRegistraciju] = useState(false);
   const [prikaziMeniKorisnika, setPrikaziMeniKorisnika] = useState(false);
 
+  // Stanja za pravne stranice i kolačiće
+  const [prikaziUvjeteModal, setPrikaziUvjeteModal] = useState(false);
+  const [prikaziPrivatnostModal, setPrikaziPrivatnostModal] = useState(false);
+  const [prikaziCookieBanner, setPrikaziCookieBanner] = useState(false);
+
   // Stanje za zaboravljenu lozinku
   const [prikaziZaboravljenuLozinku, setPrikaziZaboravljenuLozinku] = useState(false);
   const [zaboravljeniEmail, setZaboravljeniEmail] = useState("");
@@ -623,8 +628,20 @@ export default function KupkoApp() {
     if (spremljeniKorisnik) { try { setKorisnik(JSON.parse(spremljeniKorisnik)); } catch (e) { console.error(e); } }
     const spremljeniOsobniPodaci = localStorage.getItem("kupko_osobni_podaci");
     if (spremljeniOsobniPodaci) { try { setKorisnickiPodaci(JSON.parse(spremljeniOsobniPodaci)); } catch (e) { console.error(e); } }
+    
+    // Provjera kolačića
+    const kolaciciPrihvaceni = localStorage.getItem("kupko_kolacici_prihvaceni");
+    if (!kolaciciPrihvaceni) {
+      setPrikaziCookieBanner(true);
+    }
+
     generirajKôd();
   }, []);
+
+  const prihvatiKolacice = () => {
+    localStorage.setItem("kupko_kolacici_prihvaceni", "true");
+    setPrikaziCookieBanner(false);
+  };
 
   const generirajKôd = () => {
     const num1 = Math.floor(Math.random() * 8) + 1;
@@ -1345,6 +1362,40 @@ export default function KupkoApp() {
             </div>
           ) : (
             <>
+              {/* NAJPOSJEĆENIJE KATEGORIJE SEKCIJA */}
+              {!prikaziSamoOmiljene && odabranaKategorija === "sve" && pojamPretrage === "" && prikaz !== "karta" && (
+                <section className="bg-white p-6 rounded-3xl border border-slate-200 shadow-lg space-y-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2.5 bg-blue-900 text-amber-400 rounded-2xl font-black shadow">
+                      <Flame className="w-5 h-5 fill-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-lg text-slate-900">Najposjećenije kategorije</h3>
+                      <p className="text-xs text-slate-500 font-semibold">Pregled aktivnosti i broja aktivnih oglasa po kategorijama</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                    {SVE_KATEGORIJE.map((kat) => {
+                      const count = oglasi.filter(o => o.kategorija === kat.id).length;
+                      return (
+                        <div
+                          key={kat.id}
+                          onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); }}
+                          className="bg-slate-50 hover:bg-blue-50 border border-slate-200 p-4 rounded-2xl cursor-pointer transition flex flex-col items-center text-center group shadow-sm hover:shadow-md"
+                        >
+                          <span className="text-3xl mb-2 group-hover:scale-110 transition">{kat.ikona}</span>
+                          <span className="font-black text-slate-900 text-xs line-clamp-1">{kat.naziv}</span>
+                          <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full mt-2">
+                            {count} oglasa
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
               <section className="bg-white p-5 rounded-3xl border border-slate-200 shadow-lg space-y-4">
                 <div className="flex justify-between items-center flex-wrap gap-4">
                   <h3 className="text-sm font-black uppercase text-slate-500 tracking-wider">Sve Kategorije na Kupku</h3>
@@ -1702,8 +1753,8 @@ export default function KupkoApp() {
           <div>
             <h4 className="font-black text-white uppercase text-sm mb-3 tracking-wider text-amber-400">Pravne Informacije</h4>
             <ul className="space-y-2.5 text-xs font-semibold">
-              <li><button onClick={() => alert("Uvjeti korištenja su usklađeni sa zakonima RH.")} className="hover:text-amber-400 transition">Uvjeti korištenja</button></li>
-              <li><button onClick={() => alert("Politika privatnosti štiti vaše podatke prema GDPR-u.")} className="hover:text-amber-400 transition">Politika privatnosti</button></li>
+              <li><button onClick={() => setPrikaziUvjeteModal(true)} className="hover:text-amber-400 transition">Uvjeti korištenja</button></li>
+              <li><button onClick={() => setPrikaziPrivatnostModal(true)} className="hover:text-amber-400 transition">Politika privatnosti</button></li>
             </ul>
           </div>
 
@@ -1713,6 +1764,64 @@ export default function KupkoApp() {
           </div>
         </div>
       </footer>
+
+      {/* COOKIE BANNER */}
+      {prikaziCookieBanner && (
+        <div className="fixed bottom-0 left-0 right-0 bg-blue-950 text-white p-4 z-50 shadow-2xl border-t-2 border-amber-400 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs sm:text-sm max-w-4xl">
+            <span className="font-bold text-amber-400">🍪 Kolačići i Privatnost:</span> Kupko.hr koristi kolačiće (cookies) radi osiguranja ispravnog rada stranice, analitike prometa i prilagodbe korisničkog iskustva. Nastavkom korištenja portala slažete se s korištenjem kolačića.
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button onClick={prihvatiKolacice} className="bg-amber-400 hover:bg-amber-300 text-blue-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase shadow">
+              Prihvaćam sve
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: UVJETI KORIŠTENJA */}
+      {prikaziUvjeteModal && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
+            <button onClick={() => setPrikaziUvjeteModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <div className="flex items-center gap-2 text-blue-900">
+              <FileText className="w-7 h-7" />
+              <h2 className="text-2xl font-black text-slate-900">Uvjeti i pravila korištenja Kupko.hr</h2>
+            </div>
+            <div className="text-xs sm:text-sm text-slate-700 space-y-3 leading-relaxed font-medium">
+              <p>Dobrodošli na Kupko.hr. Korištenjem našeg portala prihvaćate ove uvjete korištenja u cijelosti.</p>
+              <h4 className="font-black text-slate-900 text-base mt-3">1. Predaja oglasa</h4>
+              <p>Korisnici mogu predavati oglase besplatno ili uz opciju plaćene promocije. Svi predani oglasi moraju biti istiniti, zakoniti i ne smiju kršiti prava trećih osoba.</p>
+              <h4 className="font-black text-slate-900 text-base mt-3">2. Zabranjeni sadržaj</h4>
+              <p>Zabranjeno je objavljivanje oglasa koji sadrže lažne informacije, prodaju protuzakonitih sredstava, oružja bez dozvole, piratskog softvera ili uvredljiv sadržaj.</p>
+              <h4 className="font-black text-slate-900 text-base mt-3">3. Odgovornost</h4>
+              <p>Kupko.hr je posrednik u oglasnom prostoru i ne snosi odgovornost za kvalitetu robe, prijevare ili međusobne transakcije između kupaca i prodavača.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: POLITIKA PRIVATNOSTI */}
+      {prikaziPrivatnostModal && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
+            <button onClick={() => setPrikaziPrivatnostModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <div className="flex items-center gap-2 text-emerald-700">
+              <ShieldCheck className="w-7 h-7" />
+              <h2 className="text-2xl font-black text-slate-900">Politika privatnosti (GDPR)</h2>
+            </div>
+            <div className="text-xs sm:text-sm text-slate-700 space-y-3 leading-relaxed font-medium">
+              <p>Kupko.hr izuzetno štiti vašu privatnost i usklađen je s Općom uredbom o zaštiti podataka (GDPR).</p>
+              <h4 className="font-black text-slate-900 text-base mt-3">1. Prikupljanje podataka</h4>
+              <p>Prilikom registracije prikupljamo vaše korisničko ime i e-mail adresu isključivo radi autentifikacije i slanja važnih obavijesti vezanih uz vaš račun i poruke.</p>
+              <h4 className="font-black text-slate-900 text-base mt-3">2. Sigurnost podataka</h4>
+              <p>Vaši podaci se pohranjuju sigurno i nikada se ne ustupaju trećim osobama u marketinške svrhe bez vašeg izričitog pristanka.</p>
+              <h4 className="font-black text-slate-900 text-base mt-3">3. Prava korisnika</h4>
+              <p>U svakom trenutku imate pravo zatražiti uvid, izmjenu ili potpuno brisanje vaših osobnih podataka iz naše baze.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL: SANDUČIĆ PORUKA */}
       {prikaziSanducicPoruka && (
