@@ -195,7 +195,6 @@ export default function KupkoApp() {
 
   const [prikaziPlacanjePromo, setPrikaziPlacanjePromo] = useState(false);
   const [oglasZaPromociju, setOglasZaPromociju] = useState<any>(null);
-  const [odabraniNacinPlacanja, setOdabraniNacinPlacanja] = useState("kartica");
 
   const [korakVerifikacije, setKorakVerifikacije] = useState(false);
   const [privremeniEmail, setPrivremeniEmail] = useState("");
@@ -214,6 +213,15 @@ export default function KupkoApp() {
   });
   
   const [sigurnosniKod, setSigurnosniKod] = useState({ a: 3, b: 4, unos: "" });
+
+  const [noviOglas, setNoviOglas] = useState({
+    naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
+    kategorija: "auto-moto", podkategorija: "Osobna vozila",
+    zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slike: [] as string[], opis: "",
+    prodavac: "", telefon: "", email: "", promoviran: false,
+    godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni",
+    kvadratura: "", sobe: ""
+  });
 
   useEffect(() => {
     const lokalniOglasi = localStorage.getItem("kupko_oglasi_v27");
@@ -277,34 +285,6 @@ export default function KupkoApp() {
     }
     setOmiljeniIds(noviIds);
     localStorage.setItem("kupko_omiljeni", JSON.stringify(noviIds));
-  };
-
-  const posaljiPorukuProdavacu = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!korisnik) {
-      alert("Morate biti prijavljeni da biste poslali poruku.");
-      setPrikaziPrijavu(true);
-      return;
-    }
-    if (!tekstNovePoruke.trim() || !odabraniOglas) return;
-
-    const novaPoruka = {
-      id: Date.now(),
-      oglasId: odabraniOglas.id,
-      oglasNaslov: odabraniOglas.naslov,
-      primateljEmail: odabraniOglas.autorEmail || odabraniOglas.email || "prodavac@kupko.hr",
-      primateljIme: odabraniOglas.prodavac || "Prodavač",
-      posiljateljIme: korisnik.ime,
-      posiljateljEmail: korisnik.email,
-      tekst: tekstNovePoruke.trim(),
-      datum: new Date().toLocaleString()
-    };
-
-    const azuriranePoruke = [novaPoruka, ...poruke];
-    spremiPoruke(azuriranePoruke);
-    setTekstNovePoruke("");
-    setPrikaziFormuZaSlanjePoruke(false);
-    alert("Poruka je uspješno poslana prodavaču!");
   };
 
   const obnoviOglas = (e: React.MouseEvent, id: number) => {
@@ -566,15 +546,6 @@ export default function KupkoApp() {
     alert("Uređivanje uspješno spremljeno!");
   };
 
-  const [noviOglas, setNoviOglas] = useState({
-    naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
-    kategorija: "auto-moto", podkategorija: "Osobna vozila",
-    zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slike: [] as string[], opis: "",
-    prodavac: "", telefon: "", email: "", promoviran: false,
-    godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni",
-    kvadratura: "", sobe: ""
-  });
-
   const izracunajAiProcjenuZaOglas = (glas: any) => {
     const filtriraniKat = oglasi.filter(o => o.kategorija === glas.kategorija && o.cijena);
     if (filtriraniKat.length <= 1) return "Tržište je stabilno. Cijena je unutar očekivanih okvira za ovu kategoriju.";
@@ -594,7 +565,6 @@ export default function KupkoApp() {
   const rukujDodavanjemOglasa = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Provjera prijave (Obavezno prijavljen)
     if (!korisnik) {
       alert("Morate biti prijavljeni da biste predali oglas!");
       setPrikaziFormu(false);
@@ -1513,6 +1483,60 @@ export default function KupkoApp() {
                 </div>
               </div>
 
+              {/* DINAMIČKA POLJA ZA AUTO-MOTO */}
+              {noviOglas.kategorija === "auto-moto" && (
+                <div className="bg-blue-50/70 p-4 rounded-3xl border border-blue-200 space-y-3">
+                  <h4 className="text-xs font-black text-blue-900 uppercase flex items-center gap-1.5"><Car className="w-4 h-4" /> Specifikacije vozila</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Godište</label>
+                      <input type="text" placeholder="npr. 2019" value={noviOglas.godiste} onChange={(e) => setNoviOglas({ ...noviOglas, godiste: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Kilometri</label>
+                      <input type="text" placeholder="npr. 145000" value={noviOglas.kilometri} onChange={(e) => setNoviOglas({ ...noviOglas, kilometri: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Snaga (kW)</label>
+                      <input type="text" placeholder="npr. 140" value={noviOglas.snagaKw} onChange={(e) => setNoviOglas({ ...noviOglas, snagaKw: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Gorivo</label>
+                      <select value={noviOglas.gorivo} onChange={(e) => setNoviOglas({ ...noviOglas, gorivo: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-bold bg-white">
+                        <option value="Dizel">Dizel</option>
+                        <option value="Benzin">Benzin</option>
+                        <option value="Hibrid">Hibrid</option>
+                        <option value="Električni">Električni</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Mjenjač</label>
+                      <select value={noviOglas.mjenjac} onChange={(e) => setNoviOglas({ ...noviOglas, mjenjac: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-bold bg-white">
+                        <option value="Ručni">Ručni</option>
+                        <option value="Automatski">Automatski</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* DINAMIČKA POLJA ZA NEKRETNINE */}
+              {noviOglas.kategorija === "nekretnine" && (
+                <div className="bg-emerald-50/70 p-4 rounded-3xl border border-emerald-200 space-y-3">
+                  <h4 className="text-xs font-black text-emerald-900 uppercase flex items-center gap-1.5"><Home className="w-4 h-4" /> Specifikacije nekretnine</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Kvadratura (m²)</label>
+                      <input type="text" placeholder="npr. 55" value={noviOglas.kvadratura} onChange={(e) => setNoviOglas({ ...noviOglas, kvadratura: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Broj soba</label>
+                      <input type="text" placeholder="npr. 2" value={noviOglas.sobe} onChange={(e) => setNoviOglas({ ...noviOglas, sobe: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-black text-slate-700 uppercase mb-1">Županija</label>
@@ -1666,10 +1690,16 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: DETALJI OGLASA */}
+      {/* MODAL: DETALJI OGLASA (SA OMOGUĆENIM ZATVARANJEM KLIKOM IZVAN PROZORA) */}
       {odabraniOglas && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 relative shadow-2xl space-y-6">
+        <div 
+          onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }}
+          className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 relative shadow-2xl space-y-6 cursor-default"
+          >
             <button onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }} className="absolute top-4 right-4 bg-slate-100 p-2.5 rounded-full z-10 hover:bg-slate-200"><X className="w-6 h-6" /></button>
             
             <div className="relative rounded-3xl overflow-hidden max-h-80 bg-slate-900 flex items-center justify-center shadow-md">
@@ -1694,6 +1724,24 @@ export default function KupkoApp() {
                 <span className="text-3xl sm:text-4xl font-black text-blue-700 block">{odabraniOglas.cijena} €</span>
               </div>
             </div>
+
+            {/* PRIKAZ SPECIFIKACIJA AKO POSTOJE */}
+            {odabraniOglas.kategorija === "auto-moto" && (odabraniOglas.godiste || odabraniOglas.kilometri || odabraniOglas.snagaKw) && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-blue-50 p-4 rounded-2xl border border-blue-200 text-xs font-bold text-blue-950">
+                {odabraniOglas.godiste && <div>📅 Godište: <span className="font-normal">{odabraniOglas.godiste}</span></div>}
+                {odabraniOglas.kilometri && <div>🛣️ Kilometri: <span className="font-normal">{odabraniOglas.kilometri} km</span></div>}
+                {odabraniOglas.snagaKw && <div>⚡ Snaga: <span className="font-normal">{odabraniOglas.snagaKw} kW</span></div>}
+                {odabraniOglas.gorivo && <div>⛽ Gorivo: <span className="font-normal">{odabraniOglas.gorivo}</span></div>}
+                {odabraniOglas.mjenjac && <div>⚙️ Mjenjač: <span className="font-normal">{odabraniOglas.mjenjac}</span></div>}
+              </div>
+            )}
+
+            {odabraniOglas.kategorija === "nekretnine" && (odabraniOglas.kvadratura || odabraniOglas.sobe) && (
+              <div className="grid grid-cols-2 gap-3 bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-xs font-bold text-emerald-950">
+                {odabraniOglas.kvadratura && <div>🏠 Kvadratura: <span className="font-normal">{odabraniOglas.kvadratura} m²</span></div>}
+                {odabraniOglas.sobe && <div>🚪 Sobe: <span className="font-normal">{odabraniOglas.sobe}</span></div>}
+              </div>
+            )}
 
             <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-white p-5 rounded-3xl shadow-lg space-y-2">
               <div className="flex items-center gap-2 text-amber-400 font-black text-sm uppercase">
@@ -1740,6 +1788,17 @@ export default function KupkoApp() {
                 value={formaPrijava.lozinka} onChange={(e) => setFormaPrijava({ ...formaPrijava, lozinka: e.target.value })}
                 className="w-full p-3.5 rounded-2xl border text-sm font-semibold"
               />
+              
+              <div className="flex justify-end text-xs pt-1">
+                <button 
+                  type="button" 
+                  onClick={() => { setPrikaziPrijavu(false); setPrikaziZaboravljenuLozinku(true); }}
+                  className="text-blue-700 font-bold hover:underline"
+                >
+                  Zaboravili ste lozinku?
+                </button>
+              </div>
+
               <button type="submit" className="w-full bg-blue-700 text-white font-black py-3.5 rounded-2xl text-sm shadow-md mt-2">Prijavi se</button>
             </form>
           </div>
