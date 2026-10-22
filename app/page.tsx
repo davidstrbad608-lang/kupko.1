@@ -392,7 +392,6 @@ export default function KupkoApp() {
       return;
     }
 
-    // Provjera prvih 20 korisnika za 3 besplatna promo kredita
     const brojTrenutnih = registriraniKorisnici.length;
     const dobivaKredite = brojTrenutnih < 20;
     const dodijeljeniKrediti = dobivaKredite ? 3 : 0;
@@ -594,6 +593,15 @@ export default function KupkoApp() {
 
   const rukujDodavanjemOglasa = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Provjera prijave (Obavezno prijavljen)
+    if (!korisnik) {
+      alert("Morate biti prijavljeni da biste predali oglas!");
+      setPrikaziFormu(false);
+      setPrikaziPrijavu(true);
+      return;
+    }
+
     if (!noviOglas.naslov || !noviOglas.cijena) return;
     if (parseInt(sigurnosniKod.unos) !== sigurnosniKod.a + sigurnosniKod.b) {
       alert("Netočan zbroj u anti-spam provjeri!");
@@ -602,8 +610,8 @@ export default function KupkoApp() {
 
     const sad = new Date();
     const datumString = `Objavljeno danas u ${sad.getHours().toString().padStart(2, "0")}:${sad.getMinutes().toString().padStart(2, "0")}`;
-    const autorEmailFinal = korisnik ? korisnik.email : (noviOglas.email.trim() || `anonimni_${Date.now()}@kupko.hr`);
-    const prodavacFinal = korisnik ? korisnik.ime : (noviOglas.prodavac || "Korisnik");
+    const autorEmailFinal = korisnik.email;
+    const prodavacFinal = korisnik.ime;
 
     const stvoreniOglas = {
       ...noviOglas,
@@ -672,10 +680,6 @@ export default function KupkoApp() {
   });
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
-  const preporucenoLjubimci = oglasi.filter(o => o.kategorija === "kucni-ljubimci").slice(0, 3);
-  const preporucenoAutoMoto = oglasi.filter(o => o.kategorija === "auto-moto").slice(0, 3);
-  const preporucenoNekretnine = oglasi.filter(o => o.kategorija === "nekretnine").slice(0, 3);
-
   const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail.toLowerCase() === korisnik.email.toLowerCase()) : [];
 
   const mozeUreditiIliBrisati = (o: any) => {
@@ -727,7 +731,6 @@ export default function KupkoApp() {
                         <p className="font-black text-slate-900 text-base">{korisnik.ime}</p>
                         <p className="text-xs text-blue-700 font-semibold">{korisnik.email}</p>
                         
-                        {/* PRIKAZ BESPLATNIH KREDITA */}
                         <div className="mt-2.5 bg-amber-100 border border-amber-300 text-amber-900 p-2 rounded-xl flex items-center justify-between text-xs font-black">
                           <span>🌟 Besplatni Promo Boostovi:</span>
                           <span className="bg-amber-500 text-white px-2 py-0.5 rounded-lg text-sm">{korisnik.promoKrediti || 0}</span>
@@ -839,8 +842,16 @@ export default function KupkoApp() {
                 <span className="hidden sm:inline">({omiljeniIds.length})</span>
               </button>
 
+              {/* ZAŠTIĆENI GUMB ZA PREDAJU OGLASA */}
               <button 
-                onClick={() => setPrikaziFormu(true)}
+                onClick={() => {
+                  if (!korisnik) {
+                    alert("Morate biti prijavljeni da biste predali oglas!");
+                    setPrikaziPrijavu(true);
+                    return;
+                  }
+                  setPrikaziFormu(true);
+                }}
                 className="bg-amber-400 hover:bg-amber-300 text-blue-950 font-black px-5 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-xl transition text-sm uppercase tracking-wider"
               >
                 <PlusCircle className="w-5 h-5 stroke-[2.5]" />
@@ -1127,7 +1138,7 @@ export default function KupkoApp() {
                     <button onClick={() => setPrikaz("list")} className={`p-2.5 rounded-xl ${prikaz === "list" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Lista prikaz"><List className="w-5 h-5" /></button>
 
 <Map className="w-5 h-5" />
-<button onClick={() => setPrikaz("karta")} className={`p-2.5 rounded-xl ${prikaz === "karta" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Interaktivna karta"></button>
+<button onClick={() => setPrikaz("karta")} className={`p-2.5 rounded-xl flex items-center gap-1 ${prikaz === "karta" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Interaktivna karta"></button>
                   </div>
                 </div>
 
@@ -1289,7 +1300,21 @@ export default function KupkoApp() {
             <ul className="space-y-2.5 text-xs font-semibold">
               <li><button onClick={() => alert("Kontakt: podrskakupko@gmail.com")} className="hover:text-amber-400 transition">Kontakt i pomoć</button></li>
               <li><button onClick={() => alert("O nama: Kupko je prvi pravi hrvatski oglasnik.")} className="hover:text-amber-400 transition">O nama</button></li>
-              <li><button onClick={() => setPrikaziFormu(true)} className="hover:text-amber-400 transition text-amber-300 font-bold">Predaj oglas</button></li>
+              <li>
+                <button 
+                  onClick={() => {
+                    if (!korisnik) {
+                      alert("Morate biti prijavljeni da biste predali oglas!");
+                      setPrikaziPrijavu(true);
+                      return;
+                    }
+                    setPrikaziFormu(true);
+                  }} 
+                  className="hover:text-amber-400 transition text-amber-300 font-bold"
+                >
+                  Predaj oglas
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -1408,7 +1433,6 @@ export default function KupkoApp() {
             </div>
             <p className="text-sm text-slate-600 font-medium">Oglas: <strong className="text-slate-900">{oglasZaPromociju.naslov}</strong></p>
 
-            {/* AKO KORISNIK IMA BESPLATNIH KREDITA */}
             {korisnik && (korisnik.promoKrediti || 0) > 0 ? (
               <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 text-center space-y-3">
                 <p className="text-xs font-black text-amber-900 uppercase">
