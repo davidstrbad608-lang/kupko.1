@@ -493,32 +493,37 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
+  // NAJMANJA CIJENA PROMO POSTA SADA JE 2.00 € (ZA JEFTINIJE ARTIKLE)
   const dohvatiPaketeZaOglas = (glas: any) => {
     const cijenaNum = parseFloat(glas?.cijena || "0");
     
     if (cijenaNum < 200) {
+      // Jeftiniji artikli (npr. bicikli, odjeća, knjige, ljubimci) - Minimalno 2.00 €
       return [
-        { naziv: "Mini Boost (3 dana)", cijena: "0.50" },
-        { naziv: "Standardni Boost (7 dana)", cijena: "1.00" },
-        { naziv: "Dugotrajni Boost (30 dana)", cijena: "2.50" }
-      ];
-    } else if (cijenaNum >= 200 && cijenaNum < 2000) {
-      return [
-        { naziv: "Mini Boost (3 dana)", cijena: "1.50" },
-        { naziv: "Standardni Boost (7 dana)", cijena: "3.00" },
+        { naziv: "Mini Boost (3 dana)", cijena: "2.00" },
+        { naziv: "Standardni Boost (7 dana)", cijena: "3.50" },
         { naziv: "Dugotrajni Boost (30 dana)", cijena: "6.00" }
       ];
-    } else if (cijenaNum >= 2000 && cijenaNum < 20000) {
+    } else if (cijenaNum >= 200 && cijenaNum < 2000) {
+      // Srednja vrijednost (npr. mobiteli, računala, manji aparati)
       return [
-        { naziv: "Mini Boost (3 dana)", cijena: "3.00" },
-        { naziv: "Standardni Boost (7 dana)", cijena: "6.00" },
-        { naziv: "Maksimalni Boost (30 dana)", cijena: "12.00" }
+        { naziv: "Mini Boost (3 dana)", cijena: "4.00" },
+        { naziv: "Standardni Boost (7 dana)", cijena: "7.00" },
+        { naziv: "Dugotrajni Boost (30 dana)", cijena: "12.00" }
+      ];
+    } else if (cijenaNum >= 2000 && cijenaNum < 20000) {
+      // Veća vrijednost (npr. automobili, skuteri, vrijedna oprema)
+      return [
+        { naziv: "Mini Boost (3 dana)", cijena: "6.00" },
+        { naziv: "Standardni Boost (7 dana)", cijena: "11.00" },
+        { naziv: "Maksimalni Boost (30 dana)", cijena: "20.00" }
       ];
     } else {
+      // Visoka vrijednost (npr. nekretnine, stanovi, kuće, luksuzna vozila)
       return [
-        { naziv: "Premium Standard (7 dana)", cijena: "9.00" },
-        { naziv: "Premium Produženi (14 dana)", cijena: "15.00" },
-        { naziv: "Maksimalni VIP Boost (30 dana)", cijena: "22.00" }
+        { naziv: "Premium Standard (7 dana)", cijena: "15.00" },
+        { naziv: "Premium Produženi (14 dana)", cijena: "25.00" },
+        { naziv: "Maksimalni VIP Boost (30 dana)", cijena: "40.00" }
       ];
     }
   };
@@ -616,7 +621,6 @@ export default function KupkoApp() {
     let konacniPromoviran = noviOglas.promoviran;
     let noviKreditiKorisnika = korisnik.promoKrediti || 0;
 
-    // Ako je korisnik odabrao promo pri predaji i ima besplatni kredit
     if (konacniPromoviran && noviKreditiKorisnika > 0) {
       noviKreditiKorisnika -= 1;
       const azuriraniKorisnik = { ...korisnik, promoKrediti: noviKreditiKorisnika };
@@ -1487,7 +1491,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PREDAJA OGLASA (DODANA OPCIJA PROMO POSTA DIREKTNO PRI PREDAJI) */}
       {prikaziFormu && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
@@ -1616,7 +1619,6 @@ export default function KupkoApp() {
                 </div>
               </div>
 
-              {/* OPCIJA PROMO POSTA DIREKTNO PRI PREDAJI OGLASA */}
               <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 space-y-2">
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <input 
