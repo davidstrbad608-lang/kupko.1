@@ -338,7 +338,6 @@ export default function KupkoApp() {
     const imeClean = formaRegistracija.ime.trim();
     const emailLower = formaRegistracija.email.toLowerCase().trim();
 
-    // STROGA PROVJERA: Samo ti možeš koristiti korisničko ime "admin"
     if (imeClean.toLowerCase() === "admin") {
       alert("Korisničko ime 'admin' je rezervirano i nije dozvoljeno za registraciju!");
       return;
@@ -494,10 +493,42 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
+  const dohvatiPaketeZaOglas = (glas: any) => {
+    const cijenaNum = parseFloat(glas?.cijena || "0");
+    
+    if (cijenaNum < 200) {
+      return [
+        { naziv: "Mini Boost (3 dana)", cijena: "0.50" },
+        { naziv: "Standardni Boost (7 dana)", cijena: "1.00" },
+        { naziv: "Dugotrajni Boost (30 dana)", cijena: "2.50" }
+      ];
+    } else if (cijenaNum >= 200 && cijenaNum < 2000) {
+      return [
+        { naziv: "Mini Boost (3 dana)", cijena: "1.50" },
+        { naziv: "Standardni Boost (7 dana)", cijena: "3.00" },
+        { naziv: "Dugotrajni Boost (30 dana)", cijena: "6.00" }
+      ];
+    } else if (cijenaNum >= 2000 && cijenaNum < 20000) {
+      return [
+        { naziv: "Mini Boost (3 dana)", cijena: "3.00" },
+        { naziv: "Standardni Boost (7 dana)", cijena: "6.00" },
+        { naziv: "Maksimalni Boost (30 dana)", cijena: "12.00" }
+      ];
+    } else {
+      return [
+        { naziv: "Premium Standard (7 dana)", cijena: "9.00" },
+        { naziv: "Premium Produženi (14 dana)", cijena: "15.00" },
+        { naziv: "Maksimalni VIP Boost (30 dana)", cijena: "22.00" }
+      ];
+    }
+  };
+
   const pokreniPromociju = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni da biste mogli promovirati oglas!"); return; }
     setOglasZaPromociju(glas);
+    const paketi = dohvatiPaketeZaOglas(glas);
+    setOdabraniPromoPaket(paketi[0]);
     setPrikaziPlacanjePromo(true);
   };
 
@@ -582,6 +613,24 @@ export default function KupkoApp() {
       return;
     }
 
+    let konacniPromoviran = noviOglas.promoviran;
+    let noviKreditiKorisnika = korisnik.promoKrediti || 0;
+
+    // Ako je korisnik odabrao promo pri predaji i ima besplatni kredit
+    if (konacniPromoviran && noviKreditiKorisnika > 0) {
+      noviKreditiKorisnika -= 1;
+      const azuriraniKorisnik = { ...korisnik, promoKrediti: noviKreditiKorisnika };
+      postaviKorisnika(azuriraniKorisnik);
+
+      const azuriraniRegKorisnici = registriraniKorisnici.map(k => 
+        k.email.toLowerCase() === korisnik.email.toLowerCase() ? { ...k, promoKrediti: noviKreditiKorisnika } : k
+      );
+      setRegistriraniKorisnici(azuriraniRegKorisnici);
+      localStorage.setItem("kupko_baza_korisnika", JSON.stringify(azuriraniRegKorisnici));
+      
+      alert("🌟 Uspješno iskorišten vaš besplatni promo post pri objavi oglasa!");
+    }
+
     const sad = new Date();
     const datumString = `Objavljeno danas u ${sad.getHours().toString().padStart(2, "0")}:${sad.getMinutes().toString().padStart(2, "0")}`;
     const autorEmailFinal = korisnik.email;
@@ -589,8 +638,9 @@ export default function KupkoApp() {
 
     const stvoreniOglas = {
       ...noviOglas,
+      promoviran: konacniPromoviran,
+      top: konacniPromoviran,
       id: Date.now(),
-      top: noviOglas.promoviran,
       datum: datumString,
       prodavac: prodavacFinal,
       autorEmail: autorEmailFinal,
@@ -636,23 +686,6 @@ export default function KupkoApp() {
     }
   };
 
-  // Dinamički odabir paketa prema kategoriji oglasa koji se promovira
-  const dohvatiPaketeZaOglas = (kat: string) => {
-    if (kat === "auto-moto" || kat === "nekretnine") {
-      return [
-        { naziv: "Premium Standard (7 dana)", cijena: "9.00" },
-        { naziv: "Premium Produženi (14 dana)", cijena: "15.00" },
-        { naziv: "Maksimalni VIP Boost (30 dana)", cijena: "25.00" }
-      ];
-    } else {
-      return [
-        { naziv: "Standardni Boost (7 dana)", cijena: "4.00" },
-        { naziv: "Produženi Boost (14 dana)", cijena: "7.00" },
-        { naziv: "Dugotrajni Boost (30 dana)", cijena: "12.00" }
-      ];
-    }
-  };
-
   const filtriraniOglasi = oglasi.filter((o) => {
     const odgovaraTrazilici = o.naslov.toLowerCase().includes(pojamPretrage.toLowerCase());
     const odgovaraKategoriji = odabranaKategorija === "sve" || o.kategorija === odabranaKategorija;
@@ -688,7 +721,6 @@ export default function KupkoApp() {
       
       <div className="relative z-10">
         
-        {/* AKCIJSKI BANNER ZA PRVIH 20 KORISNIKA */}
         {preostaloMjestaZaGrateis > 0 && (
           <div className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-blue-950 px-4 py-2.5 text-xs sm:text-sm font-black text-center shadow-md flex items-center justify-center gap-2 border-b border-amber-600">
             <Sparkles className="w-5 h-5 fill-blue-950 text-amber-400 animate-spin" />
@@ -696,7 +728,6 @@ export default function KupkoApp() {
           </div>
         )}
 
-        {/* TOP KORISNIČKA TRAKA */}
         <div className="bg-blue-950 text-blue-200 text-sm py-2 px-4 shadow-sm relative">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <span className="flex items-center gap-1.5 font-bold tracking-wide">
@@ -772,7 +803,6 @@ export default function KupkoApp() {
           </div>
         </div>
 
-        {/* HEADER */}
         <header className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white shadow-xl sticky top-0 z-40 border-b border-blue-700">
           <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <div 
@@ -833,7 +863,6 @@ export default function KupkoApp() {
                 <span className="hidden sm:inline">({omiljeniIds.length})</span>
               </button>
 
-              {/* ZAŠTIĆENI GUMB ZA PREDAJU OGLASA */}
               <button 
                 onClick={() => {
                   if (!korisnik) {
@@ -852,7 +881,6 @@ export default function KupkoApp() {
           </div>
         </header>
 
-        {/* 1. SEKTOR: PLAĆENI PROMO OGLASI */}
         {!prikaziSamoOmiljene && !prikaziReelsMod && promoOglasi.length > 0 && (
           <section className="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 py-6 text-blue-950 shadow-xl border-b-2 border-amber-600">
             <div className="max-w-7xl mx-auto px-4">
@@ -1231,7 +1259,6 @@ export default function KupkoApp() {
                               </div>
                             </div>
 
-                            {/* GUMB ZA PROMO VIDLJIV SVAKOM PRIJAVLJENOM KORISNIKU */}
                             {korisnik && !o.promoviran && (
                               <div className="mt-4 pt-4 border-t border-slate-100">
                                 <button
@@ -1243,7 +1270,6 @@ export default function KupkoApp() {
                               </div>
                             )}
 
-                            {/* UREĐIVANJE I BRISANJE SAMO ZA AUTORA ILI ADMINA */}
                             {mozeUreditiIliBrisati(o) && (
                               <div className="mt-2 pt-2 flex gap-2">
                                 <button
@@ -1272,7 +1298,6 @@ export default function KupkoApp() {
         </main>
       </div>
 
-      {/* FOOTER */}
       <footer className="bg-blue-950 text-slate-200 mt-20 border-t-4 border-amber-400 pt-12 pb-10 text-sm relative z-10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
@@ -1325,7 +1350,6 @@ export default function KupkoApp() {
         </div>
       </footer>
 
-      {/* COOKIE BANNER */}
       {prikaziCookieBanner && (
         <div className="fixed bottom-0 left-0 right-0 bg-blue-950 text-white p-4 z-50 shadow-2xl border-t-2 border-amber-400 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs sm:text-sm max-w-4xl">
@@ -1339,7 +1363,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: UVJETI */}
       {prikaziUvjeteModal && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
@@ -1355,7 +1378,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PRIVATNOST */}
       {prikaziPrivatnostModal && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
@@ -1371,7 +1393,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: SANDUČIĆ PORUKA */}
       {prikaziSanducicPoruka && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -1396,7 +1417,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: MOJI PODACI */}
       {prikaziUnosPodatakaModal && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-lg w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
@@ -1414,7 +1434,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PLAĆANJE / KORIŠTENJE PROMO KREDITA (S DINAMIČKIM CIJENAMA I DUŽIM TRAJANJEM) */}
       {prikaziPlacanjePromo && oglasZaPromociju && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
@@ -1424,6 +1443,9 @@ export default function KupkoApp() {
               <h2 className="text-xl font-black text-slate-900">Promocija Oglasa</h2>
             </div>
             <p className="text-sm text-slate-600 font-medium">Oglas: <strong className="text-slate-900">{oglasZaPromociju.naslov}</strong></p>
+            <p className="text-xs text-blue-700 font-bold bg-blue-50 p-2 rounded-xl border">
+              Cijena artikla: {oglasZaPromociju.cijena} € (Cijene promo paketa automatski prilagođene vrijednosti)
+            </p>
 
             {korisnik && (korisnik.promoKrediti || 0) > 0 ? (
               <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 text-center space-y-3">
@@ -1439,16 +1461,14 @@ export default function KupkoApp() {
               </div>
             ) : (
               <form onSubmit={potvrdiUplatuPromo} className="space-y-4">
-                <label className="block text-xs font-black text-slate-700 uppercase">
-                  Odaberite paket promocije za kategoriju <span className="text-blue-700">({oglasZaPromociju.kategorija})</span>:
-                </label>
+                <label className="block text-xs font-black text-slate-700 uppercase">Odaberite paket promocije:</label>
                 <div className="space-y-2">
-                  {dohvatiPaketeZaOglas(oglasZaPromociju.kategorija).map((paket) => (
+                  {dohvatiPaketeZaOglas(oglasZaPromociju).map((paket) => (
                     <div 
                       key={paket.naziv}
                       onClick={() => setOdabraniPromoPaket(paket)}
                       className={`p-3.5 rounded-2xl border cursor-pointer flex justify-between items-center transition ${
-                        (!odabraniPromoPaket && paket === dohvatiPaketeZaOglas(oglasZaPromociju.kategorija)[0]) || odabraniPromoPaket?.naziv === paket.naziv 
+                        odabraniPromoPaket?.naziv === paket.naziv 
                           ? "bg-blue-50 border-blue-600 ring-2 ring-blue-600" 
                           : "bg-slate-50 border-slate-200 hover:bg-slate-100"
                       }`}
@@ -1459,7 +1479,7 @@ export default function KupkoApp() {
                   ))}
                 </div>
                 <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-black py-3.5 rounded-2xl uppercase tracking-wider shadow-lg text-sm">
-                  Plati {odabraniPromoPaket ? odabraniPromoPaket.cijena : dohvatiPaketeZaOglas(oglasZaPromociju.kategorija)[0].cijena} €
+                  Plati {odabraniPromoPaket ? odabraniPromoPaket.cijena : dohvatiPaketeZaOglas(oglasZaPromociju)[0].cijena} €
                 </button>
               </form>
             )}
@@ -1467,7 +1487,7 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PREDAJ OGLAS */}
+      {/* MODAL: PREDAJA OGLASA (DODANA OPCIJA PROMO POSTA DIREKTNO PRI PREDAJI) */}
       {prikaziFormu && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
@@ -1523,7 +1543,6 @@ export default function KupkoApp() {
                 </div>
               </div>
 
-              {/* DINAMIČKA POLJA ZA AUTO-MOTO */}
               {noviOglas.kategorija === "auto-moto" && (
                 <div className="bg-blue-50/70 p-4 rounded-3xl border border-blue-200 space-y-3">
                   <h4 className="text-xs font-black text-blue-900 uppercase flex items-center gap-1.5"><Car className="w-4 h-4" /> Specifikacije vozila</h4>
@@ -1560,7 +1579,6 @@ export default function KupkoApp() {
                 </div>
               )}
 
-              {/* DINAMIČKA POLJA ZA NEKRETNINE */}
               {noviOglas.kategorija === "nekretnine" && (
                 <div className="bg-emerald-50/70 p-4 rounded-3xl border border-emerald-200 space-y-3">
                   <h4 className="text-xs font-black text-emerald-900 uppercase flex items-center gap-1.5"><Home className="w-4 h-4" /> Specifikacije nekretnine</h4>
@@ -1596,6 +1614,26 @@ export default function KupkoApp() {
                   <label className="block text-xs font-black text-slate-700 uppercase mb-1">Broj Mobitela *</label>
                   <input type="text" placeholder="091..." required value={noviOglas.telefon} onChange={(e) => setNoviOglas({ ...noviOglas, telefon: e.target.value })} className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold" />
                 </div>
+              </div>
+
+              {/* OPCIJA PROMO POSTA DIREKTNO PRI PREDAJI OGLASA */}
+              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 space-y-2">
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    checked={noviOglas.promoviran}
+                    onChange={(e) => setNoviOglas({ ...noviOglas, promoviran: e.target.checked })}
+                    className="rounded text-amber-500 w-5 h-5"
+                  />
+                  <span className="font-black text-amber-900 text-sm flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-600" /> Želim odmah promovirati ovaj oglas (Izdvoji na vrh)
+                  </span>
+                </label>
+                {korisnik && (korisnik.promoKrediti || 0) > 0 && noviOglas.promoviran && (
+                  <p className="text-xs text-amber-800 font-bold ml-7">
+                    ✨ Automatski će se iskoristiti 1 vaš besplatni promo post! (Preostalo: {korisnik.promoKrediti})
+                  </p>
+                )}
               </div>
 
               <div className="bg-slate-50 p-5 rounded-3xl border">
@@ -1640,10 +1678,10 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: VERIFIKACIJA KODA */}
       {korakVerifikacije && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
+          <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl relative">
+            <button onClick={() => setKorakVerifikacije(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-black text-slate-900">Potvrdite vaš E-mail</h2>
             <p className="text-sm text-slate-600 font-medium">Poslali smo verifikacijski kod na: <strong className="text-slate-900">{privremeniEmail}</strong></p>
             <form onSubmit={potvrdiVerifikacijskiKod} className="space-y-3.5">
@@ -1660,7 +1698,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: ZABORAVLJENA LOZINKA */}
       {prikaziZaboravljenuLozinku && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
@@ -1704,7 +1741,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: UREDI OGLAS */}
       {prikaziUredivanje && oglasZaUrediti && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
@@ -1730,7 +1766,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: DETALJI OGLASA */}
       {odabraniOglas && (
         <div 
           onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }}
@@ -1765,7 +1800,6 @@ export default function KupkoApp() {
               </div>
             </div>
 
-            {/* PRIKAZ SPECIFIKACIJA AKO POSTOJE */}
             {odabraniOglas.kategorija === "auto-moto" && (odabraniOglas.godiste || odabraniOglas.kilometri || odabraniOglas.snagaKw) && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-blue-50 p-4 rounded-2xl border border-blue-200 text-xs font-bold text-blue-950">
                 {odabraniOglas.godiste && <div>📅 Godište: <span className="font-normal">{odabraniOglas.godiste}</span></div>}
@@ -1811,7 +1845,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PRIJAVA */}
       {prikaziPrijavu && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl">
@@ -1845,7 +1878,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: REGISTRACIJA */}
       {prikaziRegistraciju && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
