@@ -493,33 +493,28 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
-  // NAJMANJA CIJENA PROMO POSTA SADA JE 2.00 € (ZA JEFTINIJE ARTIKLE)
   const dohvatiPaketeZaOglas = (glas: any) => {
     const cijenaNum = parseFloat(glas?.cijena || "0");
     
     if (cijenaNum < 200) {
-      // Jeftiniji artikli (npr. bicikli, odjeća, knjige, ljubimci) - Minimalno 2.00 €
       return [
         { naziv: "Mini Boost (3 dana)", cijena: "2.00" },
         { naziv: "Standardni Boost (7 dana)", cijena: "3.50" },
         { naziv: "Dugotrajni Boost (30 dana)", cijena: "6.00" }
       ];
     } else if (cijenaNum >= 200 && cijenaNum < 2000) {
-      // Srednja vrijednost (npr. mobiteli, računala, manji aparati)
       return [
         { naziv: "Mini Boost (3 dana)", cijena: "4.00" },
         { naziv: "Standardni Boost (7 dana)", cijena: "7.00" },
         { naziv: "Dugotrajni Boost (30 dana)", cijena: "12.00" }
       ];
     } else if (cijenaNum >= 2000 && cijenaNum < 20000) {
-      // Veća vrijednost (npr. automobili, skuteri, vrijedna oprema)
       return [
         { naziv: "Mini Boost (3 dana)", cijena: "6.00" },
         { naziv: "Standardni Boost (7 dana)", cijena: "11.00" },
         { naziv: "Maksimalni Boost (30 dana)", cijena: "20.00" }
       ];
     } else {
-      // Visoka vrijednost (npr. nekretnine, stanovi, kuće, luksuzna vozila)
       return [
         { naziv: "Premium Standard (7 dana)", cijena: "15.00" },
         { naziv: "Premium Produženi (14 dana)", cijena: "25.00" },
@@ -667,26 +662,54 @@ export default function KupkoApp() {
     alert("Oglas uspješno predan!");
   };
 
-  const rukujVisestrukimUcitavanjemSlika = (e: React.ChangeEvent<HTMLInputElement>, uredi = false) => {
+  // Funkcija za slanje pojedinačne datoteke na Cloudinary
+  const uploadToCloudinary = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "kupko_preset");
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dzc1mpgz/auto/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      if (data.secure_url) {
+        return data.secure_url;
+      } else {
+        throw new Error("Greška prilikom uploada");
+      }
+    } catch (error) {
+      console.error("Greška:", error);
+      alert("Došlo je do greške prilikom uploada datoteke na Cloudinary.");
+      return null;
+    }
+  };
+
+  // Nova funkcija za višestruko učitavanje slika i videa preko Cloudinaryja
+  const rukujVisestrukimUcitavanjemSlika = async (e: React.ChangeEvent<HTMLInputElement>, uredi = false) => {
     const datoteke = e.target.files;
     if (datoteke) {
-      Array.from(datoteke).forEach((file) => {
-        const citac = new FileReader();
-        citac.onloadend = () => {
+      for (const file of Array.from(datoteke)) {
+        const cloudinaryUrl = await uploadToCloudinary(file);
+        if (cloudinaryUrl) {
           if (uredi) {
             setOglasZaUrediti((prev: any) => ({
               ...prev,
-              slike: [...(prev.slike || []), citac.result as string]
+              slike: [...(prev.slike || []), cloudinaryUrl]
             }));
           } else {
             setNoviOglas((prev) => ({
               ...prev,
-              slike: [...prev.slike, citac.result as string]
+              slike: [...prev.slike, cloudinaryUrl]
             }));
           }
-        };
-        citac.readAsDataURL(file);
-      });
+        }
+      }
     }
   };
 
@@ -709,14 +732,6 @@ export default function KupkoApp() {
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
   const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail.toLowerCase() === korisnik.email.toLowerCase()) : [];
-
-  const mozeUreditiIliBrisati = (o: any) => {
-    if (!korisnik) return false;
-    if (korisnik.isOwner) return true;
-    const jeAutorEmail = o.autorEmail && o.autorEmail.toLowerCase() === korisnik.email.toLowerCase();
-    const jeAutorIme = o.prodavac && o.prodavac.toLowerCase() === korisnik.ime.toLowerCase();
-    return jeAutorEmail || jeAutorIme;
-  };
 
   const preostaloMjestaZaGrateis = Math.max(0, 20 - registriraniKorisnici.length);
 
@@ -996,7 +1011,11 @@ export default function KupkoApp() {
                     return (
                       <div>
                         <div className="relative h-96 w-full bg-black">
-                          <img src={slika} alt={currentOglas.naslov} className="w-full h-full object-cover" />
+                          {slika.endsWith(".mp4") || slika.includes("video") ? (
+                            <video src={slika} controls autoPlay className="w-full h-full object-cover" />
+                          ) : (
+                            <img src={slika} alt={currentOglas.naslov} className="w-full h-full object-cover" />
+                          )}
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40"></div>
                           
                           <span className="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs uppercase px-3 py-1.5 rounded-full shadow">
@@ -1639,18 +1658,22 @@ export default function KupkoApp() {
               </div>
 
               <div className="bg-slate-50 p-5 rounded-3xl border">
-                <label className="block text-xs font-black text-slate-700 uppercase mb-2">Galerija slika</label>
+                <label className="block text-xs font-black text-slate-700 uppercase mb-2">Galerija slika i videa (Reels)</label>
                 <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-2xl p-6 bg-white cursor-pointer relative mb-3 hover:bg-slate-50 transition">
-                  <input type="file" accept="image/*" multiple onChange={(e) => rukujVisestrukimUcitavanjemSlika(e, false)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                  <input type="file" accept="image/*,video/*" multiple onChange={(e) => rukujVisestrukimUcitavanjemSlika(e, false)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
                   <Upload className="w-8 h-8 text-blue-600 mb-2" />
-                  <p className="text-sm font-black text-slate-800">Odaberite slike s uređaja</p>
+                  <p className="text-sm font-black text-slate-800">Odaberite slike ili videozapise s uređaja</p>
                 </div>
 
                 {noviOglas.slike.length > 0 && (
                   <div className="grid grid-cols-4 gap-2.5">
                     {noviOglas.slike.map((s, idx) => (
-                      <div key={idx} className="relative rounded-xl overflow-hidden border h-20 shadow-sm">
-                        <img src={s} alt="Upload" className="w-full h-full object-cover" />
+                      <div key={idx} className="relative rounded-xl overflow-hidden border h-20 shadow-sm bg-black">
+                        {s.endsWith(".mp4") || s.includes("video") ? (
+                          <video src={s} className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={s} alt="Upload" className="w-full h-full object-cover" />
+                        )}
                         <button type="button" onClick={() => setNoviOglas({ ...noviOglas, slike: noviOglas.slike.filter((_, i) => i !== idx) })} className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"><X className="w-3 h-3" /></button>
                       </div>
                     ))}
@@ -1780,11 +1803,15 @@ export default function KupkoApp() {
             <button onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }} className="absolute top-4 right-4 bg-slate-100 p-2.5 rounded-full z-10 hover:bg-slate-200"><X className="w-6 h-6" /></button>
             
             <div className="relative rounded-3xl overflow-hidden max-h-80 bg-slate-900 flex items-center justify-center shadow-md">
-              <img 
-                src={odabraniOglas.slike && odabraniOglas.slike.length > 0 ? odabraniOglas.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} 
-                alt={odabraniOglas.naslov} 
-                className="w-full h-80 object-cover" 
-              />
+              {odabraniOglas.slike && odabraniOglas.slike.length > 0 && (odabraniOglas.slike[0].endsWith(".mp4") || odabraniOglas.slike[0].includes("video")) ? (
+                <video src={odabraniOglas.slike[0]} controls className="w-full h-80 object-cover" />
+              ) : (
+                <img 
+                  src={odabraniOglas.slike && odabraniOglas.slike.length > 0 ? odabraniOglas.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} 
+                  alt={odabraniOglas.naslov} 
+                  className="w-full h-80 object-cover" 
+                />
+              )}
             </div>
             
             <div className="flex justify-between items-start border-b border-slate-200 pb-5">
