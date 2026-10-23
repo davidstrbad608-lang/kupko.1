@@ -195,6 +195,7 @@ export default function KupkoApp() {
 
   const [prikaziPlacanjePromo, setPrikaziPlacanjePromo] = useState(false);
   const [oglasZaPromociju, setOglasZaPromociju] = useState<any>(null);
+  const [odabraniPromoPaket, setOdabraniPromoPaket] = useState<any>(null);
 
   const [korakVerifikacije, setKorakVerifikacije] = useState(false);
   const [privremeniEmail, setPrivremeniEmail] = useState("");
@@ -337,13 +338,19 @@ export default function KupkoApp() {
     const imeClean = formaRegistracija.ime.trim();
     const emailLower = formaRegistracija.email.toLowerCase().trim();
 
+    // STROGA PROVJERA: Samo ti možeš koristiti korisničko ime "admin"
+    if (imeClean.toLowerCase() === "admin") {
+      alert("Korisničko ime 'admin' je rezervirano i nije dozvoljeno za registraciju!");
+      return;
+    }
+
     if (!formaRegistracija.prihvacenaPrivatnost || !formaRegistracija.prihvaceniUvjeti) {
       alert("Morate pročitati i prihvatiti Politiku privatnosti te Uvjete i pravila korištenja da biste se registrirali.");
       return;
     }
 
     const zauzetoIme = registriraniKorisnici.some((k) => k.ime.toLowerCase() === imeClean.toLowerCase());
-    if (zauzetoIme || imeClean.toLowerCase() === "admin") {
+    if (zauzetoIme) {
       alert("Korisničko ime je već zauzeto! Molimo odaberite drugo korisničko ime.");
       return;
     }
@@ -374,7 +381,7 @@ export default function KupkoApp() {
 
     const brojTrenutnih = registriraniKorisnici.length;
     const dobivaKredite = brojTrenutnih < 20;
-    const dodijeljeniKrediti = dobivaKredite ? 3 : 0;
+    const dodijeljeniKrediti = dobivaKredite ? 1 : 0;
 
     const noviRegKorisnik = {
       ime: privremenoIme, 
@@ -395,7 +402,7 @@ export default function KupkoApp() {
     setFormaRegistracija({ ime: "", email: "", lozinka: "", prihvacenaPrivatnost: false, prihvaceniUvjeti: false });
     
     if (dobivaKredite) {
-      alert(`🎉 Čestitamo! Ušli ste među prvih 20 korisnika i dobili ste 🌟 3 besplatna Promo boosta na poklon!`);
+      alert(`🎉 Čestitamo! Ušli ste među prvih 20 korisnika i dobili ste 🌟 1 besplatni promo post na poklon!`);
     } else {
       alert(`📧 [Simulacija E-maila za Dobrodošlicu na ${privremeniEmail}]:\n\n"Dobrodošli na Kupko, ${privremenoIme}!"`);
     }
@@ -487,7 +494,6 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
-  // 🌟 OVDJE JE OMOGUĆENO DA BILO KOJI PRIJAVLJENI KORISNIK (NPR. TI SVOJEM PRIJATELJU) MOŽE BOOSTATI OGLAS SVOJIM KREDITIMA!
   const pokreniPromociju = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni da biste mogli promovirati oglas!"); return; }
@@ -516,12 +522,12 @@ export default function KupkoApp() {
 
     setPrikaziPlacanjePromo(false);
     setOglasZaPromociju(null);
-    alert(`🌟 Uspješno iskorišten 1 besplatni promo kredit! Oglas je promoviran. Preostalo kredita: ${noviKrediti}`);
+    alert(`🌟 Uspješno iskorišten 1 besplatni promo post! Oglas je promoviran. Preostalo kredita: ${noviKrediti}`);
   };
 
   const potvrdiUplatuPromo = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!oglasZaPromociju) return;
+    if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
     const azuriraniNiz = oglasi.map((o) =>
       o.id === oglasZaPromociju.id ? { ...o, promoviran: true, top: true } : o
@@ -531,7 +537,7 @@ export default function KupkoApp() {
     setOglasZaPromociju(null);
     
     const ciljaniMail = korisnik ? korisnik.email : "korisnik@kupko.hr";
-    alert(`📧 [Simulacija E-mail Potvrde o Uplati na ${ciljaniMail}]:\n\n"Uspješno ste izvršili uplatu od 5.00 € za promidžbu Vašeg oglasa '${oglasZaPromociju.naslov}'."`);
+    alert(`📧 [Simulacija E-mail Potvrde o Uplati na ${ciljaniMail}]:\n\n"Uspješno ste izvršili uplatu od ${odabraniPromoPaket.cijena} € (${odabraniPromoPaket.naziv}) za promidžbu Vašeg oglasa '${oglasZaPromociju.naslov}'."`);
   };
 
   const rukujSpremanjemUredivanja = (e: React.FormEvent) => {
@@ -630,6 +636,23 @@ export default function KupkoApp() {
     }
   };
 
+  // Dinamički odabir paketa prema kategoriji oglasa koji se promovira
+  const dohvatiPaketeZaOglas = (kat: string) => {
+    if (kat === "auto-moto" || kat === "nekretnine") {
+      return [
+        { naziv: "Premium Standard (7 dana)", cijena: "9.00" },
+        { naziv: "Premium Produženi (14 dana)", cijena: "15.00" },
+        { naziv: "Maksimalni VIP Boost (30 dana)", cijena: "25.00" }
+      ];
+    } else {
+      return [
+        { naziv: "Standardni Boost (7 dana)", cijena: "4.00" },
+        { naziv: "Produženi Boost (14 dana)", cijena: "7.00" },
+        { naziv: "Dugotrajni Boost (30 dana)", cijena: "12.00" }
+      ];
+    }
+  };
+
   const filtriraniOglasi = oglasi.filter((o) => {
     const odgovaraTrazilici = o.naslov.toLowerCase().includes(pojamPretrage.toLowerCase());
     const odgovaraKategoriji = odabranaKategorija === "sve" || o.kategorija === odabranaKategorija;
@@ -669,7 +692,7 @@ export default function KupkoApp() {
         {preostaloMjestaZaGrateis > 0 && (
           <div className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-blue-950 px-4 py-2.5 text-xs sm:text-sm font-black text-center shadow-md flex items-center justify-center gap-2 border-b border-amber-600">
             <Sparkles className="w-5 h-5 fill-blue-950 text-amber-400 animate-spin" />
-            <span>AKCIJA LANSIRANJA: Prvih 20 registriranih korisnika dobiva 3 besplatna Promo boosta! (Preostalo još: {preostaloMjestaZaGrateis} / 20)</span>
+            <span>AKCIJA LANSIRANJA: Prvih 20 registriranih korisnika dobiva 1 besplatni promo post! (Preostalo još: {preostaloMjestaZaGrateis} / 20)</span>
           </div>
         )}
 
@@ -700,7 +723,7 @@ export default function KupkoApp() {
                         <p className="text-xs text-blue-700 font-semibold">{korisnik.email}</p>
                         
                         <div className="mt-2.5 bg-amber-100 border border-amber-300 text-amber-900 p-2 rounded-xl flex items-center justify-between text-xs font-black">
-                          <span>🌟 Besplatni Promo Boostovi:</span>
+                          <span>🌟 Besplatni Promo Post:</span>
                           <span className="bg-amber-500 text-white px-2 py-0.5 rounded-lg text-sm">{korisnik.promoKrediti || 0}</span>
                         </div>
                       </div>
@@ -1104,9 +1127,7 @@ export default function KupkoApp() {
                   <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-2xl border">
                     <button onClick={() => setPrikaz("grid")} className={`p-2.5 rounded-xl ${prikaz === "grid" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Grid prikaz"><Grid className="w-5 h-5" /></button>
                     <button onClick={() => setPrikaz("list")} className={`p-2.5 rounded-xl ${prikaz === "list" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Lista prikaz"><List className="w-5 h-5" /></button>
-
-<Map className="w-5 h-5" />
-<button onClick={() => setPrikaz("karta")} className={`p-2.5 rounded-xl flex items-center gap-1 ${prikaz === "karta" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Interaktivna karta"></button>
+                    <button onClick={() => setPrikaz("karta")} className={`p-2.5 rounded-xl flex items-center gap-1 ${prikaz === "karta" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Interaktivna karta"><Map className="w-5 h-5" /></button>
                   </div>
                 </div>
 
@@ -1210,7 +1231,7 @@ export default function KupkoApp() {
                               </div>
                             </div>
 
-                            {/* GUMB ZA PROMO VIDLJIV SVAKOM PRIJAVLJENOM KORISNIKU (NPR. ZA POMOĆ PRIJATELJU) */}
+                            {/* GUMB ZA PROMO VIDLJIV SVAKOM PRIJAVLJENOM KORISNIKU */}
                             {korisnik && !o.promoviran && (
                               <div className="mt-4 pt-4 border-t border-slate-100">
                                 <button
@@ -1393,7 +1414,7 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* MODAL: PLAĆANJE / KORIŠTENJE PROMO KREDITA */}
+      {/* MODAL: PLAĆANJE / KORIŠTENJE PROMO KREDITA (S DINAMIČKIM CIJENAMA I DUŽIM TRAJANJEM) */}
       {prikaziPlacanjePromo && oglasZaPromociju && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
@@ -1407,20 +1428,38 @@ export default function KupkoApp() {
             {korisnik && (korisnik.promoKrediti || 0) > 0 ? (
               <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 text-center space-y-3">
                 <p className="text-xs font-black text-amber-900 uppercase">
-                  🌟 Imate {korisnik.promoKrediti} besplatna promo kredita na raspolaganju!
+                  🌟 Imate {korisnik.promoKrediti} besplatni promo post na raspolaganju!
                 </p>
                 <button 
                   onClick={iskoristiBesplatniBoost}
                   className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-3.5 rounded-2xl text-xs uppercase shadow tracking-wider"
                 >
-                  Iskoristi besplatni promo boost (0 €)
+                  Iskoristi besplatni promo post (0 €)
                 </button>
               </div>
             ) : (
               <form onSubmit={potvrdiUplatuPromo} className="space-y-4">
-                <p className="text-sm font-black text-blue-700 bg-blue-50 p-3.5 rounded-2xl border">Cijena promocije: <strong>5.00 €</strong></p>
+                <label className="block text-xs font-black text-slate-700 uppercase">
+                  Odaberite paket promocije za kategoriju <span className="text-blue-700">({oglasZaPromociju.kategorija})</span>:
+                </label>
+                <div className="space-y-2">
+                  {dohvatiPaketeZaOglas(oglasZaPromociju.kategorija).map((paket) => (
+                    <div 
+                      key={paket.naziv}
+                      onClick={() => setOdabraniPromoPaket(paket)}
+                      className={`p-3.5 rounded-2xl border cursor-pointer flex justify-between items-center transition ${
+                        (!odabraniPromoPaket && paket === dohvatiPaketeZaOglas(oglasZaPromociju.kategorija)[0]) || odabraniPromoPaket?.naziv === paket.naziv 
+                          ? "bg-blue-50 border-blue-600 ring-2 ring-blue-600" 
+                          : "bg-slate-50 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      <span className="font-bold text-sm text-slate-900">{paket.naziv}</span>
+                      <span className="font-black text-blue-700">{paket.cijena} €</span>
+                    </div>
+                  ))}
+                </div>
                 <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-black py-3.5 rounded-2xl uppercase tracking-wider shadow-lg text-sm">
-                  Plati 5.00 € (Kartica / Apple Pay)
+                  Plati {odabraniPromoPaket ? odabraniPromoPaket.cijena : dohvatiPaketeZaOglas(oglasZaPromociju.kategorija)[0].cijena} €
                 </button>
               </form>
             )}
@@ -1813,7 +1852,7 @@ export default function KupkoApp() {
             <button onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-black mb-2 text-slate-900">Registracija na Kupko</h2>
             <p className="text-xs text-amber-600 font-black mb-4 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-              🎁 Prvih 20 korisnika automatski dobiva 3 besplatna promo boosta!
+              🎁 Prvih 20 korisnika automatski dobiva 1 besplatni promo post!
             </p>
             
             <form onSubmit={rukujRegistracijom} className="space-y-4">
@@ -1855,7 +1894,7 @@ export default function KupkoApp() {
               </div>
 
               <button type="submit" className="w-full bg-amber-400 text-blue-950 font-black py-3.5 rounded-2xl mt-3 text-sm shadow-md">
-                Registriraj se i osvoji besplatne kredite
+                Registriraj se i osvoji besplatni promo post
               </button>
             </form>
           </div>
