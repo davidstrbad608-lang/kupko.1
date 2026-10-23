@@ -468,7 +468,12 @@ export default function KupkoApp() {
     setPrikaziUnosPodatakaModal(false);
     alert("Osobni podaci su uspješno spremljeni!");
   };
-
+const mozeUreditiIliBrisati = (glas: any) => {
+    if (!korisnik) return false;
+    const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
+                    (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
+    return jeAutor || korisnik.isOwner;
+  };
   const obrisiOglas = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
