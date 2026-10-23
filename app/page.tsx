@@ -567,7 +567,7 @@ export default function KupkoApp() {
     setPrikaziPlacanjePromo(false);
     setOglasZaPromociju(null);
     
-    const ciljaniMail = korisnik ? korisnik.email : "korisnik@kupko.hr";
+    const ciljaniMail = korisnik ? korisnik.email : "kupko.podrska@gmail.com";
     alert(`📧 [Simulacija E-mail Potvrde o Uplati na ${ciljaniMail}]:\n\n"Uspješno ste izvršili uplatu od ${odabraniPromoPaket.cijena} € (${odabraniPromoPaket.naziv}) za promidžbu Vašeg oglasa '${oglasZaPromociju.naslov}'."`);
   };
 
@@ -1273,6 +1273,7 @@ export default function KupkoApp() {
 
                               <div className="flex items-center gap-2">
                                 <button
+                                  type="button"
                                   onClick={(e) => obnoviOglas(e, o.id)}
                                   title="Obnovi oglas"
                                   className="p-2.5 bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-700 rounded-2xl transition shadow-sm"
@@ -1282,7 +1283,7 @@ export default function KupkoApp() {
                               </div>
                             </div>
 
-{korisnik && !o.promoviran && (
+                            {korisnik && !o.promoviran && (
                               <div className="mt-4 pt-4 border-t border-slate-100">
                                 <button
                                   type="button"
@@ -1297,12 +1298,14 @@ export default function KupkoApp() {
                             {mozeUreditiIliBrisati(o) && (
                               <div className="mt-2 pt-2 flex gap-2">
                                 <button
+                                  type="button"
                                   onClick={(e) => pokreniUredivanje(e, o)}
                                   className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
                                 >
                                   <Edit3 className="w-4 h-4" /> Uredi
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={(e) => obrisiOglas(e, o)}
                                   className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
                                 >
@@ -1339,10 +1342,11 @@ export default function KupkoApp() {
           <div>
             <h4 className="font-black text-white uppercase text-sm mb-3 tracking-wider text-amber-400">Pomoć i Korisnici</h4>
             <ul className="space-y-2.5 text-xs font-semibold">
-              <li><button onClick={() => alert("Kontakt: podrskakupko@gmail.com")} className="hover:text-amber-400 transition">Kontakt i pomoć</button></li>
-              <li><button onClick={() => alert("O nama: Kupko je prvi pravi hrvatski oglasnik.")} className="hover:text-amber-400 transition">O nama</button></li>
+              <li><button type="button" onClick={() => alert("Kontakt: kupko.podrska@gmail.com")} className="hover:text-amber-400 transition">Kontakt i pomoć</button></li>
+              <li><button type="button" onClick={() => alert("O nama: Kupko je prvi pravi hrvatski oglasnik.")} className="hover:text-amber-400 transition">O nama</button></li>
               <li>
                 <button 
+                  type="button"
                   onClick={() => {
                     if (!korisnik) {
                       alert("Morate biti prijavljeni da biste predali oglas!");
@@ -1362,8 +1366,8 @@ export default function KupkoApp() {
           <div>
             <h4 className="font-black text-white uppercase text-sm mb-3 tracking-wider text-amber-400">Pravne Informacije</h4>
             <ul className="space-y-2.5 text-xs font-semibold">
-              <li><button onClick={() => setPrikaziUvjeteModal(true)} className="hover:text-amber-400 transition">Uvjeti korištenja</button></li>
-              <li><button onClick={() => setPrikaziPrivatnostModal(true)} className="hover:text-amber-400 transition">Politika privatnosti</button></li>
+              <li><button type="button" onClick={() => setPrikaziUvjeteModal(true)} className="hover:text-amber-400 transition">Uvjeti korištenja</button></li>
+              <li><button type="button" onClick={() => setPrikaziPrivatnostModal(true)} className="hover:text-amber-400 transition">Politika privatnosti</button></li>
             </ul>
           </div>
 
@@ -1380,7 +1384,7 @@ export default function KupkoApp() {
             <span className="font-bold text-amber-400">🍪 Kolačići i Privatnost:</span> Kupko.hr koristi kolačiće radi osiguranja ispravnog rada stranice i analitike.
           </div>
           <div className="flex gap-2 shrink-0">
-            <button onClick={prihvatiKolacice} className="bg-amber-400 hover:bg-amber-300 text-blue-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase shadow">
+            <button type="button" onClick={prihvatiKolacice} className="bg-amber-400 hover:bg-amber-300 text-blue-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase shadow">
               Prihvaćam sve
             </button>
           </div>
@@ -1390,7 +1394,7 @@ export default function KupkoApp() {
       {prikaziUvjeteModal && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
-            <button onClick={() => setPrikaziUvjeteModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziUvjeteModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <div className="flex items-center gap-2 text-blue-900">
               <FileText className="w-7 h-7" />
               <h2 className="text-2xl font-black text-slate-900">Uvjeti i pravila korištenja Kupko.hr</h2>
@@ -1405,7 +1409,7 @@ export default function KupkoApp() {
       {prikaziPrivatnostModal && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
-            <button onClick={() => setPrikaziPrivatnostModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziPrivatnostModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <div className="flex items-center gap-2 text-emerald-700">
               <ShieldCheck className="w-7 h-7" />
               <h2 className="text-2xl font-black text-slate-900">Politika privatnosti (GDPR)</h2>
@@ -1420,7 +1424,7 @@ export default function KupkoApp() {
       {prikaziSanducicPoruka && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setPrikaziSanducicPoruka(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziSanducicPoruka(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <div className="flex items-center gap-2.5 mb-4 text-indigo-700">
               <MessageSquare className="w-7 h-7" />
               <h2 className="text-2xl font-black text-slate-900">Vaš sandučić poruka</h2>
@@ -1444,7 +1448,7 @@ export default function KupkoApp() {
       {prikaziUnosPodatakaModal && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-lg w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziUnosPodatakaModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziUnosPodatakaModal(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-black mb-2 text-slate-900">Moji osobni podaci</h2>
             <form onSubmit={spremiOsobnePodatke} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -1461,7 +1465,7 @@ export default function KupkoApp() {
       {prikaziPlacanjePromo && oglasZaPromociju && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
-            <button onClick={() => setPrikaziPlacanjePromo(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziPlacanjePromo(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <div className="flex items-center gap-2.5 text-amber-600">
               <Sparkles className="w-7 h-7" />
               <h2 className="text-xl font-black text-slate-900">Promocija Oglasa</h2>
@@ -1477,6 +1481,7 @@ export default function KupkoApp() {
                   🌟 Imate {korisnik.promoKrediti} besplatni promo post na raspolaganju!
                 </p>
                 <button 
+                  type="button"
                   onClick={iskoristiBesplatniBoost}
                   className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-3.5 rounded-2xl text-xs uppercase shadow tracking-wider"
                 >
@@ -1514,7 +1519,7 @@ export default function KupkoApp() {
       {prikaziFormu && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziFormu(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziFormu(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             
             <h2 className="text-2xl font-black text-slate-900 mb-4">Predaj novi oglas na Kupku</h2>
 
@@ -1707,7 +1712,7 @@ export default function KupkoApp() {
       {korakVerifikacije && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl relative">
-            <button onClick={() => setKorakVerifikacije(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setKorakVerifikacije(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-black text-slate-900">Potvrdite vaš E-mail</h2>
             <p className="text-sm text-slate-600 font-medium">Poslali smo verifikacijski kod na: <strong className="text-slate-900">{privremeniEmail}</strong></p>
             <form onSubmit={potvrdiVerifikacijskiKod} className="space-y-3.5">
@@ -1727,7 +1732,7 @@ export default function KupkoApp() {
       {prikaziZaboravljenuLozinku && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
-            <button onClick={() => { setPrikaziZaboravljenuLozinku(false); setKorakResetiranja(1); }} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => { setPrikaziZaboravljenuLozinku(false); setKorakResetiranja(1); }} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <div className="flex items-center gap-2 text-blue-700">
               <KeyRound className="w-6 h-6" />
               <h2 className="text-xl font-black text-slate-900">Oporavak lozinke</h2>
@@ -1770,7 +1775,7 @@ export default function KupkoApp() {
       {prikaziUredivanje && oglasZaUrediti && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziUredivanje(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziUredivanje(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-black mb-4 text-slate-900">Uredi oglas</h2>
 
             <form onSubmit={rukujSpremanjemUredivanja} className="space-y-4">
@@ -1801,7 +1806,7 @@ export default function KupkoApp() {
             onClick={(e) => e.stopPropagation()}
             className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 relative shadow-2xl space-y-6 cursor-default"
           >
-            <button onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }} className="absolute top-4 right-4 bg-slate-100 p-2.5 rounded-full z-10 hover:bg-slate-200"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }} className="absolute top-4 right-4 bg-slate-100 p-2.5 rounded-full z-10 hover:bg-slate-200"><X className="w-6 h-6" /></button>
             
             <div className="relative rounded-3xl overflow-hidden max-h-80 bg-slate-900 flex items-center justify-center shadow-md">
               {odabraniOglas.slike && odabraniOglas.slike.length > 0 && (odabraniOglas.slike[0].endsWith(".mp4") || odabraniOglas.slike[0].includes("video")) ? (
@@ -1878,7 +1883,7 @@ export default function KupkoApp() {
       {prikaziPrijavu && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl">
-            <button onClick={() => setPrikaziPrijavu(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziPrijavu(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-black mb-4 text-slate-900">Prijava na Kupko</h2>
             <form onSubmit={rukujPrijavom} className="space-y-3.5">
               <input 
@@ -1911,7 +1916,7 @@ export default function KupkoApp() {
       {prikaziRegistraciju && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
-            <button onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-black mb-2 text-slate-900">Registracija na Kupko</h2>
             <p className="text-xs text-amber-600 font-black mb-4 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
               🎁 Prvih 20 korisnika automatski dobiva 1 besplatni promo post!
