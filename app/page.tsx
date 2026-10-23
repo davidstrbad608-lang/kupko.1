@@ -106,9 +106,6 @@ export default function KupkoApp() {
   });
 
   const [prikaziSanducicPoruka, setPrikaziSanducicPoruka] = useState(false);
-  const [tekstNovePoruke, setTekstNovePoruke] = useState("");
-  const [prikaziFormuZaSlanjePoruke, setPrikaziFormuZaSlanjePoruke] = useState(false);
-
   const [prikaziUredivanje, setPrikaziUredivanje] = useState(false);
   const [oglasZaUrediti, setOglasZaUrediti] = useState<any>(null);
 
@@ -169,7 +166,7 @@ export default function KupkoApp() {
     try {
       const { data, error } = await supabase.from('oglasi').select('*');
       if (error) {
-        console.error("Greška pri dohvatu iz Supabase:", error);
+        console.error("Greška pri dohvatu iz Supabase:", error.message, error.details);
       } else if (data) {
         setOglasi(data);
       }
@@ -187,11 +184,6 @@ export default function KupkoApp() {
     const num1 = Math.floor(Math.random() * 8) + 1;
     const num2 = Math.floor(Math.random() * 8) + 1;
     setSigurnosniKod({ a: num1, b: num2, unos: "" });
-  };
-
-  const spremiPoruke = (noviNizPoruka: any) => {
-    setPoruke(noviNizPoruka);
-    localStorage.setItem("kupko_poruke_v2", JSON.stringify(noviNizPoruka));
   };
 
   const postaviKorisnika = (podaciKorisnika: { ime: string; email: string; isOwner: boolean; promoKrediti?: number } | null) => {
@@ -226,7 +218,8 @@ export default function KupkoApp() {
       .eq('id', id);
 
     if (error) {
-      alert("Greška pri obnavljanju oglasa.");
+      console.error("Greška pri obnavljanju:", error.message);
+      alert("Greška pri obnavljanju oglasa: " + error.message);
     } else {
       dohvatiOglaseIzSupabase();
       alert("Oglas je uspješno obnovljen i promoviran!");
@@ -420,7 +413,8 @@ export default function KupkoApp() {
     if (confirm("Jeste li sigurni da želite obrisati oglas?")) {
       const { error } = await supabase.from('oglasi').delete().eq('id', glas.id);
       if (error) {
-        alert("Greška prilikom brisanja oglasa.");
+        console.error("Greška pri brisanju:", error.message);
+        alert("Greška prilikom brisanja oglasa: " + error.message);
       } else {
         dohvatiOglaseIzSupabase();
         setOdabraniOglas(null);
@@ -481,7 +475,12 @@ export default function KupkoApp() {
     if (!oglasZaPromociju || !korisnik) return;
     if ((korisnik.promoKrediti || 0) <= 0) return;
 
-    await supabase.from('oglasi').update({ promoviran: true, top: true }).eq('id', oglasZaPromociju.id);
+    const { error } = await supabase.from('oglasi').update({ promoviran: true, top: true }).eq('id', oglasZaPromociju.id);
+    if (error) {
+      alert("Greška pri boostanju: " + error.message);
+      return;
+    }
+
     dohvatiOglaseIzSupabase();
 
     const noviKrediti = (korisnik.promoKrediti || 0) - 1;
@@ -503,7 +502,12 @@ export default function KupkoApp() {
     e.preventDefault();
     if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
-    await supabase.from('oglasi').update({ promoviran: true, top: true }).eq('id', oglasZaPromociju.id);
+    const { error } = await supabase.from('oglasi').update({ promoviran: true, top: true }).eq('id', oglasZaPromociju.id);
+    if (error) {
+      alert("Greška pri uplati promo paketa: " + error.message);
+      return;
+    }
+
     dohvatiOglaseIzSupabase();
     setPrikaziPlacanjePromo(false);
     setOglasZaPromociju(null);
@@ -526,7 +530,8 @@ export default function KupkoApp() {
       .eq('id', oglasZaUrediti.id);
 
     if (error) {
-      alert("Greška pri spremanju uređivanja u bazu.");
+      console.error("Greška pri uređivanju:", error.message);
+      alert("Greška pri spremanju uređivanja u bazu: " + error.message);
     } else {
       dohvatiOglaseIzSupabase();
       setOdabraniOglas(null);
@@ -586,42 +591,42 @@ export default function KupkoApp() {
 
     const sad = new Date();
     const datumString = `Objavljeno danas u ${sad.getHours().toString().padStart(2, "0")}:${sad.getMinutes().toString().padStart(2, "0")}`;
+    const autorEmailFinal = korisnik.email;
     const prodavacFinal = korisnik.ime;
 
     const stvoreniOglas = {
       naslov: noviOglas.naslov,
       cijena: noviOglas.cijena,
-      staraCijena: noviOglas.staraCijena,
-      popustPostotak: noviOglas.popustPostotak,
+      staraCijena: noviOglas.staraCijena || null,
+      popustPostotak: noviOglas.popustPostotak || null,
       snizeno: noviOglas.snizeno,
       kategorija: noviOglas.kategorija,
       podkategorija: noviOglas.podkategorija,
       zupanija: noviOglas.zupanija,
-      grad: noviOglas.grad,
+      grad: noviOglas.grad || null,
       stanje: noviOglas.stanje,
-      opis: noviOglas.opis,
+      opis: noviOglas.opis || null,
       prodavac: prodavacFinal,
       autorEmail: autorEmailFinal,
-      email: autorEmailFinal,
       telefon: noviOglas.telefon,
       promoviran: konacniPromoviran,
       top: konacniPromoviran,
       datum: datumString,
-      godiste: noviOglas.godiste,
-      kilometri: noviOglas.kilometri,
-      snagaKw: noviOglas.snagaKw,
-      gorivo: noviOglas.gorivo,
-      mjenjac: noviOglas.mjenjac,
-      kvadratura: noviOglas.kvadratura,
-      sobe: noviOglas.sobe,
+      godiste: noviOglas.godiste || null,
+      kilometri: noviOglas.kilometri || null,
+      snagaKw: noviOglas.snagaKw || null,
+      gorivo: noviOglas.gorivo || null,
+      mjenjac: noviOglas.mjenjac || null,
+      kvadratura: noviOglas.kvadratura || null,
+      sobe: noviOglas.sobe || null,
       slike: noviOglas.slike.length > 0 ? noviOglas.slike : ["https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"]
     };
 
     const { error } = await supabase.from('oglasi').insert([stvoreniOglas]);
 
     if (error) {
-      console.error(error);
-      alert("Došlo je do greške prilikom spremanja oglasa u Supabase bazu.");
+      console.error("Detaljna greška iz Supabase-a:", error.message, error.details, error.hint);
+      alert("Greška pri spremanju u bazu: " + error.message);
     } else {
       dohvatiOglaseIzSupabase();
       setPrikaziFormu(false);
@@ -651,7 +656,7 @@ export default function KupkoApp() {
       const data = await response.json();
       return data.secure_url || null;
     } catch (error) {
-      console.error("Greška:", error);
+      console.error("Greška Cloudinary:", error);
       alert("Došlo je do greške prilikom uploada datoteke na Cloudinary.");
       return null;
     }
@@ -697,7 +702,6 @@ export default function KupkoApp() {
   });
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
-  const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail?.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail?.toLowerCase() === korisnik.email.toLowerCase()) : [];
   const preostaloMjestaZaGrateis = Math.max(0, 20 - registriraniKorisnici.length);
 
   return (
@@ -752,12 +756,6 @@ export default function KupkoApp() {
                         </button>
                         <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSamoOmiljene(true); }} className="w-full text-left px-4 py-2.5 font-bold hover:bg-slate-100 flex items-center gap-2.5">
                           <Heart className="w-4 h-4 text-red-500" /> Spremljeno ({omiljeniIds.length})
-                        </button>
-                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSanducicPoruka(true); }} className="w-full text-left px-4 py-2.5 font-bold hover:bg-slate-100 flex items-center justify-between">
-                          <span className="flex items-center gap-2.5">
-                            <MessageSquare className="w-4 h-4 text-indigo-600" /> Poruke
-                          </span>
-                          <span className="bg-indigo-600 text-white text-xs px-2 py-0.5 rounded-full font-black">{mojePoruke.length}</span>
                         </button>
                         <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziUnosPodatakaModal(true); }} className="w-full text-left px-4 py-2.5 font-bold hover:bg-slate-100 flex items-center gap-2.5">
                           <Settings className="w-4 h-4 text-slate-700" /> Postavke (Moji podaci)
@@ -1382,30 +1380,6 @@ export default function KupkoApp() {
             <div className="text-xs sm:text-sm text-slate-700 space-y-3 leading-relaxed font-medium">
               <p>Kupko.hr štiti vašu privatnost u skladu s GDPR-om.</p>
             </div>
-          </div>
-        </div>
-      )}
-
-      {prikaziSanducicPoruka && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button type="button" onClick={() => setPrikaziSanducicPoruka(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
-            <div className="flex items-center gap-2.5 mb-4 text-indigo-700">
-              <MessageSquare className="w-7 h-7" />
-              <h2 className="text-2xl font-black text-slate-900">Vaš sandučić poruka</h2>
-            </div>
-            {mojePoruke.length === 0 ? (
-              <p className="text-center py-12 text-slate-500 font-bold">Nemate nijednu poruku u sandučiću.</p>
-            ) : (
-              <div className="space-y-4">
-                {mojePoruke.map((p) => (
-                  <div key={p.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2.5">
-                    <span className="font-black text-indigo-900 text-sm block">{p.oglasNaslov}</span>
-                    <p className="text-sm text-slate-800 font-medium">{p.tekst}</p>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       )}
