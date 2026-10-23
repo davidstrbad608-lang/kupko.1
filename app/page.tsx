@@ -607,7 +607,7 @@ export default function KupkoApp() {
       stanje: noviOglas.stanje,
       opis: noviOglas.opis || null,
       prodavac: prodavacFinal,
-      autor_email: autorEmailFinal,
+      autorEmail: autorEmailFinal,
       telefon: noviOglas.telefon,
       promoviran: konacniPromoviran,
       top: konacniPromoviran,
@@ -1743,14 +1743,14 @@ export default function KupkoApp() {
 
       {odabraniOglas && (
         <div 
-          onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }}
+          onClick={() => { setOdabraniOglas(null); }}
           className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 cursor-pointer"
         >
           <div 
             onClick={(e) => e.stopPropagation()}
             className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 relative shadow-2xl space-y-6 cursor-default"
           >
-            <button type="button" onClick={() => { setOdabraniOglas(null); setPrikaziFormuZaSlanjePoruke(false); }} className="absolute top-4 right-4 bg-slate-100 p-2.5 rounded-full z-10 hover:bg-slate-200"><X className="w-6 h-6" /></button>
+            <button type="button" onClick={() => { setOdabraniOglas(null); }} className="absolute top-4 right-4 bg-slate-100 p-2.5 rounded-full z-10 hover:bg-slate-200"><X className="w-6 h-6" /></button>
             
             <div className="relative rounded-3xl overflow-hidden max-h-80 bg-slate-900 flex items-center justify-center shadow-md">
               {odabraniOglas.slike && odabraniOglas.slike.length > 0 && (odabraniOglas.slike[0].endsWith(".mp4") || odabraniOglas.slike[0].includes("video")) ? (
