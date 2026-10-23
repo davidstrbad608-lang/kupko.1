@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { supabase } from "./supabase";
 import { 
   Search, PlusCircle, Heart, MapPin, Grid, List, Phone, X, 
   ShoppingBag, CheckCircle2, Mail, User, Clock, Upload, Image as ImageIcon,
@@ -60,90 +61,8 @@ const SVE_KATEGORIJE = [
   }
 ];
 
-const POCETNI_OGLASI = [
-  {
-    id: 101,
-    naslov: "Prekrasni štenci zlatnog retrivera - cijepljeni i čipirani",
-    cijena: "450",
-    kategorija: "kucni-ljubimci",
-    podkategorija: "Psi",
-    zupanija: "Zagrebačka",
-    grad: "Velika Gorica",
-    stanje: "Novo",
-    slike: ["https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&q=80"],
-    top: true,
-    promoviran: true,
-    datum: "Objavljeno danas u 11:00",
-    opis: "U ponudi su prekrasni štenci zlatnog retrivera, očišćeni od parazita, cijepljeni, čipirani i s rodovnicom.",
-    prodavac: "Petra Horvat",
-    autorEmail: "petra@kupko.hr",
-    telefon: "0919988776"
-  },
-  {
-    id: 1,
-    naslov: "BMW Serija 3 320d Automatic M-Sport - Full Oprema",
-    cijena: "18900",
-    kategorija: "auto-moto",
-    podkategorija: "Osobna vozila",
-    zupanija: "Grad Zagreb",
-    grad: "Zagreb - Maksimir",
-    stanje: "Korišteno - Kao novo",
-    slike: ["https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80"],
-    top: true,
-    promoviran: true,
-    datum: "Objavljeno danas u 15:30",
-    opis: "Garažirano vozilo u izvanrednom stanju. Redovito servisiran u ovlaštenom BMW servisu.",
-    prodavac: "Ivan Horvat",
-    autorEmail: "ivan@kupko.hr",
-    telefon: "0912345678",
-    godiste: "2019",
-    kilometri: "145000",
-    snagaKw: "140",
-    gorivo: "Dizel",
-    mjenjac: "Automatski"
-  },
-  {
-    id: 2,
-    naslov: "Dvosoban luksuzan stan u novogradnji s garažom",
-    cijena: "145000",
-    kategorija: "nekretnine",
-    podkategorija: "Stanovi - Prodaja",
-    zupanija: "Splitsko-dalmatinska",
-    grad: "Split - Žnjan",
-    stanje: "Novo",
-    slike: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"],
-    top: false,
-    promoviran: false,
-    datum: "Objavljeno jučer",
-    opis: "Prekrasan stan u novogradnji, 55 m2, blizina mora i svih sadržaja.",
-    prodavac: "Ana Marić",
-    autorEmail: "ana@kupko.hr",
-    telefon: "0981112223",
-    kvadratura: "55",
-    sobe: "2"
-  },
-  {
-    id: 3,
-    naslov: "iPhone 15 Pro Max 256GB - Zapakiran s garancijom",
-    cijena: "980",
-    kategorija: "elektronika",
-    podkategorija: "Mobiteli i oprema",
-    zupanija: "Grad Zagreb",
-    grad: "Zagreb - Centar",
-    stanje: "Novo",
-    slike: ["https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=80"],
-    top: false,
-    promoviran: false,
-    datum: "Objavljeno prije 2 sata",
-    opis: "Mobitel je nekorišten, zapakiran u originalnoj kutiji s 2 godine službene garancije.",
-    prodavac: "Luka Perić",
-    autorEmail: "luka@kupko.hr",
-    telefon: "0953334455"
-  }
-];
-
 export default function KupkoApp() {
-  const [oglasi, setOglasi] = useState<any[]>(POCETNI_OGLASI);
+  const [oglasi, setOglasi] = useState<any[]>([]);
   const [registriraniKorisnici, setRegistriraniKorisnici] = useState<any[]>([]);
   const [poruke, setPoruke] = useState<any[]>([]);
   
@@ -225,8 +144,8 @@ export default function KupkoApp() {
   });
 
   useEffect(() => {
-    const lokalniOglasi = localStorage.getItem("kupko_oglasi_v27");
-    if (lokalniOglasi) { try { setOglasi(JSON.parse(lokalniOglasi)); } catch (e) { console.error(e); } }
+    dohvatiOglaseIzSupabase();
+
     const spremljeniKorisnici = localStorage.getItem("kupko_baza_korisnika");
     if (spremljeniKorisnici) { try { setRegistriraniKorisnici(JSON.parse(spremljeniKorisnici)); } catch (e) { console.error(e); } }
     const spremljenePoruke = localStorage.getItem("kupko_poruke_v2");
@@ -246,6 +165,19 @@ export default function KupkoApp() {
     generirajKôd();
   }, []);
 
+  const dohvatiOglaseIzSupabase = async () => {
+    try {
+      const { data, error } = await supabase.from('oglasi').select('*');
+      if (error) {
+        console.error("Greška pri dohvatu iz Supabase:", error);
+      } else if (data) {
+        setOglasi(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const prihvatiKolacice = () => {
     localStorage.setItem("kupko_kolacici_prihvaceni", "true");
     setPrikaziCookieBanner(false);
@@ -255,11 +187,6 @@ export default function KupkoApp() {
     const num1 = Math.floor(Math.random() * 8) + 1;
     const num2 = Math.floor(Math.random() * 8) + 1;
     setSigurnosniKod({ a: num1, b: num2, unos: "" });
-  };
-
-  const spremiOglase = (noviNiz: any) => {
-    setOglasi(noviNiz);
-    localStorage.setItem("kupko_oglasi_v27", JSON.stringify(noviNiz));
   };
 
   const spremiPoruke = (noviNizPoruka: any) => {
@@ -276,9 +203,9 @@ export default function KupkoApp() {
     }
   };
 
-  const toggleOmiljeni = (e: React.MouseEvent, id: number) => {
+  const toggleOmiljeni = (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
-    let noviIds: number[];
+    let noviIds: any[];
     if (omiljeniIds.includes(id)) {
       noviIds = omiljeniIds.filter((item) => item !== id);
     } else {
@@ -288,15 +215,22 @@ export default function KupkoApp() {
     localStorage.setItem("kupko_omiljeni", JSON.stringify(noviIds));
   };
 
-  const obnoviOglas = (e: React.MouseEvent, id: number) => {
+  const obnoviOglas = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
     const sad = new Date();
     const datumString = `Objavljeno danas u ${sad.getHours().toString().padStart(2, "0")}:${sad.getMinutes().toString().padStart(2, "0")}`;
-    const azuriraniNiz = oglasi.map((item) =>
-      item.id === id ? { ...item, datum: datumString, top: true } : item
-    );
-    spremiOglase(azuriraniNiz);
-    alert("Oglas je uspješno obnovljen!");
+    
+    const { error } = await supabase
+      .from('oglasi')
+      .update({ datum: datumString, promoviran: true, top: true })
+      .eq('id', id);
+
+    if (error) {
+      alert("Greška pri obnavljanju oglasa.");
+    } else {
+      dohvatiOglaseIzSupabase();
+      alert("Oglas je uspješno obnovljen i promoviran!");
+    }
   };
 
   const rukujPrijavom = (e: React.FormEvent) => {
@@ -468,23 +402,30 @@ export default function KupkoApp() {
     setPrikaziUnosPodatakaModal(false);
     alert("Osobni podaci su uspješno spremljeni!");
   };
-const mozeUreditiIliBrisati = (glas: any) => {
+
+  const mozeUreditiIliBrisati = (glas: any) => {
     if (!korisnik) return false;
     const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
                     (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
     return jeAutor || korisnik.isOwner;
   };
-  const obrisiOglas = (e: React.MouseEvent, glas: any) => {
+
+  const obrisiOglas = async (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
     const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
                     (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
     if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti brisati tuđi oglas!"); return; }
+    
     if (confirm("Jeste li sigurni da želite obrisati oglas?")) {
-      const noviOglasi = oglasi.filter((o) => o.id !== glas.id);
-      spremiOglase(noviOglasi);
-      setOdabraniOglas(null);
-      alert("Oglas uspješno obrisan.");
+      const { error } = await supabase.from('oglasi').delete().eq('id', glas.id);
+      if (error) {
+        alert("Greška prilikom brisanja oglasa.");
+      } else {
+        dohvatiOglaseIzSupabase();
+        setOdabraniOglas(null);
+        alert("Oglas uspješno obrisan iz baze.");
+      }
     }
   };
 
@@ -500,7 +441,6 @@ const mozeUreditiIliBrisati = (glas: any) => {
 
   const dohvatiPaketeZaOglas = (glas: any) => {
     const cijenaNum = parseFloat(glas?.cijena || "0");
-    
     if (cijenaNum < 200) {
       return [
         { naziv: "Mini Boost (3 dana)", cijena: "2.00" },
@@ -537,14 +477,12 @@ const mozeUreditiIliBrisati = (glas: any) => {
     setPrikaziPlacanjePromo(true);
   };
 
-  const iskoristiBesplatniBoost = () => {
+  const iskoristiBesplatniBoost = async () => {
     if (!oglasZaPromociju || !korisnik) return;
     if ((korisnik.promoKrediti || 0) <= 0) return;
 
-    const azuriraniNiz = oglasi.map((o) =>
-      o.id === oglasZaPromociju.id ? { ...o, promoviran: true, top: true } : o
-    );
-    spremiOglase(azuriraniNiz);
+    await supabase.from('oglasi').update({ promoviran: true, top: true }).eq('id', oglasZaPromociju.id);
+    dohvatiOglaseIzSupabase();
 
     const noviKrediti = (korisnik.promoKrediti || 0) - 1;
     const azuriraniKorisnik = { ...korisnik, promoKrediti: noviKrediti };
@@ -561,14 +499,12 @@ const mozeUreditiIliBrisati = (glas: any) => {
     alert(`🌟 Uspješno iskorišten 1 besplatni promo post! Oglas je promoviran. Preostalo kredita: ${noviKrediti}`);
   };
 
-  const potvrdiUplatuPromo = (e: React.FormEvent) => {
+  const potvrdiUplatuPromo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
-    const azuriraniNiz = oglasi.map((o) =>
-      o.id === oglasZaPromociju.id ? { ...o, promoviran: true, top: true } : o
-    );
-    spremiOglase(azuriraniNiz);
+    await supabase.from('oglasi').update({ promoviran: true, top: true }).eq('id', oglasZaPromociju.id);
+    dohvatiOglaseIzSupabase();
     setPrikaziPlacanjePromo(false);
     setOglasZaPromociju(null);
     
@@ -576,14 +512,27 @@ const mozeUreditiIliBrisati = (glas: any) => {
     alert(`📧 [Simulacija E-mail Potvrde o Uplati na ${ciljaniMail}]:\n\n"Uspješno ste izvršili uplatu od ${odabraniPromoPaket.cijena} € (${odabraniPromoPaket.naziv}) za promidžbu Vašeg oglasa '${oglasZaPromociju.naslov}'."`);
   };
 
-  const rukujSpremanjemUredivanja = (e: React.FormEvent) => {
+  const rukujSpremanjemUredivanja = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!oglasZaUrediti.naslov || !oglasZaUrediti.cijena) return;
-    const noviNiz = oglasi.map((o) => (o.id === oglasZaUrediti.id ? oglasZaUrediti : o));
-    spremiOglase(noviNiz);
-    setOdabraniOglas(null);
-    setPrikaziUredivanje(false);
-    alert("Uređivanje uspješno spremljeno!");
+
+    const { error } = await supabase
+      .from('oglasi')
+      .update({ 
+        naslov: oglasZaUrediti.naslov, 
+        cijena: oglasZaUrediti.cijena, 
+        opis: oglasZaUrediti.opis 
+      })
+      .eq('id', oglasZaUrediti.id);
+
+    if (error) {
+      alert("Greška pri spremanju uređivanja u bazu.");
+    } else {
+      dohvatiOglaseIzSupabase();
+      setOdabraniOglas(null);
+      setPrikaziUredivanje(false);
+      alert("Uređivanje uspješno spremljeno u bazu!");
+    }
   };
 
   const izracunajAiProcjenuZaOglas = (glas: any) => {
@@ -602,7 +551,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
     }
   };
 
-  const rukujDodavanjemOglasa = (e: React.FormEvent) => {
+  const rukujDodavanjemOglasa = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!korisnik) {
@@ -641,33 +590,55 @@ const mozeUreditiIliBrisati = (glas: any) => {
     const prodavacFinal = korisnik.ime;
 
     const stvoreniOglas = {
-      ...noviOglas,
-      promoviran: konacniPromoviran,
-      top: konacniPromoviran,
-      id: Date.now(),
-      datum: datumString,
+      naslov: noviOglas.naslov,
+      cijena: noviOglas.cijena,
+      staraCijena: noviOglas.staraCijena,
+      popustPostotak: noviOglas.popustPostotak,
+      snizeno: noviOglas.snizeno,
+      kategorija: noviOglas.kategorija,
+      podkategorija: noviOglas.podkategorija,
+      zupanija: noviOglas.zupanija,
+      grad: noviOglas.grad,
+      stanje: noviOglas.stanje,
+      opis: noviOglas.opis,
       prodavac: prodavacFinal,
       autorEmail: autorEmailFinal,
       email: autorEmailFinal,
+      telefon: noviOglas.telefon,
+      promoviran: konacniPromoviran,
+      top: konacniPromoviran,
+      datum: datumString,
+      godiste: noviOglas.godiste,
+      kilometri: noviOglas.kilometri,
+      snagaKw: noviOglas.snagaKw,
+      gorivo: noviOglas.gorivo,
+      mjenjac: noviOglas.mjenjac,
+      kvadratura: noviOglas.kvadratura,
+      sobe: noviOglas.sobe,
       slike: noviOglas.slike.length > 0 ? noviOglas.slike : ["https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"]
     };
 
-    const azurirano = [stvoreniOglas, ...oglasi];
-    spremiOglase(azurirano);
-    setPrikaziFormu(false);
-    setNoviOglas({
-      naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
-      kategorija: "auto-moto", podkategorija: "Osobna vozila",
-      zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slike: [], opis: "",
-      prodavac: "", telefon: "", email: "", promoviran: false,
-      godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni",
-      kvadratura: "", sobe: ""
-    });
-    generirajKôd();
-    alert("Oglas uspješno predan!");
+    const { error } = await supabase.from('oglasi').insert([stvoreniOglas]);
+
+    if (error) {
+      console.error(error);
+      alert("Došlo je do greške prilikom spremanja oglasa u Supabase bazu.");
+    } else {
+      dohvatiOglaseIzSupabase();
+      setPrikaziFormu(false);
+      setNoviOglas({
+        naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
+        kategorija: "auto-moto", podkategorija: "Osobna vozila",
+        zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slike: [], opis: "",
+        prodavac: "", telefon: "", email: "", promoviran: false,
+        godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni",
+        kvadratura: "", sobe: ""
+      });
+      generirajKôd();
+      alert("Oglas uspješno predan i spremljen u Supabase bazu podataka!");
+    }
   };
 
-  // Funkcija za slanje pojedinačne datoteke na Cloudinary
   const uploadToCloudinary = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -676,18 +647,10 @@ const mozeUreditiIliBrisati = (glas: any) => {
     try {
       const response = await fetch(
         "https://api.cloudinary.com/v1_1/dzc1mpgz/auto/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
+        { method: "POST", body: formData }
       );
-
       const data = await response.json();
-      if (data.secure_url) {
-        return data.secure_url;
-      } else {
-        throw new Error("Greška prilikom uploada");
-      }
+      return data.secure_url || null;
     } catch (error) {
       console.error("Greška:", error);
       alert("Došlo je do greške prilikom uploada datoteke na Cloudinary.");
@@ -695,7 +658,6 @@ const mozeUreditiIliBrisati = (glas: any) => {
     }
   };
 
-  // Nova funkcija za višestruko učitavanje slika i videa preko Cloudinaryja
   const rukujVisestrukimUcitavanjemSlika = async (e: React.ChangeEvent<HTMLInputElement>, uredi = false) => {
     const datoteke = e.target.files;
     if (datoteke) {
@@ -719,7 +681,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
   };
 
   const filtriraniOglasi = oglasi.filter((o) => {
-    const odgovaraTrazilici = o.naslov.toLowerCase().includes(pojamPretrage.toLowerCase());
+    const odgovaraTrazilici = o.naslov?.toLowerCase().includes(pojamPretrage.toLowerCase());
     const odgovaraKategoriji = odabranaKategorija === "sve" || o.kategorija === odabranaKategorija;
     const odgovaraPodkategoriji = odabranaPodkategorija === "sve" || o.podkategorija === odabranaPodkategorija;
     const odgovaraZupaniji = odabranaZupanija === "sve" || o.zupanija === odabranaZupanija;
@@ -736,8 +698,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
   });
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
-  const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail.toLowerCase() === korisnik.email.toLowerCase()) : [];
-
+  const mojePoruke = korisnik ? poruke.filter(p => p.primateljEmail?.toLowerCase() === korisnik.email.toLowerCase() || p.posiljateljEmail?.toLowerCase() === korisnik.email.toLowerCase()) : [];
   const preostaloMjestaZaGrateis = Math.max(0, 20 - registriraniKorisnici.length);
 
   return (
@@ -756,7 +717,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <span className="flex items-center gap-1.5 font-bold tracking-wide">
               <Shield className="w-4 h-4 text-emerald-400" />
-              🇭🇷 Kupko.hr - Sigurni Hrvatski Oglasnik
+              🇭🇷 Kupko.hr - Sigurni Hrvatski Oglasnik (Supabase baza aktivna)
             </span>
             <div className="flex items-center gap-4">
               {korisnik ? (
@@ -850,7 +811,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Pretraži ponudu (npr. Zlatni retriver, BMW, Stan...)"
+                  placeholder="Pretraži ponudu iz baze (npr. Zlatni retriver, BMW, Stan...)"
                   value={pojamPretrage}
                   onChange={(e) => setPojamPretrage(e.target.value)}
                   className="w-full pl-11 pr-4 py-3 rounded-2xl text-slate-900 bg-white shadow-md text-base font-semibold outline-none focus:ring-4 focus:ring-amber-400 placeholder:text-slate-400"
@@ -969,7 +930,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
                   </div>
                   <div>
                     <h3 className="text-xl font-black tracking-wide text-white">👑 Admin Upravljačka Ploča</h3>
-                    <p className="text-sm font-medium text-blue-200">Pregled statistike u stvarnom vremenu (vidljivo samo tebi)</p>
+                    <p className="text-sm font-medium text-blue-200">Pregled statistike u stvarnom vremenu (iz Supabase baze)</p>
                   </div>
                 </div>
                 <span className="text-xs bg-amber-400 text-blue-950 font-black px-4 py-1.5 rounded-full uppercase tracking-wider">Vlasnički pristup</span>
@@ -1007,7 +968,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
               </div>
 
               {oglasi.length === 0 ? (
-                <p className="text-center py-20 text-slate-500 font-bold">Nema oglasa za prikaz.</p>
+                <p className="text-center py-20 text-slate-500 font-bold">Nema oglasa u bazi.</p>
               ) : (
                 <div className="relative bg-slate-950 rounded-3xl overflow-hidden border shadow-2xl flex flex-col">
                   {(() => {
@@ -1178,7 +1139,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
               <section>
                 <div className="flex justify-between items-center mb-6 bg-white p-5 rounded-3xl shadow-lg border border-slate-200">
                   <h3 className="text-xl font-black text-slate-900">
-                    {prikaziSamoOmiljene ? "Vaši omiljeni oglasi" : (prikaz === "karta" ? "Interaktivna Karta - Oglasi po županijama" : "Aktivni Oglasi")} ({filtriraniOglasi.length})
+                    {prikaziSamoOmiljene ? "Vaši omiljeni oglasi" : (prikaz === "karta" ? "Interaktivna Karta - Oglasi po županijama" : "Aktivni Oglasi iz Baze")} ({filtriraniOglasi.length})
                   </h3>
                   <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-2xl border">
                     <button onClick={() => setPrikaz("grid")} className={`p-2.5 rounded-xl ${prikaz === "grid" ? "bg-white text-blue-700 shadow-md" : "text-slate-500"}`} title="Grid prikaz"><Grid className="w-5 h-5" /></button>
@@ -1339,7 +1300,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
               <span className="text-amber-400 text-xs font-bold bg-amber-400/20 px-2 py-0.5 rounded ml-1 border border-amber-400/30">HR</span>
             </div>
             <p className="text-slate-300 leading-relaxed text-xs mb-4">
-              Kupko.hr je vodeći hrvatski besplatni oglasnik za brzu i sigurnu kupoprodaju.
+              Kupko.hr je vodeći hrvatski besplatni oglasnik za brzu i sigurnu kupoprodaju (Supabase baza aktivna).
             </p>
             <p className="text-amber-400 font-extrabold text-xs">© 2026 Kupko.hr - Sva prava pridržana.</p>
           </div>
@@ -1378,7 +1339,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
 
           <div>
             <h4 className="font-black text-white uppercase text-sm mb-3 tracking-wider text-amber-400">Sigurnost</h4>
-            <p className="text-slate-300 text-xs">Potpuno sigurna kupoprodaja i provjereni korisnici.</p>
+            <p className="text-slate-300 text-xs">Potpuno sigurna kupoprodaja, provjereni korisnici i Supabase baza podataka.</p>
           </div>
         </div>
       </footer>
@@ -1526,7 +1487,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
           <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
             <button type="button" onClick={() => setPrikaziFormu(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
             
-            <h2 className="text-2xl font-black text-slate-900 mb-4">Predaj novi oglas na Kupku</h2>
+            <h2 className="text-2xl font-black text-slate-900 mb-4">Predaj novi oglas u Supabase bazu</h2>
 
             <form onSubmit={rukujDodavanjemOglasa} className="space-y-4">
               <div>
@@ -1673,7 +1634,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
                 <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-2xl p-6 bg-white cursor-pointer relative mb-3 hover:bg-slate-50 transition">
                   <input type="file" accept="image/*,video/*" multiple onChange={(e) => rukujVisestrukimUcitavanjemSlika(e, false)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
                   <Upload className="w-8 h-8 text-blue-600 mb-2" />
-                  <p className="text-sm font-black text-slate-800">Odaberite slike ili videozapise s uređaja</p>
+                  <p className="text-sm font-black text-slate-800">Odaberite slike ili videozapise s uređaja (Cloudinary)</p>
                 </div>
 
                 {noviOglas.slike.length > 0 && (
@@ -1707,7 +1668,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
               </div>
 
               <button type="submit" className="w-full bg-blue-700 hover:bg-blue-800 text-white font-black py-4 rounded-2xl uppercase tracking-wider text-sm shadow-lg">
-                Objavi Oglas
+                Spremi u Supabase bazu podataka
               </button>
             </form>
           </div>
@@ -1781,7 +1742,7 @@ const mozeUreditiIliBrisati = (glas: any) => {
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-3xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
             <button type="button" onClick={() => setPrikaziUredivanje(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
-            <h2 className="text-2xl font-black mb-4 text-slate-900">Uredi oglas</h2>
+            <h2 className="text-2xl font-black mb-4 text-slate-900">Uredi oglas u bazi</h2>
 
             <form onSubmit={rukujSpremanjemUredivanja} className="space-y-4">
               <input 
@@ -1794,8 +1755,13 @@ const mozeUreditiIliBrisati = (glas: any) => {
                 value={oglasZaUrediti.cijena} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, cijena: e.target.value })}
                 className="w-full p-3.5 rounded-2xl border text-sm font-semibold"
               />
+              <textarea 
+                rows={3}
+                value={oglasZaUrediti.opis || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, opis: e.target.value })}
+                className="w-full p-3.5 rounded-2xl border text-sm font-semibold"
+              />
               <button type="submit" className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl uppercase text-sm shadow-lg">
-                Spremi Sve Promjene
+                Spremi Sve Promjene u Bazu
               </button>
             </form>
           </div>
