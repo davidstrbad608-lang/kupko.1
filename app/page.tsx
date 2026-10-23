@@ -1282,9 +1282,10 @@ export default function KupkoApp() {
                               </div>
                             </div>
 
-                            {korisnik && !o.promoviran && (
+{korisnik && !o.promoviran && (
                               <div className="mt-4 pt-4 border-t border-slate-100">
                                 <button
+                                  type="button"
                                   onClick={(e) => pokreniPromociju(e, o)}
                                   className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-2.5 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md uppercase tracking-wider"
                                 >
