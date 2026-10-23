@@ -586,7 +586,6 @@ export default function KupkoApp() {
 
     const sad = new Date();
     const datumString = `Objavljeno danas u ${sad.getHours().toString().padStart(2, "0")}:${sad.getMinutes().toString().padStart(2, "0")}`;
-    const autorEmailFinal = korisnik.email;
     const prodavacFinal = korisnik.ime;
 
     const stvoreniOglas = {
