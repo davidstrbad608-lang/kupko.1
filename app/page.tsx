@@ -182,6 +182,63 @@ export default function KupkoApp() {
     }
   };
 
+  const detektirajLokacijuIBlizuOglase = () => {
+    if (!navigator.geolocation) {
+      alert("Geolokacija nije podržana u vašem pregledniku.");
+      return;
+    }
+
+    alert("Molimo dopustite pristup lokaciji kako bismo pronašli oglase u vašoj blizini.");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=hr`);
+          const data = await response.json();
+          const address = data.address || {};
+          const gradIliOkrug = (address.city || address.town || address.village || address.county || "").toLowerCase();
+          
+          // Pokušaj pronaći odgovarajuću županiju iz naše liste
+          let pronadjenaZupanija = ZUPANIJE.find(z => gradIliOkrug.includes(z.toLowerCase().replace("-", " ")));
+          
+          if (gradIliOkrug.includes("zagreb")) {
+            pronadjenaZupanija = "Grad Zagreb";
+          } else if (gradIliOkrug.includes("split")) {
+            pronadjenaZupanija = "Splitsko-dalmatinska";
+          } else if (gradIliOkrug.includes("rijeka")) {
+            pronadjenaZupanija = "Primorsko-goranska";
+          } else if (gradIliOkrug.includes("osijek")) {
+            pronadjenaZupanija = "Osječko-baranjska";
+          } else if (gradIliOkrug.includes("varaždin")) {
+            pronadjenaZupanija = "Varaždinska";
+          }
+
+          if (pronadjenaZupanija) {
+            setOdabranaZupanija(pronadjenaZupanija);
+            alert(`📍 Uspješno detektirana lokacija! Prikazujem oglase za županiju: ${pronadjenaZupanija}`);
+          } else {
+            // Ako ne nađe točnu županiju, postavi grad u pretragu
+            const nazivGrada = address.city || address.town || address.village || "";
+            if (nazivGrada) {
+              setPojamPretrage(nazivGrada);
+              alert(`📍 Detektiran grad: ${nazivGrada}. Filtriram oglase.`);
+            } else {
+              alert("Lokacija detektirana, ali nismo uspjeli mapirati točnu regiju. Pokušajte ručno odabrati županiju.");
+            }
+          }
+          setTrenutnaStranica(1);
+        } catch (err) {
+          console.error(err);
+          alert("Došlo je do greške prilikom dohvaćanja naziva lokacije.");
+        }
+      },
+      (error) => {
+        alert("Pristup lokaciji je odbijen. Molimo omogućite dozvolu za lokaciju u postavkama preglednika.");
+      }
+    );
+  };
+
   const prihvatiKolacice = () => {
     localStorage.setItem("kupko_kolacici_prihvaceni", "true");
     setPrikaziCookieBanner(false);
@@ -931,14 +988,26 @@ export default function KupkoApp() {
                 <Search className="absolute left-3.5 top-3.5 text-slate-400 w-5 h-5" />
               </div>
 
-              <select
-                value={odabranaZupanija}
-                onChange={(e) => { setOdabranaZupanija(e.target.value); setTrenutnaStranica(1); }}
-                className="px-4 py-3 rounded-2xl bg-blue-950 text-white border border-blue-400/50 text-sm font-bold outline-none cursor-pointer shadow-md"
-              >
-                <option value="sve">🇭🇷 Cijela Hrvatska</option>
-                {ZUPANIJE.map((z) => <option key={z} value={z} className="bg-slate-900">{z}</option>)}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  value={odabranaZupanija}
+                  onChange={(e) => { setOdabranaZupanija(e.target.value); setTrenutnaStranica(1); }}
+                  className="px-4 py-3 rounded-2xl bg-blue-950 text-white border border-blue-400/50 text-sm font-bold outline-none cursor-pointer shadow-md"
+                >
+                  <option value="sve">🇭🇷 Cijela Hrvatska</option>
+                  {ZUPANIJE.map((z) => <option key={z} value={z} className="bg-slate-900">{z}</option>)}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={detektirajLokacijuIBlizuOglase}
+                  title="Pronađi oglase u mojoj blizini"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md transition shrink-0"
+                >
+                  <Navigation className="w-4 h-4 animate-pulse" />
+                  <span className="hidden lg:inline">U blizini 📍</span>
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-2.5 w-full md:w-auto">
@@ -1478,6 +1547,16 @@ export default function KupkoApp() {
               <p className="text-slate-300 leading-relaxed text-xs mb-4">
                 Kupko.hr je vodeći hrvatski besplatni oglasnik za brzu i sigurnu kupoprodaju.
               </p>
+              <div className="mb-4">
+                <a 
+                  href="https://www.facebook.com/profile.php?fb_profile_edit_entry_point=%7B%22click_point%22%3A%22edit_profile_button%22%2C%22feature%22%3A%22profile_header%22%7D&id=61595502347266&sk=about" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow"
+                >
+                  <span>📘 Posjetite našu Facebook stranicu</span>
+                </a>
+              </div>
               <p className="text-amber-400 font-extrabold text-xs">© 2026 Kupko.hr - Sva prava pridržana.</p>
             </div>
 
