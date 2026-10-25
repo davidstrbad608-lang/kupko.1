@@ -1385,7 +1385,7 @@ export default function KupkoApp() {
                                     className="p-2.5 bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-700 rounded-2xl transition shadow-sm"
                                   >
                                     <RotateCw className="w-5 h-5" />
-                                    </button>
+                                  </button>
                                 </div>
                               </div>
 
@@ -1476,7 +1476,7 @@ export default function KupkoApp() {
                 <span className="text-amber-400 text-xs font-bold bg-amber-400/20 px-2 py-0.5 rounded ml-1 border border-amber-400/30">HR</span>
               </div>
               <p className="text-slate-300 leading-relaxed text-xs mb-4">
-                Kupko.hr je vodeći hrvatski besplatni oglasnik za brzu i sigurnu kupoprodaju (Supabase baza aktivna).
+                Kupko.hr je vodeći hrvatski besplatni oglasnik za brzu i sigurnu kupoprodaju.
               </p>
               <p className="text-amber-400 font-extrabold text-xs">© 2026 Kupko.hr - Sva prava pridržana.</p>
             </div>
@@ -1542,7 +1542,11 @@ export default function KupkoApp() {
                 <h2 className="text-2xl font-black text-slate-900">Uvjeti i pravila korištenja Kupko.hr</h2>
               </div>
               <div className="text-xs sm:text-sm text-slate-700 space-y-3 leading-relaxed font-medium">
-                <p>Dobrodošli na Kupko.hr. Korištenjem našeg portala prihvaćate ove uvjete korištenja.</p>
+                <p><strong>1. Uvodne odredbe</strong><br/>Dobrodošli na Kupko.hr. Ovi Uvjeti korištenja definiraju pravila i uvjete korištenja internetskog portala Kupko.hr te svih pripadajućih usluga.</p>
+                <p><strong>2. Registracija i korisnički račun</strong><br/>Korisnik je dužan unijeti točne podatke prilikom registracije. Za sigurnost lozinke i sve aktivnosti ostvarene putem korisničkog računa odgovoran je isključivo korisnik.</p>
+                <p><strong>3. Objavljivanje oglasa</strong><br/>Svi oglasi moraju biti u skladu sa zakonom Republike Hrvatske. Zabranjeno je postavljanje lažnih oglasa, roba čija je prodaja protuzakonita te korištenje uvredljivog sadržaja.</p>
+                <p><strong>4. Plaćanje i promocija</strong><br/>Usluge isticanja i promocije oglasa naplaćuju se putem sigurnog sustava naplate (Stripe). Cijene su jasno istaknute prije svake potvrde transakcije.</p>
+                <p><strong>5. Odgovornost</strong><br/>Kupko.hr služi kao internetski oglasnik za spajanje kupaca i prodavača te ne snosi odgovornost za kvalitetu predmeta, realizaciju kupoprodaje ili eventualne sporove.</p>
               </div>
             </div>
           </div>
@@ -1557,7 +1561,11 @@ export default function KupkoApp() {
                 <h2 className="text-2xl font-black text-slate-900">Politika privatnosti (GDPR)</h2>
               </div>
               <div className="text-xs sm:text-sm text-slate-700 space-y-3 leading-relaxed font-medium">
-                <p>Kupko.hr štiti vašu privatnost u skladu s GDPR-om.</p>
+                <p><strong>1. Opće odredbe</strong><br/>Kupko.hr posvećen je zaštiti privatnosti i osobnih podataka svojih korisnika u skladu s Općom uredbom o zaštiti podataka (GDPR).</p>
+                <p><strong>2. Prikupljanje podataka</strong><br/>Prikupljamo samo nužne podatke potrebne za registraciju i predaju oglasa (korisničko ime, e-mail adresa, telefonski broj i županija).</p>
+                <p><strong>3. Svrha obrade</strong><br/>Vaši se podaci koriste isključivo za omogućavanje rada oglasnika, autentifikaciju korisnika te komunikaciju između kupaca i prodavača.</p>
+                <p><strong>4. Kolačići (Cookies)</strong><br/>Stranica koristi kolačiće za osiguranje osnovnih tehničkih funkcija, stabilnosti rada platforme i poboljšanje korisničkog iskustva.</p>
+                <p><strong>5. Prava korisnika</strong><br/>Korisnik u svakom trenutku može zatražiti uvid, ispravak ili potpuno brisanje svojih osobnih podataka slanjem zahtjeva na našu podršku.</p>
               </div>
             </div>
           </div>
