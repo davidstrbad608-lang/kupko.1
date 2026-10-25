@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const { email, subject, message } = await request.json();
 
-    console.label = "Pokušaj slanja na: " + email;
+    console.log("Pokušaj slanja na: " + email);
 
     const response = await resend.emails.send({
       from: 'Kupko.hr <onboarding@resend.dev>',
@@ -16,7 +16,6 @@ export async function POST(request: Request) {
       html: `<p>${message}</p>`,
     });
 
-    // Ako Resend vrati grešku unutar objekta
     if (response.error) {
       console.error("Resend vratio grešku:", response.error);
       return NextResponse.json({ success: false, error: response.error.message }, { status: 400 });
