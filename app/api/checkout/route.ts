@@ -10,7 +10,6 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { paketNaziv, cijena, oglasNaslov } = body;
 
-    // Pretvaramo cijenu u cente (Stripe prima iznose u centima, npr. 5.00 € = 500)
     const unitAmount = Math.round(parseFloat(cijena) * 100);
 
     const session = await stripe.checkout.sessions.create({
