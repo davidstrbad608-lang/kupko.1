@@ -568,13 +568,13 @@ export default function KupkoApp() {
     const cijenaNum = parseFloat(glas?.cijena || "0");
     if (cijenaNum < 200) {
       return [
-        { naziv: "Objava i Mini Boost (3 dana)", cijena: "2.00" },
+        { naziv: "Mini Boost (3 dana)", cijena: "2.00" },
         { naziv: "Standardni Paket (7 dana)", cijena: "3.50" },
         { naziv: "Dugotrajni Paket (30 dana)", cijena: "6.00" }
       ];
     } else if (cijenaNum >= 200 && cijenaNum < 2000) {
       return [
-        { naziv: "Objava i Mini Boost (3 dana)", cijena: "4.00" },
+        { naziv: "Mini Boost (3 dana)", cijena: "4.00" },
         { naziv: "Standardni Paket (7 dana)", cijena: "7.00" },
         { naziv: "Dugotrajni Paket (30 dana)", cijena: "12.00" }
       ];
@@ -619,7 +619,7 @@ export default function KupkoApp() {
 
     setPrikaziPlacanjePromo(false);
     setOglasZaPromociju(null);
-    alert(`🌟 Uspješno iskorišten Giveaway besplatni oglas/boost! Preostalo kredita: ${noviKrediti}`);
+    alert(`🌟 Uspješno iskorišten vaš Giveaway besplatni oglas! Oglas je promoviran. Preostalo kredita: ${noviKrediti}`);
   };
 
   const potvrdiUplatuPromo = async (e: React.FormEvent) => {
@@ -717,50 +717,6 @@ export default function KupkoApp() {
       return;
     }
 
-    // Provjera ako korisnik ima Giveaway besplatni kredit
-    let imaGiveawayKredit = (korisnik.promoKrediti || 0) > 0;
-
-    if (!imaGiveawayKredit) {
-      // Ako nema besplatni giveaway kredit, obavezna je naplata/izbor paketa objave
-      // Otvaramo modal za naplatu objave oglasa
-      setPrikaziFormu(false);
-      // Kreiramo privremeni objekt oglasa za naplatu
-      const privremeniNoviOglas = {
-        ...noviOglas,
-        prodavac: korisnik.ime,
-        autor_email: korisnik.email,
-        datum: "Upravo objavljeno",
-        slike: noviOglas.slike.length > 0 ? noviOglas.slike : ["https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"]
-      };
-      
-      // Privremeno spremamo oglas u bazu neaktivan ili ga šaljemo direktno na Stripe naplatu paketa objave
-      // Za potrebe ovog toka, otvorit ćemo prozor za naplatu objave:
-      const { data: insertedData, error: insertErr } = await supabase.from('oglasi').insert([privremeniNoviOglas]).select();
-      if (insertErr) {
-        alert("Greška pri kreiranju oglasa: " + insertErr.message);
-        return;
-      }
-      
-      if (insertedData && insertedData[0]) {
-        setOglasZaPromociju(insertedData[0]);
-        const paketi = dohvatiPaketeZaOglas(insertedData[0]);
-        setOdabraniPromoPaket(paketi[0]);
-        setPrikaziPlacanjePromo(true);
-      }
-      return;
-    }
-
-    // Ako IMA Giveaway besplatni kredit, skidamo 1 kredit i objavljujemo besplatno odmah!
-    let noviKreditiKorisnika = (korisnik.promoKrediti || 0) - 1;
-    const azuriraniKorisnik = { ...korisnik, promoKrediti: noviKreditiKorisnika };
-    postaviKorisnika(azuriraniKorisnik);
-
-    const azuriraniRegKorisnici = registriraniKorisnici.map(k => 
-      k.email.toLowerCase() === korisnik.email.toLowerCase() ? { ...k, promoKrediti: noviKreditiKorisnika } : k
-    );
-    setRegistriraniKorisnici(azuriraniRegKorisnici);
-    localStorage.setItem("kupko_baza_korisnika", JSON.stringify(azuriraniRegKorisnici));
-
     const sad = new Date();
     const datumString = `Objavljeno danas u ${sad.getHours().toString().padStart(2, "0")}:${sad.getMinutes().toString().padStart(2, "0")}`;
 
@@ -779,8 +735,8 @@ export default function KupkoApp() {
       prodavac: korisnik.ime,
       autor_email: korisnik.email,
       telefon: noviOglas.telefon,
-      promoviran: true,
-      top: true,
+      promoviran: noviOglas.promoviran,
+      top: noviOglas.promoviran,
       datum: datumString,
       godiste: noviOglas.godiste || null,
       kilometri: noviOglas.kilometri || null,
@@ -792,7 +748,7 @@ export default function KupkoApp() {
       slike: noviOglas.slike.length > 0 ? noviOglas.slike : ["https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"]
     };
 
-    const { error } = await supabase.from('oglasi').insert([stvoreniOglas]);
+    const { data, error } = await supabase.from('oglasi').insert([stvoreniOglas]).select();
 
     if (error) {
       alert("Greška pri spremanju u bazu: " + error.message);
@@ -808,7 +764,14 @@ export default function KupkoApp() {
         kvadratura: "", sobe: ""
       });
       generirajKôd();
-      alert("🎉 Uspješno iskorišten vaš Giveaway besplatni oglas! Oglas je objavljen i promoviran.");
+
+      // Odmah nakon što stisnu "Objavi", prikazujemo modal s cijenama/paketima za promociju
+      if (data && data[0]) {
+        setOglasZaPromociju(data[0]);
+        const paketi = dohvatiPaketeZaOglas(data[0]);
+        setOdabraniPromoPaket(paketi[0]);
+        setPrikaziPlacanjePromo(true);
+      }
     }
   };
 
@@ -1687,8 +1650,8 @@ export default function KupkoApp() {
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
               <button type="button" onClick={() => setPrikaziPlacanjePromo(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
-              <h2 className="text-lg font-black text-slate-900 flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" /> Plaćanje objave oglasa</h2>
-              <p className="text-xs text-slate-500 font-medium">Oglas: <strong className="text-slate-800">{oglasZaPromociju.naslov}</strong></p>
+              <h2 className="text-lg font-black text-slate-900 flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" /> Promocija i objava oglasa</h2>
+              <p className="text-xs text-slate-500 font-medium">Uspješno spremljen oglas: <strong className="text-slate-800">{oglasZaPromociju.naslov}</strong></p>
 
               {korisnik && (korisnik.promoKrediti || 0) > 0 ? (
                 <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center space-y-3">
@@ -1705,7 +1668,7 @@ export default function KupkoApp() {
                 </div>
               ) : (
                 <form onSubmit={potvrdiUplatuPromo} className="space-y-3">
-                  <label className="block text-[11px] font-bold text-slate-600 uppercase">Odaberite paket objave i promocije:</label>
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase">Odaberite paket promocije za vaš oglas:</label>
                   <div className="space-y-2">
                     {dohvatiPaketeZaOglas(oglasZaPromociju).map((paket) => (
                       <div 
@@ -1786,7 +1749,6 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
-                {/* Auto-Moto Specifikacije */}
                 {noviOglas.kategorija === "auto-moto" && (
                   <div className="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-2.5">
                     <h4 className="text-[11px] font-black text-blue-900 uppercase flex items-center gap-1.5"><Car className="w-3.5 h-3.5" /> Specifikacije vozila</h4>
@@ -1823,7 +1785,6 @@ export default function KupkoApp() {
                   </div>
                 )}
 
-                {/* Nekretnine Specifikacije */}
                 {noviOglas.kategorija === "nekretnine" && (
                   <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 space-y-2.5">
                     <h4 className="text-[11px] font-black text-emerald-900 uppercase flex items-center gap-1.5"><Home className="w-3.5 h-3.5" /> Specifikacije nekretnine</h4>
@@ -1861,6 +1822,20 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
+                <div className="bg-amber-50 p-3 rounded-2xl border border-amber-200 space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={noviOglas.promoviran}
+                      onChange={(e) => setNoviOglas({ ...noviOglas, promoviran: e.target.checked })}
+                      className="rounded text-amber-500 w-4 h-4"
+                    />
+                    <span className="font-bold text-amber-900 text-xs flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Odmah želim istaknuti (promovirati) oglas
+                    </span>
+                  </label>
+                </div>
+
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                   <label className="block text-[11px] font-bold text-slate-600 uppercase mb-2">Slike i videozapisi</label>
                   <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-4 bg-white cursor-pointer relative mb-2 hover:bg-slate-50 transition">
@@ -1896,7 +1871,7 @@ export default function KupkoApp() {
                 </div>
 
                 <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 rounded-2xl uppercase tracking-wider text-xs shadow transition">
-                  Nastavi na objavu (Provjera Giveaway kredita / Naplata)
+                  Objavi oglas
                 </button>
               </form>
             </div>
@@ -2004,7 +1979,6 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
-                {/* Uređivanje Auto-Moto specifikacija */}
                 {oglasZaUrediti.kategorija === "auto-moto" && (
                   <div className="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-2.5">
                     <h4 className="text-[11px] font-black text-blue-900 uppercase">Specifikacije vozila</h4>
@@ -2025,7 +1999,6 @@ export default function KupkoApp() {
                   </div>
                 )}
 
-                {/* Uređivanje Nekretnina specifikacija */}
                 {oglasZaUrediti.kategorija === "nekretnine" && (
                   <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 space-y-2.5">
                     <h4 className="text-[11px] font-black text-emerald-900 uppercase">Specifikacije nekretnine</h4>
@@ -2090,7 +2063,6 @@ export default function KupkoApp() {
                 </div>
               </div>
 
-              {/* Prikaz Auto-Moto specifikacija u detaljima */}
               {odabraniOglas.kategorija === "auto-moto" && (odabraniOglas.godiste || odabraniOglas.kilometri || odabraniOglas.snagaKw) && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-blue-50 p-4 rounded-2xl border border-blue-200 text-xs font-bold text-blue-950">
                   {odabraniOglas.godiste && <div>📅 Godište: <span className="font-normal">{odabraniOglas.godiste}</span></div>}
@@ -2101,7 +2073,6 @@ export default function KupkoApp() {
                 </div>
               )}
 
-              {/* Prikaz Nekretnine specifikacija u detaljima */}
               {odabraniOglas.kategorija === "nekretnine" && (odabraniOglas.kvadratura || odabraniOglas.sobe) && (
                 <div className="grid grid-cols-2 gap-2.5 bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-xs font-bold text-emerald-950">
                   {odabraniOglas.kvadratura && <div>🏠 Kvadratura: <span className="font-normal">{odabraniOglas.kvadratura} m²</span></div>}
