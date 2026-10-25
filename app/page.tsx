@@ -75,6 +75,11 @@ export default function KupkoApp() {
   const [maxCijena, setMaxCijena] = useState("");
   const [odabranoStanje, setOdabranoStanje] = useState("sve");
 
+  // NOVO: Stanja za sortiranje i filtriranje po prodavaču
+  const [sortiranje, setSortiranje] = useState("najnovije"); // "najnovije", "cijena-uzlazno", "cijena-silazno"
+  const [odabraniProdavacFilter, setOdabraniProdavacFilter] = useState<string | null>(null);
+  const [noviTekstPoruke, setNoviTekstPoruke] = useState("");
+
   const [omiljeniIds, setOmiljeniIds] = useState<number[]>([]);
   const [prikaziSamoOmiljene, setPrikaziSamoOmiljene] = useState(false);
 
@@ -224,6 +229,34 @@ export default function KupkoApp() {
       dohvatiOglaseIzSupabase();
       alert("Oglas je uspješno obnovljen i promoviran!");
     }
+  };
+
+  // NOVO: Funkcija za slanje poruke prodavaču
+  const posaljiPorukuProdavacu = (oglasId: any, primateljEmail: string) => {
+    if (!korisnik) {
+      alert("Morate biti prijavljeni da biste poslali poruku prodavaču!");
+      setPrikaziPrijavu(true);
+      return;
+    }
+    if (!noviTekstPoruke.trim()) {
+      alert("Molimo unesite tekst poruke.");
+      return;
+    }
+
+    const novaPoruka = {
+      id: Date.now().toString(),
+      oglasId: String(oglasId),
+      posiljatelj: korisnik.email,
+      primatelj: primateljEmail || "nepoznato@kupko.hr",
+      tekst: noviTekstPoruke,
+      datum: new Date().toLocaleDateString("hr-HR") + " " + new Date().toLocaleTimeString("hr-HR", { hour: '2-digit', minute: '2-digit' })
+    };
+
+    const azuriranePoruke = [novaPoruka, ...poruke];
+    setPoruke(azuriranePoruke);
+    localStorage.setItem("kupko_poruke_v2", JSON.stringify(azuriranePoruke));
+    setNoviTekstPoruke("");
+    alert("Poruka je uspješno poslana prodavaču!");
   };
 
   const rukujPrijavom = (e: React.FormEvent) => {
@@ -406,7 +439,7 @@ export default function KupkoApp() {
   const obrisiOglas = async (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
-    const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
+    const jeAutor = (glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase()) || 
                     (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
     if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti brisati tuđi oglas!"); return; }
     
@@ -426,7 +459,7 @@ export default function KupkoApp() {
   const pokreniUredivanje = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
-    const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
+    const jeAutor = (glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase()) || 
                     (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
     if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti uređivati tuđi oglas!"); return; }
     setOglasZaUrediti({ ...glas });
@@ -684,12 +717,16 @@ export default function KupkoApp() {
     }
   };
 
+  // NOVO: Ažurirano filtriranje sa sortiranjem i filterom po prodavaču (`autor_email`)
   const filtriraniOglasi = oglasi.filter((o) => {
     const odgovaraTrazilici = o.naslov?.toLowerCase().includes(pojamPretrage.toLowerCase());
     const odgovaraKategoriji = odabranaKategorija === "sve" || o.kategorija === odabranaKategorija;
     const odgovaraPodkategoriji = odabranaPodkategorija === "sve" || o.podkategorija === odabranaPodkategorija;
     const odgovaraZupaniji = odabranaZupanija === "sve" || o.zupanija === odabranaZupanija;
     const odgovaraOmiljenima = !prikaziSamoOmiljene || omiljeniIds.includes(o.id);
+    
+    // Provjera filtera po prodavaču
+    const odgovaraProdavacu = !odabraniProdavacFilter || o.autor_email === odabraniProdavacFilter;
     
     const cijenaNum = parseFloat(o.cijena || "0");
     const minNum = minCijena !== "" ? parseFloat(minCijena) : 0;
@@ -698,7 +735,12 @@ export default function KupkoApp() {
 
     const odgovaraStanju = odabranoStanje === "sve" || (o.stanje && o.stanje.toLowerCase().includes(odabranoStanje.toLowerCase()));
 
-    return odgovaraTrazilici && odgovaraKategoriji && odgovaraPodkategoriji && odgovaraZupaniji && odgovaraOmiljenima && odgovaraCijeni && odgovaraStanju;
+    return odgovaraTrazilici && odgovaraKategoriji && odgovaraPodkategoriji && odgovaraZupaniji && odgovaraOmiljenima && odgovaraCijeni && odgovaraStanju && odgovaraProdavacu;
+  }).sort((a, b) => {
+    if (sortiranje === "cijena-uzlazno") return Number(a.cijena || 0) - Number(b.cijena || 0);
+    if (sortiranje === "cijena-silazno") return Number(b.cijena || 0) - Number(a.cijena || 0);
+    // Standardno: najnovije prvo (po ID-u ili redoslijedu)
+    return Number(b.id || 0) - Number(a.id || 0);
   });
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
@@ -751,6 +793,9 @@ export default function KupkoApp() {
                         <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSamoOmiljene(false); }} className="w-full text-left px-4 py-2.5 font-bold hover:bg-slate-100 flex items-center gap-2.5">
                           <Package className="w-4 h-4 text-blue-700" /> Moji oglasi
                         </button>
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziSanducicPoruka(true); }} className="w-full text-left px-4 py-2.5 font-bold hover:bg-slate-100 flex items-center gap-2.5">
+                          <MessageSquare className="w-4 h-4 text-indigo-600" /> Sandučić poruka ({poruke.filter(p => p.primatelj === korisnik.email || p.posiljatelj === korisnik.email).length})
+                        </button>
                         <button onClick={() => { setPrikaziMeniKorisnika(false); alert("PayProtect: Sigurna kupoprodaja preko Kupka uz escrow zaštitu sredstava."); }} className="w-full text-left px-4 py-2.5 font-bold hover:bg-slate-100 flex items-center gap-2.5">
                           <ShieldCheck className="w-4 h-4 text-emerald-600" /> PayProtect
                         </button>
@@ -789,7 +834,7 @@ export default function KupkoApp() {
           <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <div 
               className="flex items-center gap-3.5 cursor-pointer group"
-              onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); setPojamPretrage(""); setPrikaziSamoOmiljene(false); setOdabraniOglas(null); setPrikaziReelsMod(false); }}
+              onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); setPojamPretrage(""); setPrikaziSamoOmiljene(false); setOdabraniOglas(null); setPrikaziReelsMod(false); setOdabraniProdavacFilter(null); }}
             >
               <div className="relative bg-amber-400 p-3 rounded-2xl text-blue-950 shadow-xl group-hover:scale-105 transition">
                 <ShoppingBag className="w-8 h-8 stroke-[2.5]" />
@@ -1088,7 +1133,35 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2.5">
+                {/* NOVO: Dodan odjeljak za Sortiranje i aktivni filter prodavača */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-black uppercase text-slate-600">Sortiraj oglase:</label>
+                    <select
+                      value={sortiranje}
+                      onChange={(e) => setSortiranje(e.target.value)}
+                      className="p-2 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-800 shadow-sm"
+                    >
+                      <option value="najnovije">Najnovije prvo</option>
+                      <option value="cijena-uzlazno">Cijena: od najniže prema najvišoj</option>
+                      <option value="cijena-silazno">Cijena: od najviše prema najnižoj</option>
+                    </select>
+                  </div>
+
+                  {odabraniProdavacFilter && (
+                    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200">
+                      <span className="text-xs text-blue-900 font-bold">Filter po prodavaču: <b>{odabraniProdavacFilter}</b></span>
+                      <button 
+                        onClick={() => setOdabraniProdavacFilter(null)}
+                        className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-lg font-black hover:bg-red-200 transition"
+                      >
+                        Ukloni filter ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2.5 pt-2">
                   <button
                     onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); }}
                     className={`px-5 py-2.5 rounded-2xl text-sm font-black transition shadow-sm ${odabranaKategorija === "sve" ? "bg-blue-700 text-white shadow-md" : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200"}`}
@@ -1380,6 +1453,35 @@ export default function KupkoApp() {
             <div className="text-xs sm:text-sm text-slate-700 space-y-3 leading-relaxed font-medium">
               <p>Kupko.hr štiti vašu privatnost u skladu s GDPR-om.</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* NOVO: Modal za prikaz sandučića poruka */}
+      {prikaziSanducicPoruka && korisnik && (
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
+            <button type="button" onClick={() => setPrikaziSanducicPoruka(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-6 h-6" /></button>
+            <div className="flex items-center gap-2 text-blue-900">
+              <MessageSquare className="w-7 h-7 text-indigo-600" />
+              <h2 className="text-2xl font-black text-slate-900">Moj sandučić poruka</h2>
+            </div>
+            
+            {poruke.filter(p => p.primatelj === korisnik.email || p.posiljatelj === korisnik.email).length === 0 ? (
+              <p className="text-slate-500 text-sm py-8 text-center font-medium">Nemate aktivnih poruka u sandučiću.</p>
+            ) : (
+              <div className="space-y-3">
+                {poruke.filter(p => p.primatelj === korisnik.email || p.posiljatelj === korisnik.email).map(p => (
+                  <div key={p.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                    <div className="flex justify-between items-center text-xs text-slate-500 font-bold">
+                      <span>{p.posiljatelj === korisnik.email ? `Poslano prema: ${p.primatelj}` : `Primljeno od: ${p.posiljatelj}`}</span>
+                      <span>{p.datum}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-slate-800">{p.tekst}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1809,17 +1911,46 @@ export default function KupkoApp() {
               <p className="whitespace-pre-line">{odabraniOglas.opis || "Nema opisa."}</p>
             </div>
 
-            <div className="bg-blue-50/80 p-5 rounded-3xl border flex items-center justify-between shadow-sm">
+            <div className="bg-blue-50/80 p-5 rounded-3xl border flex items-center justify-between shadow-sm flex-wrap gap-4">
               <div>
                 <span className="text-xs text-blue-600 uppercase font-black block">Oglašivač</span>
                 <p className="font-black text-base text-blue-950 flex items-center gap-2 mt-0.5">
                   <User className="w-5 h-5 text-blue-700" /> {odabraniOglas.prodavac || "Korisnik"}
                 </p>
+                {/* NOVO: Klikabilan email prodavača koji filtrira njegove oglase */}
+                {odabraniOglas.autor_email && (
+                  <button 
+                    onClick={() => { setOdabraniProdavacFilter(odabraniOglas.autor_email); setOdabraniOglas(null); }}
+                    className="text-xs text-blue-600 font-bold underline hover:text-blue-800 mt-1 block"
+                  >
+                    📧 {odabraniOglas.autor_email} (Klikni za sve oglase ovog prodavača)
+                  </button>
+                )}
               </div>
               <div className="text-right text-sm text-slate-700 font-bold">
                 <span>📞 Tel: <strong className="text-slate-900">{odabraniOglas.telefon || "Dostupan na upit"}</strong></span>
               </div>
             </div>
+
+            {/* NOVO: Forma za slanje poruke prodavaču */}
+            {korisnik && korisnik.email !== odabraniOglas.autor_email && (
+              <div className="mt-4 border-t pt-4 bg-slate-50 p-4 rounded-2xl border">
+                <h5 className="text-xs font-black uppercase text-slate-700 mb-2">Pošalji poruku prodavaču:</h5>
+                <textarea
+                  placeholder="Npr. Pozdrav, je li oglas još aktuelan i može li cijena dolje?"
+                  value={noviTekstPoruke}
+                  onChange={(e) => setNoviTekstPoruke(e.target.value)}
+                  className="w-full p-3 rounded-xl border text-sm font-semibold bg-white mb-3"
+                  rows={2}
+                />
+                <button
+                  onClick={() => posaljiPorukuProdavacu(odabraniOglas.id, odabraniOglas.autor_email)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-5 py-3 rounded-xl uppercase tracking-wider transition shadow"
+                >
+                  Pošalji upit prodavaču ✉️
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
