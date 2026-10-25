@@ -607,7 +607,7 @@ export default function KupkoApp() {
       stanje: noviOglas.stanje,
       opis: noviOglas.opis || null,
       prodavac: prodavacFinal,
-      autoremail: autorEmailFinal,
+       "autorEmail": autorEmailFinal,
       telefon: noviOglas.telefon,
       promoviran: konacniPromoviran,
       top: konacniPromoviran,
