@@ -1,16 +1,30 @@
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
     const { email, subject, message } = await request.json();
 
-    // Ovdje možete spojiti pravi servis (npr. Resend, SendGrid ili Nodemailer)
-    // Za sada vraćamo valjani JSON odgovor da aplikacija radi besprijekorno:
-    console.log(`Pravi e-mail poslan na: ${email} | Tema: ${subject}`);
+    console.label = "Pokušaj slanja na: " + email;
 
-    return NextResponse.json({ success: true, message: "E-mail je uspješno poslan!" });
+    const response = await resend.emails.send({
+      from: 'Kupko.hr <onboarding@resend.dev>',
+      to: [email],
+      subject: subject,
+      html: `<p>${message}</p>`,
+    });
+
+    // Ako Resend vrati grešku unutar objekta
+    if (response.error) {
+      console.error("Resend vratio grešku:", response.error);
+      return NextResponse.json({ success: false, error: response.error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, data: response.data });
   } catch (error: any) {
-    console.error("Greška u API route send-email:", error);
+    console.error("Greška u try/catch bloku:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
