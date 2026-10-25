@@ -199,7 +199,6 @@ export default function KupkoApp() {
           const address = data.address || {};
           const gradIliOkrug = (address.city || address.town || address.village || address.county || "").toLowerCase();
           
-          // Pokušaj pronaći odgovarajuću županiju iz naše liste
           let pronadjenaZupanija = ZUPANIJE.find(z => gradIliOkrug.includes(z.toLowerCase().replace("-", " ")));
           
           if (gradIliOkrug.includes("zagreb")) {
@@ -218,7 +217,6 @@ export default function KupkoApp() {
             setOdabranaZupanija(pronadjenaZupanija);
             alert(`📍 Uspješno detektirana lokacija! Prikazujem oglase za županiju: ${pronadjenaZupanija}`);
           } else {
-            // Ako ne nađe točnu županiju, postavi grad u pretragu
             const nazivGrada = address.city || address.town || address.village || "";
             if (nazivGrada) {
               setPojamPretrage(nazivGrada);
@@ -576,7 +574,10 @@ export default function KupkoApp() {
     const jeAutor = (glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase()) || 
                     (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
     if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti uređivati tuđi oglas!"); return; }
-    setOglasZaUrediti({ ...glas });
+    setOglasZaUrediti({ 
+      ...glas, 
+      slike: glas.slike || [] 
+    });
     setPrikaziUredivanje(true);
   };
 
@@ -684,7 +685,20 @@ export default function KupkoApp() {
       .update({ 
         naslov: oglasZaUrediti.naslov, 
         cijena: oglasZaUrediti.cijena, 
-        opis: oglasZaUrediti.opis 
+        opis: oglasZaUrediti.opis,
+        kategorija: oglasZaUrediti.kategorija,
+        podkategorija: oglasZaUrediti.podkategorija,
+        zupanija: oglasZaUrediti.zupanija,
+        grad: oglasZaUrediti.grad || null,
+        telefon: oglasZaUrediti.telefon,
+        godiste: oglasZaUrediti.godiste || null,
+        kilometri: oglasZaUrediti.kilometri || null,
+        snagaKw: oglasZaUrediti.snagaKw || null,
+        gorivo: oglasZaUrediti.gorivo || null,
+        mjenjac: oglasZaUrediti.mjenjac || null,
+        kvadratura: oglasZaUrediti.kvadratura || null,
+        sobe: oglasZaUrediti.sobe || null,
+        slike: oglasZaUrediti.slike || []
       })
       .eq('id', oglasZaUrediti.id);
 
@@ -2012,22 +2026,160 @@ export default function KupkoApp() {
               <h2 className="text-2xl font-black mb-4 text-slate-900">Uredi oglas u bazi</h2>
 
               <form onSubmit={rukujSpremanjemUredivanja} className="space-y-4">
-                <input 
-                  type="text" required 
-                  value={oglasZaUrediti.naslov} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, naslov: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl border text-sm font-semibold"
-                />
-                <input 
-                  type="text" required 
-                  value={oglasZaUrediti.cijena} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, cijena: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl border text-sm font-semibold"
-                />
-                <textarea 
-                  rows={3}
-                  value={oglasZaUrediti.opis || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, opis: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl border text-sm font-semibold"
-                />
-                <button type="submit" className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl uppercase text-sm shadow-lg">
+                <div>
+                  <label className="block text-xs font-black text-slate-700 uppercase mb-1">Naslov oglasa *</label>
+                  <input 
+                    type="text" required 
+                    value={oglasZaUrediti.naslov} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, naslov: e.target.value })}
+                    className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Cijena (€) *</label>
+                    <input 
+                      type="text" required 
+                      value={oglasZaUrediti.cijena} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, cijena: e.target.value })}
+                      className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Glavna Kategorija</label>
+                    <select 
+                      value={oglasZaUrediti.kategorija} 
+                      onChange={(e) => {
+                        const novaKat = e.target.value;
+                        const prvaPod = SVE_KATEGORIJE.find((k) => k.id === novaKat)?.podkategorije[0] || "";
+                        setOglasZaUrediti({ ...oglasZaUrediti, kategorija: novaKat, podkategorija: prvaPod });
+                      }}
+                      className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm bg-white font-bold"
+                    >
+                      {SVE_KATEGORIJE.map((k) => (
+                        <option key={k.id} value={k.id}>{k.ikona} {k.naziv}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Podkategorija</label>
+                    <select 
+                      value={oglasZaUrediti.podkategorija} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, podkategorija: e.target.value })}
+                      className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm bg-white font-semibold"
+                    >
+                      {SVE_KATEGORIJE.find((k) => k.id === oglasZaUrediti.kategorija)?.podkategorije.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {oglasZaUrediti.kategorija === "auto-moto" && (
+                  <div className="bg-blue-50/70 p-4 rounded-3xl border border-blue-200 space-y-3">
+                    <h4 className="text-xs font-black text-blue-900 uppercase flex items-center gap-1.5"><Car className="w-4 h-4" /> Specifikacije vozila</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Godište</label>
+                        <input type="text" value={oglasZaUrediti.godiste || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, godiste: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Kilometri</label>
+                        <input type="text" value={oglasZaUrediti.kilometri || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, kilometri: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Snaga (kW)</label>
+                        <input type="text" value={oglasZaUrediti.snagaKw || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, snagaKw: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Gorivo</label>
+                        <select value={oglasZaUrediti.gorivo || "Dizel"} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, gorivo: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-bold bg-white">
+                          <option value="Dizel">Dizel</option>
+                          <option value="Benzin">Benzin</option>
+                          <option value="Hibrid">Hibrid</option>
+                          <option value="Električni">Električni</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Mjenjač</label>
+                        <select value={oglasZaUrediti.mjenjac || "Ručni"} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, mjenjac: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-bold bg-white">
+                          <option value="Ručni">Ručni</option>
+                          <option value="Automatski">Automatski</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {oglasZaUrediti.kategorija === "nekretnine" && (
+                  <div className="bg-emerald-50/70 p-4 rounded-3xl border border-emerald-200 space-y-3">
+                    <h4 className="text-xs font-black text-emerald-900 uppercase flex items-center gap-1.5"><Home className="w-4 h-4" /> Specifikacije nekretnine</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Kvadratura (m²)</label>
+                        <input type="text" value={oglasZaUrediti.kvadratura || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, kvadratura: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Broj soba</label>
+                        <input type="text" value={oglasZaUrediti.sobe || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, sobe: e.target.value })} className="w-full p-3 rounded-xl border text-sm font-semibold bg-white" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Županija</label>
+                    <select
+                      value={oglasZaUrediti.zupanija}
+                      onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, zupanija: e.target.value })}
+                      className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm bg-white font-bold"
+                    >
+                      {ZUPANIJE.map((z) => <option key={z} value={z}>{z}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Grad / Mjesto</label>
+                    <input type="text" value={oglasZaUrediti.grad || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, grad: e.target.value })} className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-slate-700 uppercase mb-1">Broj Mobitela *</label>
+                    <input type="text" required value={oglasZaUrediti.telefon || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, telefon: e.target.value })} className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold" />
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-5 rounded-3xl border">
+                  <label className="block text-xs font-black text-slate-700 uppercase mb-2">Galerija slika i videa (Reels)</label>
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-2xl p-6 bg-white cursor-pointer relative mb-3 hover:bg-slate-50 transition">
+                    <input type="file" accept="image/*,video/*" multiple onChange={(e) => rukujVisestrukimUcitavanjemSlika(e, true)} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                    <Upload className="w-8 h-8 text-blue-600 mb-2" />
+                    <p className="text-sm font-black text-slate-800">Dodaj još slika ili videozapisa</p>
+                  </div>
+
+                  {oglasZaUrediti.slike && oglasZaUrediti.slike.length > 0 && (
+                    <div className="grid grid-cols-4 gap-2.5">
+                      {oglasZaUrediti.slike.map((s: string, idx: number) => (
+                        <div key={idx} className="relative rounded-xl overflow-hidden border h-20 shadow-sm bg-black">
+                          {s.endsWith(".mp4") || s.includes("video") ? (
+                            <video src={s} className="w-full h-full object-cover" />
+                          ) : (
+                            <img src={s} alt="Upload" className="w-full h-full object-cover" />
+                          )}
+                          <button type="button" onClick={() => setOglasZaUrediti({ ...oglasZaUrediti, slike: oglasZaUrediti.slike.filter((_: string, i: number) => i !== idx) })} className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"><X className="w-3 h-3" /></button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-black text-slate-700 uppercase mb-1">Opis oglasa</label>
+                  <textarea 
+                    rows={4}
+                    value={oglasZaUrediti.opis || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, opis: e.target.value })}
+                    className="w-full p-3.5 rounded-2xl border border-slate-300 text-sm font-semibold"
+                  />
+                </div>
+
+                <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl uppercase text-sm shadow-lg">
                   Spremi Sve Promjene u Bazu
                 </button>
               </form>
