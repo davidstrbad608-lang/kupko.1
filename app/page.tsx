@@ -398,7 +398,7 @@ export default function KupkoApp() {
 
   const mozeUreditiIliBrisati = (glas: any) => {
     if (!korisnik) return false;
-    const jeAutor = (glas.autorEmail && glas.autorEmail.toLowerCase() === korisnik.email.toLowerCase()) || 
+    const jeAutor = (glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase()) || 
                     (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
     return jeAutor || korisnik.isOwner;
   };
