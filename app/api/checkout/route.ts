@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2025-02-28.acacia' as any,
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { paketNaziv, cijena, oglasNaslov } = body;
-
-    const unitAmount = Math.round(parseFloat(cijena) * 100);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -19,22 +15,22 @@ export async function POST(request: Request) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `Promo paket: ${paketNaziv}`,
-              description: `Isticanje oglasa: "${oglasNaslov}"`,
+              name: `Promocija: ${paketNaziv}`,
+              description: `Oglas: ${oglasNaslov}`,
             },
-            unit_amount: unitAmount,
+            unit_amount: Math.round(parseFloat(cijena) * 100), // Stripe računa u centima
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}?uspjeh=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}?otkazano=true`,
+      success_url: `${request.headers.get('origin')}?success=true`,
+      cancel_url: `${request.headers.get('origin')}?canceled=true`,
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (error: any) {
-    console.error("Greška pri kreiranju Stripe sesije:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err: any) {
+    console.error("Greška sa Stripe-om:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
