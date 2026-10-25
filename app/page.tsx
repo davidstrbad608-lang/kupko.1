@@ -75,10 +75,14 @@ export default function KupkoApp() {
   const [maxCijena, setMaxCijena] = useState("");
   const [odabranoStanje, setOdabranoStanje] = useState("sve");
 
-  // NOVO: Stanja za sortiranje i filtriranje po prodavaču
-  const [sortiranje, setSortiranje] = useState("najnovije"); // "najnovije", "cijena-uzlazno", "cijena-silazno"
+  // Sortiranje i filter po prodavaču
+  const [sortiranje, setSortiranje] = useState("najnovije"); 
   const [odabraniProdavacFilter, setOdabraniProdavacFilter] = useState<string | null>(null);
   const [noviTekstPoruke, setNoviTekstPoruke] = useState("");
+
+  // NOVO: Stanje za paginaciju (straničenje)
+  const [trenutnaStranica, setTrenutnaStranica] = useState(1);
+  const oglasiPoStranici = 9;
 
   const [omiljeniIds, setOmiljeniIds] = useState<number[]>([]);
   const [prikaziSamoOmiljene, setPrikaziSamoOmiljene] = useState(false);
@@ -231,7 +235,6 @@ export default function KupkoApp() {
     }
   };
 
-  // NOVO: Funkcija za slanje poruke prodavaču
   const posaljiPorukuProdavacu = (oglasId: any, primateljEmail: string) => {
     if (!korisnik) {
       alert("Morate biti prijavljeni da biste poslali poruku prodavaču!");
@@ -717,15 +720,13 @@ export default function KupkoApp() {
     }
   };
 
-  // NOVO: Ažurirano filtriranje sa sortiranjem i filterom po prodavaču (`autor_email`)
+  // Filtriranje i sortiranje oglasa
   const filtriraniOglasi = oglasi.filter((o) => {
     const odgovaraTrazilici = o.naslov?.toLowerCase().includes(pojamPretrage.toLowerCase());
     const odgovaraKategoriji = odabranaKategorija === "sve" || o.kategorija === odabranaKategorija;
     const odgovaraPodkategoriji = odabranaPodkategorija === "sve" || o.podkategorija === odabranaPodkategorija;
     const odgovaraZupaniji = odabranaZupanija === "sve" || o.zupanija === odabranaZupanija;
     const odgovaraOmiljenima = !prikaziSamoOmiljene || omiljeniIds.includes(o.id);
-    
-    // Provjera filtera po prodavaču
     const odgovaraProdavacu = !odabraniProdavacFilter || o.autor_email === odabraniProdavacFilter;
     
     const cijenaNum = parseFloat(o.cijena || "0");
@@ -739,9 +740,13 @@ export default function KupkoApp() {
   }).sort((a, b) => {
     if (sortiranje === "cijena-uzlazno") return Number(a.cijena || 0) - Number(b.cijena || 0);
     if (sortiranje === "cijena-silazno") return Number(b.cijena || 0) - Number(a.cijena || 0);
-    // Standardno: najnovije prvo (po ID-u ili redoslijedu)
     return Number(b.id || 0) - Number(a.id || 0);
   });
+
+  // NOVO: Logika za paginaciju (dijeljenje filtriranih oglasa na stranice)
+  const ukupnoStranica = Math.ceil(filtriraniOglasi.length / oglasiPoStranici) || 1;
+  const indeksPocetka = (trenutnaStranica - 1) * oglasiPoStranici;
+  const trenutniOglasiNaStranici = filtriraniOglasi.slice(indeksPocetka, indeksPocetka + oglasiPoStranici);
 
   const promoOglasi = oglasi.filter((o) => o.promoviran);
   const preostaloMjestaZaGrateis = Math.max(0, 20 - registriraniKorisnici.length);
@@ -834,7 +839,7 @@ export default function KupkoApp() {
           <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <div 
               className="flex items-center gap-3.5 cursor-pointer group"
-              onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); setPojamPretrage(""); setPrikaziSamoOmiljene(false); setOdabraniOglas(null); setPrikaziReelsMod(false); setOdabraniProdavacFilter(null); }}
+              onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); setPojamPretrage(""); setPrikaziSamoOmiljene(false); setOdabraniOglas(null); setPrikaziReelsMod(false); setOdabraniProdavacFilter(null); setTrenutnaStranica(1); }}
             >
               <div className="relative bg-amber-400 p-3 rounded-2xl text-blue-950 shadow-xl group-hover:scale-105 transition">
                 <ShoppingBag className="w-8 h-8 stroke-[2.5]" />
@@ -855,7 +860,7 @@ export default function KupkoApp() {
                   type="text"
                   placeholder="Pretraži ponudu iz baze (npr. Zlatni retriver, BMW, Stan...)"
                   value={pojamPretrage}
-                  onChange={(e) => setPojamPretrage(e.target.value)}
+                  onChange={(e) => { setPojamPretrage(e.target.value); setTrenutnaStranica(1); }}
                   className="w-full pl-11 pr-4 py-3 rounded-2xl text-slate-900 bg-white shadow-md text-base font-semibold outline-none focus:ring-4 focus:ring-amber-400 placeholder:text-slate-400"
                 />
                 <Search className="absolute left-3.5 top-3.5 text-slate-400 w-5 h-5" />
@@ -863,7 +868,7 @@ export default function KupkoApp() {
 
               <select
                 value={odabranaZupanija}
-                onChange={(e) => setOdabranaZupanija(e.target.value)}
+                onChange={(e) => { setOdabranaZupanija(e.target.value); setTrenutnaStranica(1); }}
                 className="px-4 py-3 rounded-2xl bg-blue-950 text-white border border-blue-400/50 text-sm font-bold outline-none cursor-pointer shadow-md"
               >
                 <option value="sve">🇭🇷 Cijela Hrvatska</option>
@@ -881,7 +886,7 @@ export default function KupkoApp() {
               </button>
 
               <button
-                onClick={() => { setPrikaziSamoOmiljene(!prikaziSamoOmiljene); setPrikaziReelsMod(false); }}
+                onClick={() => { setPrikaziSamoOmiljene(!prikaziSamoOmiljene); setPrikaziReelsMod(false); setTrenutnaStranica(1); }}
                 className={`flex items-center justify-center gap-2 px-3.5 py-3 rounded-2xl text-sm font-black transition shadow-md ${
                   prikaziSamoOmiljene ? "bg-red-500 text-white" : "bg-blue-950 text-slate-200 hover:bg-blue-900 border border-blue-400/40"
                 }`}
@@ -1085,7 +1090,7 @@ export default function KupkoApp() {
                       return (
                         <div
                           key={kat.id}
-                          onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); }}
+                          onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); setTrenutnaStranica(1); }}
                           className="bg-slate-50 hover:bg-blue-50 border border-slate-200 p-4 rounded-2xl cursor-pointer transition flex flex-col items-center text-center group shadow-sm hover:shadow-md"
                         >
                           <span className="text-3xl mb-2 group-hover:scale-110 transition">{kat.ikona}</span>
@@ -1107,17 +1112,17 @@ export default function KupkoApp() {
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <span className="text-sm font-bold text-slate-700 flex items-center gap-1.5"><SlidersHorizontal className="w-4 h-4" /> Cijena (€):</span>
                     <input 
-                      type="number" placeholder="Min" value={minCijena} onChange={(e) => setMinCijena(e.target.value)}
+                      type="number" placeholder="Min" value={minCijena} onChange={(e) => { setMinCijena(e.target.value); setTrenutnaStranica(1); }}
                       className="w-24 p-2 rounded-xl border border-slate-300 text-sm font-semibold bg-slate-50"
                     />
                     <span className="text-slate-400 font-bold">-</span>
                     <input 
-                      type="number" placeholder="Max" value={maxCijena} onChange={(e) => setMaxCijena(e.target.value)}
+                      type="number" placeholder="Max" value={maxCijena} onChange={(e) => { setMaxCijena(e.target.value); setTrenutnaStranica(1); }}
                       className="w-24 p-2 rounded-xl border border-slate-300 text-sm font-semibold bg-slate-50"
                     />
 
                     <select 
-                      value={odabranoStanje} onChange={(e) => setOdabranoStanje(e.target.value)}
+                      value={odabranoStanje} onChange={(e) => { setOdabranoStanje(e.target.value); setTrenutnaStranica(1); }}
                       className="p-2 rounded-xl border border-slate-300 text-sm bg-slate-50 font-bold text-slate-800"
                     >
                       <option value="sve">Sva stanja</option>
@@ -1126,20 +1131,19 @@ export default function KupkoApp() {
                     </select>
 
                     {(minCijena || maxCijena || odabranoStanje !== "sve") && (
-                      <button onClick={() => { setMinCijena(""); setMaxCijena(""); setOdabranoStanje("sve"); }} className="text-sm text-red-600 font-black hover:underline ml-2">
+                      <button onClick={() => { setMinCijena(""); setMaxCijena(""); setOdabranoStanje("sve"); setTrenutnaStranica(1); }} className="text-sm text-red-600 font-black hover:underline ml-2">
                         Resetiraj
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* NOVO: Dodan odjeljak za Sortiranje i aktivni filter prodavača */}
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                   <div className="flex items-center gap-2">
                     <label className="text-xs font-black uppercase text-slate-600">Sortiraj oglase:</label>
                     <select
                       value={sortiranje}
-                      onChange={(e) => setSortiranje(e.target.value)}
+                      onChange={(e) => { setSortiranje(e.target.value); setTrenutnaStranica(1); }}
                       className="p-2 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-800 shadow-sm"
                     >
                       <option value="najnovije">Najnovije prvo</option>
@@ -1152,7 +1156,7 @@ export default function KupkoApp() {
                     <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200">
                       <span className="text-xs text-blue-900 font-bold">Filter po prodavaču: <b>{odabraniProdavacFilter}</b></span>
                       <button 
-                        onClick={() => setOdabraniProdavacFilter(null)}
+                        onClick={() => { setOdabraniProdavacFilter(null); setTrenutnaStranica(1); }}
                         className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-lg font-black hover:bg-red-200 transition"
                       >
                         Ukloni filter ✕
@@ -1163,7 +1167,7 @@ export default function KupkoApp() {
 
                 <div className="flex flex-wrap gap-2.5 pt-2">
                   <button
-                    onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); }}
+                    onClick={() => { setOdabranaKategorija("sve"); setOdabranaPodkategorija("sve"); setTrenutnaStranica(1); }}
                     className={`px-5 py-2.5 rounded-2xl text-sm font-black transition shadow-sm ${odabranaKategorija === "sve" ? "bg-blue-700 text-white shadow-md" : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200"}`}
                   >
                     Svi Oglasi
@@ -1171,7 +1175,7 @@ export default function KupkoApp() {
                   {SVE_KATEGORIJE.map((kat) => (
                     <button
                       key={kat.id}
-                      onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); }}
+                      onClick={() => { setOdabranaKategorija(kat.id); setOdabranaPodkategorija("sve"); setTrenutnaStranica(1); }}
                       className={`px-5 py-2.5 rounded-2xl text-sm font-black flex items-center gap-2 transition shadow-sm ${odabranaKategorija === kat.id ? "bg-blue-700 text-white shadow-md" : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200"}`}
                     >
                       <span className="text-base">{kat.ikona}</span>
@@ -1187,7 +1191,7 @@ export default function KupkoApp() {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       <button
-                        onClick={() => setOdabranaPodkategorija("sve")}
+                        onClick={() => { setOdabranaPodkategorija("sve"); setTrenutnaStranica(1); }}
                         className={`px-3.5 py-1.5 rounded-xl text-sm font-bold transition ${odabranaPodkategorija === "sve" ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700 border"}`}
                       >
                         Sve podkategorije
@@ -1195,7 +1199,7 @@ export default function KupkoApp() {
                       {SVE_KATEGORIJE.find((k) => k.id === odabranaKategorija)?.podkategorije.map((pod) => (
                         <button
                           key={pod}
-                          onClick={() => setOdabranaPodkategorija(pod)}
+                          onClick={() => { setOdabranaPodkategorija(pod); setTrenutnaStranica(1); }}
                           className={`px-3.5 py-1.5 rounded-xl text-sm font-bold transition ${odabranaPodkategorija === pod ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700 border hover:bg-blue-50"}`}
                         >
                           {pod}
@@ -1229,7 +1233,7 @@ export default function KupkoApp() {
                         </div>
                       </div>
                       {odabranaZupanija !== "sve" && (
-                        <button onClick={() => setOdabranaZupanija("sve")} className="bg-amber-400 text-blue-950 font-bold px-3.5 py-1.5 rounded-xl text-xs">
+                        <button onClick={() => { setOdabranaZupanija("sve"); setTrenutnaStranica(1); }} className="bg-amber-400 text-blue-950 font-bold px-3.5 py-1.5 rounded-xl text-xs">
                           Poništi županiju (Prikaži sve)
                         </button>
                       )}
@@ -1242,7 +1246,7 @@ export default function KupkoApp() {
                         return (
                           <div 
                             key={z}
-                            onClick={() => setOdabranaZupanija(jeOdabrana ? "sve" : z)}
+                            onClick={() => { setOdabranaZupanija(jeOdabrana ? "sve" : z); setTrenutnaStranica(1); }}
                             className={`p-4 rounded-2xl border cursor-pointer transition flex flex-col justify-between ${
                               jeOdabrana ? "bg-blue-700 text-white border-blue-800 shadow-lg scale-102" : "bg-slate-50 hover:bg-blue-50 border-slate-200 text-slate-800"
                             }`}
@@ -1257,103 +1261,142 @@ export default function KupkoApp() {
                     </div>
                   </div>
                 ) : (
-                  <div className={prikaz === "grid" ? "grid grid-cols-1 md:grid-cols-3 gap-6" : "flex flex-col gap-4"}>
-                    {filtriraniOglasi.map((o) => {
-                      const glavnaSlika = o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80";
-                      return (
-                        <div 
-                          key={o.id}
-                          onClick={() => setOdabraniOglas(o)}
-                          className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden hover:shadow-2xl transition flex flex-col justify-between group cursor-pointer relative"
-                        >
-                          <div className="relative">
-                            <img src={glavnaSlika} alt={o.naslov} className="w-full h-60 object-cover group-hover:scale-105 transition" />
-                            
-                            {o.promoviran && (
-                              <span className="absolute top-3.5 left-3.5 bg-amber-400 text-blue-950 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-1.5">
-                                <Sparkles className="w-4 h-4" /> PROMO
-                              </span>
-                            )}
-
-                            <button
-                              onClick={(e) => toggleOmiljeni(e, o.id)}
-                              className="absolute top-3.5 right-3.5 bg-white/95 backdrop-blur p-3 rounded-full shadow-lg hover:bg-white transition"
-                            >
-                              <Heart
-                                className={`w-6 h-6 ${
-                                  omiljeniIds.includes(o.id)
-                                    ? "fill-red-500 text-red-500"
-                                    : "text-slate-600"
-                                }`}
-                              />
-                            </button>
-                          </div>
-
-                          <div className="p-5 flex-1 flex flex-col justify-between">
-                            <div>
-                              <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-semibold">
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4 text-blue-600" /> {o.zupanija} {o.grad ? `(${o.grad})` : ""}
+                  <>
+                    <div className={prikaz === "grid" ? "grid grid-cols-1 md:grid-cols-3 gap-6" : "flex flex-col gap-4"}>
+                      {trenutniOglasiNaStranici.map((o) => {
+                        const glavnaSlika = o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80";
+                        return (
+                          <div 
+                            key={o.id}
+                            onClick={() => setOdabraniOglas(o)}
+                            className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden hover:shadow-2xl transition flex flex-col justify-between group cursor-pointer relative"
+                          >
+                            <div className="relative">
+                              <img src={glavnaSlika} alt={o.naslov} className="w-full h-60 object-cover group-hover:scale-105 transition" />
+                              
+                              {o.promoviran && (
+                                <span className="absolute top-3.5 left-3.5 bg-amber-400 text-blue-950 text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-1.5">
+                                  <Sparkles className="w-4 h-4" /> PROMO
                                 </span>
-                                <span>{o.datum}</span>
-                              </div>
-                              <h4 className="font-extrabold text-slate-900 text-lg mb-2 line-clamp-2 hover:text-blue-700 leading-snug">
-                                {o.naslov}
-                              </h4>
+                              )}
+
+                              <button
+                                onClick={(e) => toggleOmiljeni(e, o.id)}
+                                className="absolute top-3.5 right-3.5 bg-white/95 backdrop-blur p-3 rounded-full shadow-lg hover:bg-white transition"
+                              >
+                                <Heart
+                                  className={`w-6 h-6 ${
+                                    omiljeniIds.includes(o.id)
+                                      ? "fill-red-500 text-red-500"
+                                      : "text-slate-600"
+                                  }`}
+                                />
+                              </button>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-100 flex justify-between items-center mt-3">
-                              <div className="flex items-baseline gap-2">
-                                <span className="text-2xl font-black text-blue-700">{o.cijena} €</span>
+                            <div className="p-5 flex-1 flex flex-col justify-between">
+                              <div>
+                                <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-semibold">
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-4 h-4 text-blue-600" /> {o.zupanija} {o.grad ? `(${o.grad})` : ""}
+                                  </span>
+                                  <span>{o.datum}</span>
+                                </div>
+                                <h4 className="font-extrabold text-slate-900 text-lg mb-2 line-clamp-2 hover:text-blue-700 leading-snug">
+                                  {o.naslov}
+                                </h4>
                               </div>
 
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={(e) => obnoviOglas(e, o.id)}
-                                  title="Obnovi oglas"
-                                  className="p-2.5 bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-700 rounded-2xl transition shadow-sm"
-                                >
-                                  <RotateCw className="w-5 h-5" />
-                                </button>
+                              <div className="pt-4 border-t border-slate-100 flex justify-between items-center mt-3">
+                                <div className="flex items-baseline gap-2">
+                                  <span className="text-2xl font-black text-blue-700">{o.cijena} €</span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => obnoviOglas(e, o.id)}
+                                    title="Obnovi oglas"
+                                    className="p-2.5 bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-700 rounded-2xl transition shadow-sm"
+                                  >
+                                    <RotateCw className="w-5 h-5" />
+                                  </button>
+                                </div>
                               </div>
+
+                              {korisnik && !o.promoviran && (
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => pokreniPromociju(e, o)}
+                                    className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-2.5 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md uppercase tracking-wider"
+                                  >
+                                    <Sparkles className="w-4 h-4" /> Boostaj oglas (Iskoristi Promo)
+                                  </button>
+                                </div>
+                              )}
+
+                              {mozeUreditiIliBrisati(o) && (
+                                <div className="mt-2 pt-2 flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => pokreniUredivanje(e, o)}
+                                    className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
+                                  >
+                                    <Edit3 className="w-4 h-4" /> Uredi
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => obrisiOglas(e, o)}
+                                    className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
+                                  >
+                                    <Trash2 className="w-4 h-4" /> Izbriši
+                                  </button>
+                                </div>
+                              )}
                             </div>
-
-                            {korisnik && !o.promoviran && (
-                              <div className="mt-4 pt-4 border-t border-slate-100">
-                                <button
-                                  type="button"
-                                  onClick={(e) => pokreniPromociju(e, o)}
-                                  className="w-full bg-amber-400 hover:bg-amber-500 text-blue-950 font-black py-2.5 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md uppercase tracking-wider"
-                                >
-                                  <Sparkles className="w-4 h-4" /> Boostaj oglas (Iskoristi Promo)
-                                </button>
-                              </div>
-                            )}
-
-                            {mozeUreditiIliBrisati(o) && (
-                              <div className="mt-2 pt-2 flex gap-2">
-                                <button
-                                  type="button"
-                                  onClick={(e) => pokreniUredivanje(e, o)}
-                                  className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
-                                >
-                                  <Edit3 className="w-4 h-4" /> Uredi
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => obrisiOglas(e, o)}
-                                  className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold py-2 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm"
-                                >
-                                  <Trash2 className="w-4 h-4" /> Izbriši
-                                </button>
-                              </div>
-                            )}
                           </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* NOVO: Kontrole za Paginaciju (Straničenje) */}
+                    {ukupnoStranica > 1 && (
+                      <div className="flex items-center justify-center gap-2 mt-8 bg-white p-4 rounded-2xl shadow-md border border-slate-200">
+                        <button
+                          onClick={() => setTrenutnaStranica((prev) => Math.max(prev - 1, 1))}
+                          disabled={trenutnaStranica === 1}
+                          className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-xs font-black uppercase text-slate-800 transition"
+                        >
+                          Prethodna
+                        </button>
+                        
+                        <div className="flex items-center gap-1 px-3">
+                          {Array.from({ length: ukupnoStranica }, (_, i) => i + 1).map((broj) => (
+                            <button
+                              key={broj}
+                              onClick={() => setTrenutnaStranica(broj)}
+                              className={`w-9 h-9 rounded-xl text-xs font-black transition ${
+                                trenutnaStranica === broj
+                                  ? "bg-blue-700 text-white shadow-md"
+                                  : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                              }`}
+                            >
+                              {broj}
+                            </button>
+                          ))}
                         </div>
-                      );
-                    })}
-                  </div>
+
+                        <button
+                          onClick={() => setTrenutnaStranica((prev) => Math.min(prev + 1, ukupnoStranica))}
+                          disabled={trenutnaStranica === ukupnoStranica}
+                          className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-xs font-black uppercase text-slate-800 transition"
+                        >
+                          Sljedeća
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </section>
             </>
@@ -1457,7 +1500,6 @@ export default function KupkoApp() {
         </div>
       )}
 
-      {/* NOVO: Modal za prikaz sandučića poruka */}
       {prikaziSanducicPoruka && korisnik && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
@@ -1917,10 +1959,9 @@ export default function KupkoApp() {
                 <p className="font-black text-base text-blue-950 flex items-center gap-2 mt-0.5">
                   <User className="w-5 h-5 text-blue-700" /> {odabraniOglas.prodavac || "Korisnik"}
                 </p>
-                {/* NOVO: Klikabilan email prodavača koji filtrira njegove oglase */}
                 {odabraniOglas.autor_email && (
                   <button 
-                    onClick={() => { setOdabraniProdavacFilter(odabraniOglas.autor_email); setOdabraniOglas(null); }}
+                    onClick={() => { setOdabraniProdavacFilter(odabraniOglas.autor_email); setOdabraniOglas(null); setTrenutnaStranica(1); }}
                     className="text-xs text-blue-600 font-bold underline hover:text-blue-800 mt-1 block"
                   >
                     📧 {odabraniOglas.autor_email} (Klikni za sve oglase ovog prodavača)
@@ -1932,7 +1973,6 @@ export default function KupkoApp() {
               </div>
             </div>
 
-            {/* NOVO: Forma za slanje poruke prodavaču */}
             {korisnik && korisnik.email !== odabraniOglas.autor_email && (
               <div className="mt-4 border-t pt-4 bg-slate-50 p-4 rounded-2xl border">
                 <h5 className="text-xs font-black uppercase text-slate-700 mb-2">Pošalji poruku prodavaču:</h5>
