@@ -831,7 +831,7 @@ export default function KupkoApp() {
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <span className="flex items-center gap-1.5 font-bold tracking-wide">
               <Shield className="w-4 h-4 text-emerald-400" />
-              🇭🇷 Kupko.hr - Sigurni Hrvatski Oglasnik (Supabase baza aktivna)
+              🇭🇷 Kupko.hr - Sigurni Hrvatski Oglasnik 
             </span>
 
             <div className="flex items-center gap-4">
