@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 export async function POST(request: Request) {
-  // Inicijaliziramo Stripe ovdje unutar funkcije
+  // Inicijaliziramo Stripe unutar funkcije kako se ne bi pokretao tijekom builda
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
   try {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
               name: `Promocija: ${paketNaziv}`,
               description: `Oglas: ${oglasNaslov}`,
             },
-            unit_amount: Math.round(parseFloat(cijena) * 100),
+            unit_amount: Math.round(parseFloat(cijena) * 100), // Stripe računa u centima
           },
           quantity: 1,
         },
