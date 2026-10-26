@@ -634,6 +634,7 @@ export default function KupkoApp() {
           paketNaziv: odabraniPromoPaket.naziv,
           cijena: odabraniPromoPaket.cijena,
           oglasNaslov: oglasZaPromociju.naslov,
+          oglasId: oglasZaPromociju.id, // <--- OVDJE DODANO DA SE SALJE ID OGLASA
         }),
       });
 
@@ -2191,7 +2192,7 @@ export default function KupkoApp() {
               <p className="text-[11px] text-amber-700 font-bold mb-3 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
                 🎁 Giveaway: Prvih 20 korisnika dobiva besplatni oglas!
               </p>
-              
+               
               <form onSubmit={rukujRegistracijom} className="space-y-3">
                 <input 
                   type="text" required placeholder="Korisničko ime" 
