@@ -5,7 +5,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 export async function POST(request: Request) {
   try {
-    const { paketNaziv, cijena, oglasNaslov } = await request.json();
+    const { paketNaziv, cijena, oglasNaslov, oglasId } = await request.json();
 
     // Pretvaramo cijenu u cente (npr. 3.50 € postaje 350 centi)
     const unitAmount = Math.round(parseFloat(cijena) * 100);
@@ -27,6 +27,10 @@ export async function POST(request: Request) {
       mode: 'payment',
       success_url: `${request.headers.get('origin')}/?success=true`,
       cancel_url: `${request.headers.get('origin')}/?canceled=true`,
+      // OVDJE SMO DODALI METADATA SA ID-JEM OGLASA:
+      metadata: {
+        oglasId: oglasId ? oglasId.toString() : '',
+      },
     });
 
     return NextResponse.json({ url: session.url });
