@@ -765,7 +765,6 @@ export default function KupkoApp() {
       });
       generirajKôd();
 
-      // Odmah nakon što stisnu "Objavi", prikazujemo modal s cijenama/paketima za promociju
       if (data && data[0]) {
         setOglasZaPromociju(data[0]);
         const paketi = dohvatiPaketeZaOglas(data[0]);
@@ -1927,7 +1926,7 @@ export default function KupkoApp() {
                   <input 
                     type="password" required placeholder="Nova lozinka"
                     value={novaLozinka} onChange={(e) => setNovaLozinka(e.target.value)}
-                    className="w-full p-3 rounded-xl border text-xs font-semibold outline-none"
+                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none"
                   />
                   <button type="submit" className="w-full bg-emerald-600 text-white font-black py-3 rounded-xl uppercase text-xs shadow transition">
                     Spremi lozinku
