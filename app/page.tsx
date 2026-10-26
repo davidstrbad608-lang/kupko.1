@@ -5,7 +5,7 @@ import { supabase } from "./supabase";
 import { 
   Search, PlusCircle, Heart, MapPin, Grid, List, Phone, X, 
   ShoppingBag, CheckCircle2, Mail, User, Clock, Upload, Image as ImageIcon,
-  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent, Check, AlertCircle, Send, ShieldAlert, SlidersHorizontal, Eye, Bot, Navigation, MessageSquare, Wallet, Bell, Settings, Flame, Play, KeyRound, Share2
+  LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent, Check, AlertCircle, Send, ShieldAlert, SlidersHorizontal, Eye, Bot, Navigation, MessageSquare, Wallet, Bell, Settings, Flame, Play, KeyRound, Share2, BarChart2
 } from "lucide-react";
 
 const ZUPANIJE = [
@@ -142,7 +142,7 @@ export default function KupkoApp() {
   const [noviOglas, setNoviOglas] = useState({
     naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
     kategorija: "auto-moto", podkategorija: "Osobna vozila",
-    zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slike: [] as string[], opis: "",
+    zupanija: "Grad Zagreb", grad: "", adresa: "", stanje: "Novo", slike: [] as string[], opis: "",
     prodavac: "", telefon: "", email: "", promoviran: false,
     godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni",
     kvadratura: "", sobe: ""
@@ -180,6 +180,18 @@ export default function KupkoApp() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const otvoriDetaljeOglasa = async (o: any) => {
+    const noviPregledi = (o.pregledi || 0) + 1;
+    setOglasi(prev => prev.map(item => item.id === o.id ? { ...item, pregledi: noviPregledi } : item));
+    setOdabraniOglas({ ...o, pregledi: noviPregledi });
+
+    try {
+      await supabase.from('oglasi').update({ pregledi: noviPregledi }).eq('id', o.id);
+    } catch (err) {
+      console.error("Greška pri ažuriranju pregleda:", err);
     }
   };
 
@@ -693,6 +705,7 @@ export default function KupkoApp() {
         podkategorija: oglasZaUrediti.podkategorija,
         zupanija: oglasZaUrediti.zupanija,
         grad: oglasZaUrediti.grad || null,
+        adresa: oglasZaUrediti.adresa || null,
         telefon: oglasZaUrediti.telefon,
         godiste: oglasZaUrediti.godiste || null,
         kilometri: oglasZaUrediti.kilometri || null,
@@ -760,6 +773,7 @@ export default function KupkoApp() {
       podkategorija: noviOglas.podkategorija,
       zupanija: noviOglas.zupanija,
       grad: noviOglas.grad || null,
+      adresa: noviOglas.adresa || null,
       stanje: noviOglas.stanje,
       opis: noviOglas.opis || null,
       prodavac: korisnik.ime,
@@ -768,6 +782,7 @@ export default function KupkoApp() {
       promoviran: noviOglas.promoviran,
       top: noviOglas.promoviran,
       datum: datumString,
+      pregledi: 0,
       godiste: noviOglas.godiste || null,
       kilometri: noviOglas.kilometri || null,
       snagaKw: noviOglas.snagaKw || null,
@@ -788,7 +803,7 @@ export default function KupkoApp() {
       setNoviOglas({
         naslov: "", cijena: "", staraCijena: "", popustPostotak: "", snizeno: false,
         kategorija: "auto-moto", podkategorija: "Osobna vozila",
-        zupanija: "Grad Zagreb", grad: "", stanje: "Novo", slike: [], opis: "",
+        zupanija: "Grad Zagreb", grad: "", adresa: "", stanje: "Novo", slike: [], opis: "",
         prodavac: "", telefon: "", email: "", promoviran: false,
         godiste: "", kilometri: "", snagaKw: "", gorivo: "Dizel", mjenjac: "Ručni",
         kvadratura: "", sobe: ""
@@ -1108,7 +1123,7 @@ export default function KupkoApp() {
                 {promoOglasi.slice(promoSlajderIndex, promoSlajderIndex + 3).map((o) => (
                   <div 
                     key={o.id}
-                    onClick={() => setOdabraniOglas(o)}
+                    onClick={() => otvoriDetaljeOglasa(o)}
                     className="bg-white text-slate-900 rounded-3xl p-4 shadow-md border border-amber-300/60 flex gap-4 cursor-pointer hover:shadow-xl hover:scale-[1.01] transition duration-300 relative overflow-hidden group"
                   >
                     <span className="absolute top-0 right-0 bg-blue-950 text-amber-400 text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl shadow flex items-center gap-1">
@@ -1218,7 +1233,7 @@ export default function KupkoApp() {
 
                         <div className="p-4 bg-slate-900 flex gap-3 border-t border-slate-800">
                           <button
-                            onClick={() => setOdabraniOglas(currentOglas)}
+                            onClick={() => otvoriDetaljeOglasa(currentOglas)}
                             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow transition"
                           >
                             Detalji
@@ -1435,7 +1450,7 @@ export default function KupkoApp() {
                         return (
                           <div 
                             key={o.id}
-                            onClick={() => setOdabraniOglas(o)}
+                            onClick={() => otvoriDetaljeOglasa(o)}
                             className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl transition duration-300 flex flex-col justify-between group cursor-pointer relative"
                           >
                             <div className="relative overflow-hidden bg-slate-100 h-56">
@@ -1477,7 +1492,7 @@ export default function KupkoApp() {
                                   <span className="flex items-center gap-1 truncate max-w-[150px]">
                                     <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" /> {o.zupanija}
                                   </span>
-                                  <span>{o.datum}</span>
+                                  <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {o.pregledi || 0}</span>
                                 </div>
                                 <h4 className="font-extrabold text-slate-900 text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition leading-snug">
                                   {o.naslov}
@@ -1872,13 +1887,18 @@ export default function KupkoApp() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Grad</label>
+                    <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Grad / Mjesto</label>
                     <input type="text" placeholder="Zagreb" value={noviOglas.grad} onChange={(e) => setNoviOglas({ ...noviOglas, grad: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none" />
                   </div>
                   <div>
                     <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Mobitel *</label>
                     <input type="text" placeholder="091..." required value={noviOglas.telefon} onChange={(e) => setNoviOglas({ ...noviOglas, telefon: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none" />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Točna adresa (Ulica i kućni broj)</label>
+                  <input type="text" placeholder="Npr. Ilica 10" value={noviOglas.adresa} onChange={(e) => setNoviOglas({ ...noviOglas, adresa: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none focus:border-blue-600" />
                 </div>
 
                 <div className="bg-amber-50 p-3 rounded-2xl border border-amber-200 space-y-2">
@@ -2038,6 +2058,11 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Točna adresa (Ulica i kućni broj)</label>
+                  <input type="text" value={oglasZaUrediti.adresa || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, adresa: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none" />
+                </div>
+
                 {oglasZaUrediti.kategorija === "auto-moto" && (
                   <div className="bg-blue-50/70 p-4 rounded-2xl border border-blue-200 space-y-2.5">
                     <h4 className="text-[11px] font-black text-blue-900 uppercase">Specifikacije vozila</h4>
@@ -2124,12 +2149,23 @@ export default function KupkoApp() {
                   </span>
                   <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">{odabraniOglas.naslov}</h2>
                   <p className="text-xs text-slate-400 mt-1 flex items-center gap-1 font-semibold">
-                    <MapPin className="w-3.5 h-3.5 text-blue-600" /> {odabraniOglas.zupanija} • {odabraniOglas.datum}
+                    <MapPin className="w-3.5 h-3.5 text-blue-600" /> {odabraniOglas.adresa ? `${odabraniOglas.adresa}, ` : ""}{odabraniOglas.grad ? `${odabraniOglas.grad}, ` : ""}{odabraniOglas.zupanija}
                   </p>
                 </div>
                 <div className="text-right">
                   <span className="text-2xl sm:text-3xl font-black text-blue-700">{odabraniOglas.cijena} €</span>
                 </div>
+              </div>
+
+              {/* STATISTIKA PREGLEDA I DATUM */}
+              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">
+                <span className="flex items-center gap-1.5">
+                  <BarChart2 className="w-4 h-4 text-blue-600" /> 
+                  Statistika: Oglas pregledan <strong className="text-blue-700">{odabraniOglas.pregledi || 1}</strong> puta
+                </span>
+                <span className="flex items-center gap-1 text-slate-500 font-semibold">
+                  <Clock className="w-3.5 h-3.5" /> {odabraniOglas.datum}
+                </span>
               </div>
 
               {odabraniOglas.kategorija === "auto-moto" && (odabraniOglas.godiste || odabraniOglas.kilometri || odabraniOglas.snagaKw) && (
@@ -2162,10 +2198,10 @@ export default function KupkoApp() {
                 <p className="whitespace-pre-line">{odabraniOglas.opis || "Nema opisa."}</p>
               </div>
 
-              {/* === KARTA LOKACIJE ZA SVAKI OGLAS === */}
+              {/* === KARTA LOKACIJE SA TOČNOM ADRESOM === */}
               <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-2">
                 <h3 className="font-black text-sm text-slate-800 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-blue-600" /> Karta lokacije
+                  <MapPin className="w-4 h-4 text-blue-600" /> Točna lokacija na karti
                 </h3>
                 <div className="w-full h-56 rounded-xl overflow-hidden border border-slate-200 relative bg-slate-100">
                   <iframe
@@ -2175,11 +2211,11 @@ export default function KupkoApp() {
                     scrolling="no"
                     marginHeight={0}
                     marginWidth={0}
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent((odabraniOglas.grad ? odabraniOglas.grad + ", " : "") + odabraniOglas.zupanija + ", Hrvatska")}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent((odabraniOglas.adresa ? odabraniOglas.adresa + ", " : "") + (odabraniOglas.grad ? odabraniOglas.grad + ", " : "") + odabraniOglas.zupanija + ", Hrvatska")}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                     className="w-full h-full"
                   ></iframe>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">Napomena: Prikazana je lokacija za regiju: <strong className="text-slate-600">{odabraniOglas.grad ? `${odabraniOglas.grad}, ` : ""}{odabraniOglas.zupanija}</strong></p>
+                <p className="text-[11px] text-slate-400 font-medium">Lokacija: <strong className="text-slate-600">{odabraniOglas.adresa ? `${odabraniOglas.adresa}, ` : ""}{odabraniOglas.grad ? `${odabraniOglas.grad}, ` : ""}{odabraniOglas.zupanija}</strong></p>
               </div>
               {/* ===================================== */}
 
@@ -2194,7 +2230,7 @@ export default function KupkoApp() {
                       .map(slican => (
                         <div
                           key={slican.id}
-                          onClick={() => setOdabraniOglas(slican)}
+                          onClick={() => otvoriDetaljeOglasa(slican)}
                           className="bg-slate-50 hover:bg-blue-50/50 p-3 rounded-2xl border border-slate-200 cursor-pointer transition flex gap-3 items-center"
                         >
                           <img src={slican.slike?.[0] || "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={slican.naslov} className="w-16 h-16 object-cover rounded-xl" />
