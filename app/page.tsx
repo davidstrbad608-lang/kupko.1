@@ -599,7 +599,6 @@ export default function KupkoApp() {
     if (!oglasZaPromociju || !korisnik) return;
     if ((korisnik.promoKrediti || 0) <= 0) return;
 
-    // Izračunavamo datum isteka za besplatni boost (zadani standard od 7 dana)
     const datumIsteka = new Date();
     datumIsteka.setDate(datumIsteka.getDate() + 7);
 
@@ -635,7 +634,6 @@ export default function KupkoApp() {
     e.preventDefault();
     if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
-    // Određujemo broj dana ovisno o nazivu paketa
     let trajanjeDana = 7;
     if (odabraniPromoPaket.naziv.includes("3 dana")) trajanjeDana = 3;
     else if (odabraniPromoPaket.naziv.includes("7 dana")) trajanjeDana = 7;
@@ -650,7 +648,7 @@ export default function KupkoApp() {
           cijena: odabraniPromoPaket.cijena,
           oglasNaslov: oglasZaPromociju.naslov,
           oglasId: oglasZaPromociju.id,
-          trajanjeDana: trajanjeDana, // Šaljemo broj dana trajanja prema API-ju
+          trajanjeDana: trajanjeDana,
         }),
       });
 
@@ -2108,6 +2106,27 @@ export default function KupkoApp() {
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs leading-relaxed text-slate-700 font-medium">
                 <p className="whitespace-pre-line">{odabraniOglas.opis || "Nema opisa."}</p>
               </div>
+
+              {/* === KARTA LOKACIJE ZA SVAKI OGLAS === */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-2">
+                <h3 className="font-black text-sm text-slate-800 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-blue-600" /> Karta lokacije
+                </h3>
+                <div className="w-full h-56 rounded-xl overflow-hidden border border-slate-200 relative bg-slate-100">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    scrolling="no"
+                    marginHeight={0}
+                    marginWidth={0}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent((odabraniOglas.grad ? odabraniOglas.grad + ", " : "") + odabraniOglas.zupanija + ", Hrvatska")}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    className="w-full h-full"
+                  ></iframe>
+                </div>
+                <p className="text-[11px] text-slate-400 font-medium">Napomena: Prikazana je lokacija za regiju: <strong className="text-slate-600">{odabraniOglas.grad ? `${odabraniOglas.grad}, ` : ""}{odabraniOglas.zupanija}</strong></p>
+              </div>
+              {/* ===================================== */}
 
               <div className="bg-blue-50/60 p-4 rounded-2xl border border-blue-100 flex items-center justify-between flex-wrap gap-3">
                 <div>
