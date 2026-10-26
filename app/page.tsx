@@ -599,7 +599,16 @@ export default function KupkoApp() {
     if (!oglasZaPromociju || !korisnik) return;
     if ((korisnik.promoKrediti || 0) <= 0) return;
 
-    const { error } = await supabase.from('oglasi').update({ promoviran: true, top: true }).eq('id', oglasZaPromociju.id);
+    // Izračunavamo datum isteka za besplatni boost (zadani standard od 7 dana)
+    const datumIsteka = new Date();
+    datumIsteka.setDate(datumIsteka.getDate() + 7);
+
+    const { error } = await supabase.from('oglasi').update({ 
+      promoviran: true, 
+      top: true, 
+      promo_istek: datumIsteka.toISOString() 
+    }).eq('id', oglasZaPromociju.id);
+
     if (error) {
       alert("Greška: " + error.message);
       return;
@@ -626,6 +635,12 @@ export default function KupkoApp() {
     e.preventDefault();
     if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
+    // Određujemo broj dana ovisno o nazivu paketa
+    let trajanjeDana = 7;
+    if (odabraniPromoPaket.naziv.includes("3 dana")) trajanjeDana = 3;
+    else if (odabraniPromoPaket.naziv.includes("7 dana")) trajanjeDana = 7;
+    else if (odabraniPromoPaket.naziv.includes("30 dana")) trajanjeDana = 30;
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -634,7 +649,8 @@ export default function KupkoApp() {
           paketNaziv: odabraniPromoPaket.naziv,
           cijena: odabraniPromoPaket.cijena,
           oglasNaslov: oglasZaPromociju.naslov,
-          oglasId: oglasZaPromociju.id, // <--- OVDJE DODANO DA SE SALJE ID OGLASA
+          oglasId: oglasZaPromociju.id,
+          trajanjeDana: trajanjeDana, // Šaljemo broj dana trajanja prema API-ju
         }),
       });
 
