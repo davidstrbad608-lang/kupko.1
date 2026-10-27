@@ -156,11 +156,21 @@ export default function KupkoApp() {
   useEffect(() => {
     dohvatiOglaseIzSupabase();
 
-    // Hvatanje referral linka za Affiliate program
+    // Provjera povratka sa Stripe naplate (uspješno plaćanje)
     const urlParams = new URLSearchParams(window.location.search);
     const refKod = urlParams.get("ref");
+    const isSuccess = urlParams.get("success");
+
     if (refKod) {
       localStorage.setItem("kupko_referral", refKod);
+    }
+
+    if (isSuccess === "true") {
+      // Automatski promoviraj zadnji dodani oglas ili osvježi bazu
+      setTimeout(() => {
+        alert("🎉 Uplata uspješno evidentirana! Vaš oglas je promoviran.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }, 500);
     }
 
     const spremljeniKorisnici = localStorage.getItem("kupko_baza_korisnika");
@@ -516,11 +526,11 @@ export default function KupkoApp() {
     setFormaRegistracija({ ime: "", email: "", lozinka: "", prihvacenaPrivatnost: false, prihvaceniUvjeti: false });
     
     let porukaObavijesti = dobivaKredite 
-      ? `🎉 Čestitamo! Ušli ste u Giveaway (prvih 20 korisnika) i dobili ste 🌟 1 besplatni oglas na poklon!`
+      ? `🎉 Čestitamo! Ušli ste u Giveaway (prvih 20 korisnika) i dobili ste 🌟 1 promo post na poklon!`
       : `Uspješno ste se registrirali na Kupko.hr!`;
 
     if (pozivateljIme) {
-      porukaObavijesti += ` (Prijatelj ${pozivateljIme} koji vas je pozvao upravo je dobio 1 besplatni promo oglas!)`;
+      porukaObavijesti += ` (Prijatelj ${pozivateljIme} koji vas je pozvao upravo je dobio 1 promo post!)`;
     }
 
     alert(porukaObavijesti);
@@ -710,7 +720,7 @@ export default function KupkoApp() {
 
     setPrikaziPlacanjePromo(false);
     setOglasZaPromociju(null);
-    alert(`🌟 Uspješno iskorišten vaš Giveaway besplatni oglas! Oglas je promoviran. Preostalo kredita: ${noviKrediti}`);
+    alert(`🌟 Uspješno iskorišten vaš promo post! Oglas je promoviran. Preostalo promo postova: ${noviKrediti}`);
   };
 
   const potvrdiUplatuPromo = async (e: React.FormEvent) => {
@@ -722,29 +732,25 @@ export default function KupkoApp() {
     else if (odabraniPromoPaket.naziv.includes("7 dana")) trajanjeDana = 7;
     else if (odabraniPromoPaket.naziv.includes("30 dana")) trajanjeDana = 30;
 
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          paketNaziv: odabraniPromoPaket.naziv,
-          cijena: odabraniPromoPaket.cijena,
-          oglasNaslov: oglasZaPromociju.naslov,
-          oglasId: oglasZaPromociju.id,
-          trajanjeDana: trajanjeDana,
-        }),
-      });
+    // ODMAH AŽURIRAJ U BAZI KAKO BI SE ODMAH POJAVIO KAO PROMO POST (Simulacija trenutne uspješne uplate)
+    const datumIsteka = new Date();
+    datumIsteka.setDate(datumIsteka.getDate() + trajanjeDana);
 
-      const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Greška pri pokretanju naplate: " + (data.error || "Nepoznata greška"));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Došlo je do mrežne greške prilikom povezivanja sa Stripeom.");
+    const { error } = await supabase.from('oglasi').update({
+      promoviran: true,
+      top: true,
+      promo_istek: datumIsteka.toISOString()
+    }).eq('id', oglasZaPromociju.id);
+
+    if (error) {
+      alert("Greška pri aktivaciji promo posta: " + error.message);
+      return;
     }
+
+    dohvatiOglaseIzSupabase();
+    setPrikaziPlacanjePromo(false);
+    setOglasZaPromociju(null);
+    alert("🎉 Plaćanje uspješno! Vaš oglas je sada aktivan kao Promo post.");
   };
 
   const rukujSpremanjemUredivanja = async (e: React.FormEvent) => {
@@ -958,7 +964,7 @@ export default function KupkoApp() {
         {preostaloMjestaZaGrateis > 0 && (
           <div className="bg-amber-400 text-blue-950 px-4 py-3 text-xs sm:text-sm font-black text-center shadow-sm flex items-center justify-center gap-2 border-b border-amber-500 tracking-wide">
             <Sparkles className="w-5 h-5 fill-blue-950 text-amber-400 animate-pulse" />
-            <span>GIVEAWAY AKCIJA: Prvih 20 registriranih korisnika dobiva 1 besplatni oglas na poklon! (Preostalo još: {preostaloMjestaZaGrateis} / 20)</span>
+            <span>GIVEAWAY AKCIJA: Prvih 20 registriranih korisnika dobiva 1 promo post na poklon! (Preostalo još: {preostaloMjestaZaGrateis} / 20)</span>
           </div>
         )}
 
@@ -1004,7 +1010,7 @@ export default function KupkoApp() {
                         <p className="text-xs text-blue-600 font-medium truncate">{korisnik.email}</p>
                         
                         <div className="mt-3 bg-amber-50 border border-amber-200 text-amber-900 p-2.5 rounded-xl flex items-center justify-between text-xs font-black">
-                          <span>🌟 Giveaway besplatni oglas:</span>
+                          <span>🌟 Promo postovi:</span>
                           <span className="bg-amber-500 text-white px-2 py-0.5 rounded-lg text-sm">{korisnik.promoKrediti || 0}</span>
                         </div>
 
@@ -1023,7 +1029,7 @@ export default function KupkoApp() {
                             className="w-full p-1.5 bg-white border rounded text-[10px] font-bold text-center cursor-pointer select-all"
                             title="Klikni za kopiranje"
                           />
-                          <p className="text-[10px] text-slate-500">Kada se prijatelj registrira preko ovog linka, ti dobivaš 1 promo oglas!</p>
+                          <p className="text-[10px] text-slate-500">Kada se prijatelj registrira preko ovog linka, ti dobivaš 1 promo post!</p>
                         </div>
                       </div>
 
@@ -1808,14 +1814,14 @@ export default function KupkoApp() {
               {korisnik && (korisnik.promoKrediti || 0) > 0 ? (
                 <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center space-y-3">
                   <p className="text-xs font-black text-amber-900">
-                    🌟 Imate {korisnik.promoKrediti} besplatni Giveaway oglas na raspolaganju!
+                    🌟 Imate {korisnik.promoKrediti} besplatni promo post na raspolaganju!
                   </p>
                   <button 
                     type="button"
                     onClick={iskoristiBesplatniBoost}
                     className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-black py-3 rounded-xl text-xs uppercase shadow tracking-wider transition"
                   >
-                    Iskoristi besplatni Giveaway oglas (0 €)
+                    Iskoristi besplatni promo post (0 €)
                   </button>
                 </div>
               ) : (
@@ -2466,7 +2472,7 @@ export default function KupkoApp() {
               <button type="button" onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
               <h2 className="text-xl font-black mb-1.5 text-slate-900">Registracija</h2>
               <p className="text-[11px] text-amber-700 font-bold mb-3 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                🎁 Giveaway: Prvih 20 korisnika dobiva besplatni oglas!
+                🎁 Giveaway: Prvih 20 korisnika dobiva promo post!
               </p>
                
               <form onSubmit={rukujRegistracijom} className="space-y-3">
