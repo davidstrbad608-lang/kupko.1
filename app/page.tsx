@@ -522,7 +522,7 @@ export default function KupkoApp() {
     setFormaRegistracija({ ime: "", email: "", lozinka: "", prihvacenaPrivatnost: false, prihvaceniUvjeti: false });
     
     let porukaObavijesti = dobivaKredite 
-      ? `🎉 Čestitamo! Ušli ste u Giveaway (prvih 20 korisnika) i dobili ste 🌟 1 promo post na poklon!`
+      ? `🎉 Čestitamo! Ušlište u Giveaway (prvih 20 korisnika) i dobili ste 🌟 1 promo post na poklon!`
       : `Uspješno ste se registrirali na Kupko.hr!`;
 
     if (pozivateljIme) {
@@ -614,11 +614,12 @@ export default function KupkoApp() {
     alert("Osobni podaci su uspješno spremljeni!");
   };
 
-  // --- STROGA PROVJERA: SAMO ADMIN ILI VLASNIK E-MAIL-A MOŽE UREDITI/BRISATI ---
   const mozeUreditiIliBrisati = (glas: any) => {
     if (!korisnik) return false;
-    const jeAutorPoEmailu = glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase();
-    return jeAutorPoEmailu || korisnik.isOwner;
+    if (glas.autor_email) {
+      return glas.autor_email.toLowerCase() === korisnik.email.toLowerCase() || korisnik.isOwner;
+    }
+    return korisnik.isOwner;
   };
 
   const obrisiOglas = async (e: React.MouseEvent, glas: any) => {
@@ -728,8 +729,8 @@ export default function KupkoApp() {
     e.preventDefault();
     if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
-    // Ovdje kasnije možeš staviti svoj pravi Stripe link: window.location.href = "https://buy.stripe.com/...";
-    alert(`Preusmjeravanje na sigurno Stripe plaćanje za paket: ${odabraniPromoPaket.naziv} (${odabraniPromoPaket.cijena} €)...`);
+    const stripeLink = "https://buy.stripe.com/tvoj_pravi_link"; 
+    window.location.href = stripeLink;
   };
 
   const rukujSpremanjemUredivanja = async (e: React.FormEvent) => {
@@ -937,7 +938,6 @@ export default function KupkoApp() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col justify-between selection:bg-amber-400 selection:text-blue-950">
-      
       <div className="relative z-10 flex flex-col min-h-screen">
         
         {preostaloMjestaZaGrateis > 0 && (
