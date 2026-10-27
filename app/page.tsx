@@ -659,26 +659,14 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
+  // Ažurirani paketi sa sva 4 Stripe linka
   const dohvatiPaketeZaOglas = (glas: any) => {
-    const cijenaNum = parseFloat(glas?.cijena || "0");
-    if (cijenaNum < 200) {
-      return [
-        { naziv: "Mini Boost (3 dana)", cijena: "2.00" },
-        { naziv: "Standardni Paket (7 dana)", cijena: "3.50" },
-        { naziv: "Dugotrajni Paket (30 dana)", cijena: "6.00" }
-      ];
-    } else if (cijenaNum >= 200 && cijenaNum < 2000) {
-      return [
-        { naziv: "Mini Boost (3 dana)", cijena: "4.00" },
-        { naziv: "Standardni Paket (7 dana)", cijena: "7.00" },
-        { naziv: "Dugotrajni Paket (30 dana)", cijena: "12.00" }
-      ];
-    } else {
-      return [
-        { naziv: "Premium Objava (7 dana)", cijena: "15.00" },
-        { naziv: "Maksimalni VIP Paket (30 dana)", cijena: "30.00" }
-      ];
-    }
+    return [
+      { naziv: "Mini Boost (3 dana)", cijena: "3.00", stripeLink: "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00" },
+      { naziv: "Standardni Boost (7 dana)", cijena: "5.00", stripeLink: "https://buy.stripe.com/8x27sK0G92De7jQ2ApfEk01" },
+      { naziv: "Premium Paket (14 dana)", cijena: "10.00", stripeLink: "https://buy.stripe.com/7sYeVc60t2Deaw2a2RfEk02" },
+      { naziv: "VIP Mega Boost (30 dana)", cijena: "20.00", stripeLink: "https://buy.stripe.com/5kQ28q74xfq0cEa3EtfEk03" }
+    ];
   };
 
   const pokreniPromociju = (e: React.MouseEvent, glas: any) => {
@@ -729,7 +717,22 @@ export default function KupkoApp() {
     e.preventDefault();
     if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
-    const stripeLink = "https://buy.stripe.com/tvoj_pravi_link"; 
+    if (odabraniPromoPaket.stripeLink) {
+      window.location.href = odabraniPromoPaket.stripeLink;
+      return;
+    }
+
+    let stripeLink = "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00";
+    const cijenaPaketa = String(odabraniPromoPaket.cijena);
+
+    if (cijenaPaketa.includes("5")) {
+      stripeLink = "https://buy.stripe.com/8x27sK0G92De7jQ2ApfEk01";
+    } else if (cijenaPaketa.includes("10")) {
+      stripeLink = "https://buy.stripe.com/7sYeVc60t2Deaw2a2RfEk02";
+    } else if (cijenaPaketa.includes("20")) {
+      stripeLink = "https://buy.stripe.com/5kQ28q74xfq0cEa3EtfEk03";
+    }
+
     window.location.href = stripeLink;
   };
 
@@ -1189,7 +1192,7 @@ export default function KupkoApp() {
                     </span>
 
                     <img src={o.slike && o.slike.length > 0 ? o.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} alt={o.naslov} className="w-28 h-28 object-cover rounded-2xl group-hover:scale-105 transition duration-300" />
-                    
+                     
                     <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                       <div>
                         <span className="text-[11px] font-bold text-slate-400 block mb-1">📍 {o.zupanija}</span>
@@ -1207,7 +1210,7 @@ export default function KupkoApp() {
         )}
 
         <main className="max-w-7xl mx-auto px-6 py-8 space-y-8 flex-1 w-full">
-          
+           
           {korisnik?.isOwner && (
             <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 border border-amber-400/40 rounded-3xl p-6 text-white shadow-xl space-y-4">
               <div className="flex items-center justify-between">
@@ -1274,7 +1277,7 @@ export default function KupkoApp() {
                             <img src={slika} alt={currentOglas.naslov} className="w-full h-full object-cover" />
                           )}
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40"></div>
-                          
+                           
                           <span className="absolute top-4 left-4 bg-rose-600 text-white font-black text-xs uppercase px-3 py-1.5 rounded-full shadow">
                             📍 {currentOglas.zupanija}
                           </span>
@@ -1300,7 +1303,7 @@ export default function KupkoApp() {
                           >
                             Detalji
                           </button>
-                          
+                           
                           <button
                             onClick={() => setReelsIndex((prev) => prev + 1)}
                             className="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow transition flex items-center justify-center gap-1.5"
@@ -1352,7 +1355,7 @@ export default function KupkoApp() {
               <section className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4">
                 <div className="flex justify-between items-center flex-wrap gap-4">
                   <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Filtriranje ponude</h3>
-                  
+                   
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-bold text-slate-600 flex items-center gap-1"><SlidersHorizontal className="w-3.5 h-3.5" /> Cijena (€):</span>
                     <input 
@@ -1517,7 +1520,7 @@ export default function KupkoApp() {
                           >
                             <div className="relative overflow-hidden bg-slate-100 h-56">
                               <img src={glavnaSlika} alt={o.naslov} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                              
+                               
                               {o.promoviran && (
                                 <span className="absolute top-3 left-3 bg-amber-400 text-blue-950 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-xl shadow flex items-center gap-1">
                                   <Sparkles className="w-3 h-3" /> PROMO
@@ -1621,7 +1624,7 @@ export default function KupkoApp() {
                         >
                           Prethodna
                         </button>
-                        
+                         
                         <div className="flex items-center gap-1 px-2">
                           {Array.from({ length: ukupnoStranica }, (_, i) => i + 1).map((broj) => (
                             <button
@@ -1807,7 +1810,7 @@ export default function KupkoApp() {
                   <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 text-[11px] text-blue-900 font-medium">
                     Nemate više besplatnih promo postova. Nastavite na sigurno plaćanje karticom putem Stripe-a.
                   </div>
-                  
+                   
                   <label className="block text-[11px] font-bold text-slate-600 uppercase">Odaberite paket promocije:</label>
                   <div className="space-y-2">
                     {dohvatiPaketeZaOglas(oglasZaPromociju).map((paket) => (
@@ -1842,7 +1845,7 @@ export default function KupkoApp() {
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white text-slate-900 rounded-3xl max-w-2xl w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto space-y-4">
               <button type="button" onClick={() => setPrikaziFormu(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
-              
+               
               <h2 className="text-xl font-black text-slate-900">Predaj novi oglas</h2>
 
               <form onSubmit={rukujDodavanjemOglasa} className="space-y-3.5">
@@ -2265,7 +2268,7 @@ export default function KupkoApp() {
                 </button>
                 <button type="button" onClick={() => setOdabraniOglas(null)} className="bg-slate-100 p-2 rounded-full hover:bg-slate-200 transition"><X className="w-5 h-5" /></button>
               </div>
-              
+               
               <div className="relative rounded-2xl overflow-hidden h-72 bg-slate-900 flex items-center justify-center">
                 <img 
                   src={odabraniOglas.slike && odabraniOglas.slike.length > 0 ? odabraniOglas.slike[0] : "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80"} 
@@ -2273,7 +2276,7 @@ export default function KupkoApp() {
                   className="w-full h-full object-cover" 
                 />
               </div>
-              
+               
               <div className="flex justify-between items-start border-b border-slate-100 pb-4">
                 <div>
                   <span className="text-[10px] bg-blue-50 text-blue-700 font-black px-2.5 py-1 rounded-lg uppercase tracking-wider mb-1.5 inline-block">
