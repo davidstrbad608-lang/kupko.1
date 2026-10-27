@@ -156,7 +156,6 @@ export default function KupkoApp() {
   useEffect(() => {
     dohvatiOglaseIzSupabase();
 
-    // Provjera povratka sa Stripe naplate (uspješno plaćanje)
     const urlParams = new URLSearchParams(window.location.search);
     const refKod = urlParams.get("ref");
     const isSuccess = urlParams.get("success");
@@ -166,7 +165,6 @@ export default function KupkoApp() {
     }
 
     if (isSuccess === "true") {
-      // Automatski promoviraj zadnji dodani oglas ili osvježi bazu
       setTimeout(() => {
         alert("🎉 Uplata uspješno evidentirana! Vaš oglas je promoviran.");
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -502,7 +500,6 @@ export default function KupkoApp() {
 
     let azuriraniBazaKorisnika = [...registriraniKorisnici, noviRegKorisnik];
 
-    // --- AFFILIATE PROVJERA ---
     const pozivateljIme = localStorage.getItem("kupko_referral");
     if (pozivateljIme) {
       azuriraniBazaKorisnika = azuriraniBazaKorisnika.map(k => {
@@ -513,7 +510,6 @@ export default function KupkoApp() {
       });
       localStorage.removeItem("kupko_referral");
     }
-    // --------------------------
 
     setRegistriraniKorisnici(azuriraniBazaKorisnika);
     localStorage.setItem("kupko_baza_korisnika", JSON.stringify(azuriraniBazaKorisnika));
@@ -618,19 +614,21 @@ export default function KupkoApp() {
     alert("Osobni podaci su uspješno spremljeni!");
   };
 
+  // --- STROGA PROVJERA: SAMO ADMIN ILI VLASNIK E-MAIL-A MOŽE UREDITI/BRISATI ---
   const mozeUreditiIliBrisati = (glas: any) => {
     if (!korisnik) return false;
-    const jeAutor = (glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase()) || 
-                    (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
-    return jeAutor || korisnik.isOwner;
+    const jeAutorPoEmailu = glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase();
+    return jeAutorPoEmailu || korisnik.isOwner;
   };
 
   const obrisiOglas = async (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
-    const jeAutor = (glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase()) || 
-                    (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
-    if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti brisati tuđi oglas!"); return; }
+    
+    if (!mozeUreditiIliBrisati(glas)) { 
+      alert("Nemate ovlasti brisati tuđi oglas!"); 
+      return; 
+    }
     
     if (confirm("Jeste li sigurni da želite obrisati oglas?")) {
       const { error } = await supabase.from('oglasi').delete().eq('id', glas.id);
@@ -647,9 +645,12 @@ export default function KupkoApp() {
   const pokreniUredivanje = (e: React.MouseEvent, glas: any) => {
     e.stopPropagation();
     if (!korisnik) { alert("Morate biti prijavljeni!"); return; }
-    const jeAutor = (glas.autor_email && glas.autor_email.toLowerCase() === korisnik.email.toLowerCase()) || 
-                    (glas.prodavac && glas.prodavac.toLowerCase() === korisnik.ime.toLowerCase());
-    if (!jeAutor && !korisnik.isOwner) { alert("Nemate ovlasti uređivati tuđi oglas!"); return; }
+    
+    if (!mozeUreditiIliBrisati(glas)) { 
+      alert("Nemate ovlasti uređivati tuđi oglas!"); 
+      return; 
+    }
+    
     setOglasZaUrediti({ 
       ...glas, 
       slike: glas.slike || [] 
@@ -723,34 +724,12 @@ export default function KupkoApp() {
     alert(`🌟 Uspješno iskorišten vaš promo post! Oglas je promoviran. Preostalo promo postova: ${noviKrediti}`);
   };
 
-  const potvrdiUplatuPromo = async (e: React.FormEvent) => {
+  const potvrdiUplatuPromoStripe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!oglasZaPromociju || !odabraniPromoPaket) return;
 
-    let trajanjeDana = 7;
-    if (odabraniPromoPaket.naziv.includes("3 dana")) trajanjeDana = 3;
-    else if (odabraniPromoPaket.naziv.includes("7 dana")) trajanjeDana = 7;
-    else if (odabraniPromoPaket.naziv.includes("30 dana")) trajanjeDana = 30;
-
-    // ODMAH AŽURIRAJ U BAZI KAKO BI SE ODMAH POJAVIO KAO PROMO POST (Simulacija trenutne uspješne uplate)
-    const datumIsteka = new Date();
-    datumIsteka.setDate(datumIsteka.getDate() + trajanjeDana);
-
-    const { error } = await supabase.from('oglasi').update({
-      promoviran: true,
-      top: true,
-      promo_istek: datumIsteka.toISOString()
-    }).eq('id', oglasZaPromociju.id);
-
-    if (error) {
-      alert("Greška pri aktivaciji promo posta: " + error.message);
-      return;
-    }
-
-    dohvatiOglaseIzSupabase();
-    setPrikaziPlacanjePromo(false);
-    setOglasZaPromociju(null);
-    alert("🎉 Plaćanje uspješno! Vaš oglas je sada aktivan kao Promo post.");
+    // Ovdje kasnije možeš staviti svoj pravi Stripe link: window.location.href = "https://buy.stripe.com/...";
+    alert(`Preusmjeravanje na sigurno Stripe plaćanje za paket: ${odabraniPromoPaket.naziv} (${odabraniPromoPaket.cijena} €)...`);
   };
 
   const rukujSpremanjemUredivanja = async (e: React.FormEvent) => {
@@ -1014,7 +993,6 @@ export default function KupkoApp() {
                           <span className="bg-amber-500 text-white px-2 py-0.5 rounded-lg text-sm">{korisnik.promoKrediti || 0}</span>
                         </div>
 
-                        {/* AFFILIATE LINKBOX */}
                         <div className="mt-3 bg-blue-50 border border-blue-200 text-blue-900 p-2.5 rounded-xl text-xs space-y-1.5">
                           <span className="font-black block">🔗 Tvoj link za pozivanje:</span>
                           <input 
@@ -1809,12 +1787,12 @@ export default function KupkoApp() {
             <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
               <button type="button" onClick={() => setPrikaziPlacanjePromo(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
               <h2 className="text-lg font-black text-slate-900 flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" /> Promocija i objava oglasa</h2>
-              <p className="text-xs text-slate-500 font-medium">Uspješno spremljen oglas: <strong className="text-slate-800">{oglasZaPromociju.naslov}</strong></p>
+              <p className="text-xs text-slate-500 font-medium">Oglas: <strong className="text-slate-800">{oglasZaPromociju.naslov}</strong></p>
 
               {korisnik && (korisnik.promoKrediti || 0) > 0 ? (
                 <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 text-center space-y-3">
                   <p className="text-xs font-black text-amber-900">
-                    🌟 Imate {korisnik.promoKrediti} besplatni promo post na raspolaganju!
+                    🌟 Čestitamo! Imate još {korisnik.promoKrediti} besplatni promo post iz Giveaway akcije!
                   </p>
                   <button 
                     type="button"
@@ -1825,8 +1803,12 @@ export default function KupkoApp() {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={potvrdiUplatuPromo} className="space-y-3">
-                  <label className="block text-[11px] font-bold text-slate-600 uppercase">Odaberite paket promocije za vaš oglas:</label>
+                <form onSubmit={potvrdiUplatuPromoStripe} className="space-y-3">
+                  <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 text-[11px] text-blue-900 font-medium">
+                    Nemate više besplatnih promo postova. Nastavite na sigurno plaćanje karticom putem Stripe-a.
+                  </div>
+                  
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase">Odaberite paket promocije:</label>
                   <div className="space-y-2">
                     {dohvatiPaketeZaOglas(oglasZaPromociju).map((paket) => (
                       <div 
@@ -1843,8 +1825,12 @@ export default function KupkoApp() {
                       </div>
                     ))}
                   </div>
-                  <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl uppercase text-xs shadow transition">
-                    Plati {odabraniPromoPaket ? odabraniPromoPaket.cijena : dohvatiPaketeZaOglas(oglasZaPromociju)[0].cijena} € (Stripe)
+
+                  <button 
+                    type="submit" 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl uppercase text-xs shadow transition flex items-center justify-center gap-2"
+                  >
+                    <CreditCard className="w-4 h-4" /> Plati {odabraniPromoPaket ? odabraniPromoPaket.cijena : dohvatiPaketeZaOglas(oglasZaPromociju)[0].cijena} € (Stripe)
                   </button>
                 </form>
               )}
@@ -2147,7 +2133,6 @@ export default function KupkoApp() {
                   <input type="text" value={oglasZaUrediti.adresa || ""} onChange={(e) => setOglasZaUrediti({ ...oglasZaUrediti, adresa: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none" />
                 </div>
 
-                {/* DODAVANJE I UREĐIVANJE SLIKA KOD UREĐIVANJA OGLASA */}
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                   <label className="block text-[11px] font-bold text-slate-600 uppercase mb-2">Upravljanje slikama oglasa</label>
                   <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-3 bg-white cursor-pointer relative mb-2 hover:bg-slate-50 transition">
@@ -2218,7 +2203,6 @@ export default function KupkoApp() {
           </div>
         )}
 
-        {/* MODAL ZA PRIJAVU ILEGALNOG / SUMNJIVOG OGLASA */}
         {prikaziModalPrijaveOglasa && odabraniOglas && (
           <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 relative shadow-2xl space-y-4">
@@ -2425,7 +2409,6 @@ export default function KupkoApp() {
                 </div>
               )}
 
-              {/* GUMB ZA PRIJAVU OGLASA */}
               <div className="pt-2 text-right">
                 <button
                   type="button"
