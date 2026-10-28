@@ -428,7 +428,6 @@ export default function KupkoApp() {
       } else if (!data || data.length === 0) {
         setOglasi(DEMO_OGLASI);
       } else {
-        // Kombiniramo bazu i demo oglase tako da stranica nikad nije prazna
         const kombinirani = [...data, ...DEMO_OGLASI];
         setOglasi(kombinirani);
       }
@@ -665,6 +664,7 @@ export default function KupkoApp() {
     alert(`Dobrodošli natrag, ${pronadjeniKorisnik.ime}!`);
   };
 
+  // TESTNA VERZIJA REGISTRACIJE (KOD SE PRIKAZUJE DIREKTNO NA EKRANU BEZ RESENDA)
   const rukujRegistracijom = async (e: React.FormEvent) => {
     e.preventDefault();
     const imeClean = formaRegistracija.ime.trim();
@@ -700,27 +700,9 @@ export default function KupkoApp() {
     setKorakVerifikacije(true);
     setPrikaziRegistraciju(false);
 
-    try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emailLower,
-          subject: 'Vaš verifikacijski kod - Kupko.hr',
-          message: `Pozdrav ${imeClean}, vaš verifikacijski kod za registraciju na Kupko.hr je: <strong style="font-size: 20px; color: #2563eb;">${slucajniKod}</strong>`
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        alert(`📧 Verifikacijski kod poslan je na adresu: ${emailLower}`);
-      } else {
-        alert("Greška pri slanju e-maila: " + (data.error || "Nepoznata greška"));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Došlo je do mrežne greške prilikom slanja e-maila.");
-    }
+    // TESTNI PRIKAZ KODA DIREKTNO NA EKRANU
+    console.log("🔑 [TESTNI VERIFIKACIJSKI KOD]:", slucajniKod);
+    alert(`🔑 [TESTNI MOD] Vaš verifikacijski kod za ${emailLower} je: ${slucajniKod}`);
   };
 
   const potvrdiVerifikacijskiKod = async (e: React.FormEvent) => {
@@ -789,28 +771,7 @@ export default function KupkoApp() {
     const kod = Math.floor(100000 + Math.random() * 900000).toString();
     setKodResetiranja(kod);
     setKorakResetiranja(2);
-
-    try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: mailClean,
-          subject: 'Kod za oporavak lozinke - Kupko.hr',
-          message: `Vaš kod za promjenu lozinke je: <strong style="font-size: 20px; color: #2563eb;">${kod}</strong>`
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        alert(`📧 Kod za oporavak poslan je na adresu: ${mailClean}`);
-      } else {
-        alert("Greška pri slanju e-maila: " + (data.error || "Nepoznata greška"));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Došlo je do mrežne greške prilikom slanja e-maila.");
-    }
+    alert(`🔑 [TESTNI MOD] Kod za oporavak lozinke je: ${kod}`);
   };
 
   const potvrdiResetLozinke = (e: React.FormEvent) => {
@@ -857,11 +818,10 @@ export default function KupkoApp() {
     alert("Osobni podaci su uspješno spremljeni!");
   };
 
-  // Provjera može li korisnik uređivati/brisati (Samo vlasnik oglasa ili admin, DEMO oglase može brisati/uređivati SAMO admin)
   const mozeUreditiIliBrisati = (glas: any) => {
     if (!korisnik) return false;
     if (glas.isDemo) {
-      return korisnik.isOwner; // Demo oglase može dirati samo admin
+      return korisnik.isOwner;
     }
     if (glas.autor_email) {
       return glas.autor_email.toLowerCase() === korisnik.email.toLowerCase() || korisnik.isOwner;
@@ -1211,7 +1171,7 @@ export default function KupkoApp() {
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <span className="flex items-center gap-2 font-bold tracking-wide text-slate-200">
               <Shield className="w-4 h-4 text-emerald-400" />
-              🇭🇷 Kupko.hr - Vodeći domaći oglasnik 
+              🇭🇷 Kupko.hr - Vodeći domaći oglasnik (Test Mode)
             </span>
 
             <div className="flex items-center gap-5">
@@ -1831,7 +1791,6 @@ export default function KupkoApp() {
                                 <span className="text-xl font-black text-blue-700">{o.cijena} €</span>
 
                                 <div className="flex items-center gap-1.5">
-                                  {/* Gumb Obnovi prikazuje se SAMO ako je korisnik prijavljen i vlasnik oglasa (i nije demo) */}
                                   {korisnik && mozeUreditiIliBrisati(o) && !o.isDemo && (
                                     <button
                                       type="button"
@@ -1857,7 +1816,6 @@ export default function KupkoApp() {
                                 </div>
                               )}
 
-                              {/* Uređivanje i brisanje vidljivo samo ako korisnik ima ovlasti za taj oglas */}
                               {mozeUreditiIliBrisati(o) && (
                                 <div className="mt-2.5 pt-2.5 flex gap-2">
                                   {!o.isDemo && (
@@ -2165,7 +2123,6 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
-                {/* AUTOMATSKO UPOZORENJE ZA KUĆNE LJUBIMCE */}
                 {noviOglas.kategorija === "kucni-ljubimci" && (
                   <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-[11px] text-amber-900 font-medium space-y-1">
                     <span className="font-black block">⚠️ Važna pravila za kućne ljubimce:</span>
@@ -2311,8 +2268,8 @@ export default function KupkoApp() {
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white text-slate-900 rounded-3xl max-w-sm w-full p-6 text-center space-y-3.5 shadow-2xl relative">
               <button type="button" onClick={() => setKorakVerifikacije(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
-              <h2 className="text-xl font-black text-slate-900">Verifikacija E-maila</h2>
-              <p className="text-xs text-slate-500">Unesite kod poslan na: <strong className="text-slate-800">{privremeniEmail}</strong></p>
+              <h2 className="text-xl font-black text-slate-900">Verifikacija E-maila (Test Mod)</h2>
+              <p className="text-xs text-slate-500">Unesite kod koji vam je maloprije prikazan na ekranu za: <strong className="text-slate-800">{privremeniEmail}</strong></p>
               <form onSubmit={potvrdiVerifikacijskiKod} className="space-y-3">
                 <input 
                   type="text" required maxLength={6} placeholder="123456" 
@@ -2733,7 +2690,7 @@ export default function KupkoApp() {
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white text-slate-900 rounded-3xl max-w-sm w-full p-6 relative shadow-2xl max-h-[92vh] overflow-y-auto">
               <button type="button" onClick={() => setPrikaziRegistraciju(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
-              <h2 className="text-xl font-black mb-1.5 text-slate-900">Registracija</h2>
+              <h2 className="text-xl font-black mb-1.5 text-slate-900">Registracija (Test Mod)</h2>
               <p className="text-[11px] text-amber-700 font-bold mb-3 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
                 🎁 Giveaway: Prvih 20 korisnika dobiva promo post!
               </p>
@@ -2745,7 +2702,7 @@ export default function KupkoApp() {
                   className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none"
                 />
                 <input 
-                  type="email" required placeholder="E-mail adresa" 
+                  type="email" required placeholder="Bilo koji e-mail (npr. test@test.com)" 
                   value={formaRegistracija.email} onChange={(e) => setFormaRegistracija({ ...formaRegistracija, email: e.target.value })}
                   className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none"
                 />
@@ -2777,7 +2734,7 @@ export default function KupkoApp() {
                 </div>
 
                 <button type="submit" className="w-full bg-amber-400 text-blue-950 font-black py-3 rounded-xl mt-2 text-xs shadow transition">
-                  Registriraj se
+                  Registriraj se (Prikaži kod)
                 </button>
               </form>
             </div>
