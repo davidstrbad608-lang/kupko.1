@@ -914,12 +914,15 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
+  // Funkcija za pakete s ispravljenom cijenom od 2.00 € za Mini Boost i pametnom preporukom ovisno o cijeni
   const dohvatiPaketeZaOglas = (glas: any) => {
+    const cijenaOglasa = parseFloat(glas.cijena || "0");
+
     return [
-      { naziv: "Mini Boost (3 dana)", cijena: "3.00", stripeLink: "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00" },
-      { naziv: "Standardni Boost (7 dana)", cijena: "5.00", stripeLink: "https://buy.stripe.com/8x27sK0G92De7jQ2ApfEk01" },
-      { naziv: "Premium Paket (14 dana)", cijena: "10.00", stripeLink: "https://buy.stripe.com/7sYeVc60t2Deaw2a2RfEk02" },
-      { naziv: "VIP Mega Boost (30 dana)", cijena: "20.00", stripeLink: "https://buy.stripe.com/5kQ28q74xfq0cEa3EtfEk03" }
+      { naziv: "Mini Boost (3 dana)", cijena: "2.00", stripeLink: "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00", preporuceno: cijenaOglasa <= 50 },
+      { naziv: "Standardni Boost (7 dana)", cijena: "5.00", stripeLink: "https://buy.stripe.com/8x27sK0G92De7jQ2ApfEk01", preporuceno: cijenaOglasa > 50 && cijenaOglasa <= 300 },
+      { naziv: "Premium Paket (14 dana)", cijena: "10.00", stripeLink: "https://buy.stripe.com/7sYeVc60t2Deaw2a2RfEk02", preporuceno: cijenaOglasa > 300 && cijenaOglasa <= 1000 },
+      { naziv: "VIP Mega Boost (30 dana)", cijena: "20.00", stripeLink: "https://buy.stripe.com/5kQ28q74xfq0cEa3EtfEk03", preporuceno: cijenaOglasa > 1000 }
     ];
   };
 
@@ -929,7 +932,9 @@ export default function KupkoApp() {
     if (glas.isDemo) { alert("Demo oglasi se ne mogu promovirati."); return; }
     setOglasZaPromociju(glas);
     const paketi = dohvatiPaketeZaOglas(glas);
-    setOdabraniPromoPaket(paketi[0]);
+    // Automatski odabir preporučenog paketa prema cijeni
+    const preporuceniPaket = paketi.find(p => p.preporuceno) || paketi[0];
+    setOdabraniPromoPaket(preporuceniPaket);
     setPrikaziPlacanjePromo(true);
   };
 
@@ -1114,7 +1119,8 @@ export default function KupkoApp() {
         if (noviOglas.promoviran) {
           setOglasZaPromociju(data[0]);
           const paketi = dohvatiPaketeZaOglas(data[0]);
-          setOdabraniPromoPaket(paketi[0]);
+          const preporuceniPaket = paketi.find(p => p.preporuceno) || paketi[0];
+          setOdabraniPromoPaket(preporuceniPaket);
           setPrikaziPlacanjePromo(true);
         } else {
           alert("Oglas je uspješno objavljen!");
@@ -1345,7 +1351,7 @@ export default function KupkoApp() {
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Pretraži ponudu (npr. Stan, BMW, Bicikl...)"
+                  placeholder="Pretraži ponudu (npr. Stan, Auto, Bicikl...)"
                   value={pojamPretrage}
                   onChange={(e) => { setPojamPretrage(e.target.value); setTrenutnaStranica(1); }}
                   className="w-full pl-11 pr-4 py-3 rounded-2xl text-slate-900 bg-white shadow-sm text-sm font-medium outline-none focus:ring-4 focus:ring-amber-400/50 placeholder:text-slate-400 transition"
@@ -2084,11 +2090,16 @@ export default function KupkoApp() {
                         onClick={() => setOdabraniPromoPaket(paket)}
                         className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center transition ${
                           odabraniPromoPaket?.naziv === paket.naziv 
-                            ? "bg-blue-50 border-blue-600" 
+                            ? "bg-blue-50 border-blue-600 ring-2 ring-blue-400" 
                             : "bg-slate-50 border-slate-200"
                         }`}
                       >
-                        <span className="font-bold text-xs text-slate-800">{paket.naziv}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs text-slate-800">{paket.naziv}</span>
+                          {paket.preporuceno && (
+                            <span className="bg-amber-400 text-blue-950 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">Preporučeno</span>
+                          )}
+                        </div>
                         <span className="font-black text-blue-700 text-xs">{paket.cijena} €</span>
                       </div>
                     ))}
