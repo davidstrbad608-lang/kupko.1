@@ -61,7 +61,9 @@ const SVE_KATEGORIJE = [
   }
 ];
 
+// 70 DETALJNIH DEMO OGLASA (10 PO SVAKOJ OD 7 KATEGORIJA)
 const DEMO_OGLASI = [
+  // --- KUĆNI LJUBIMCI ---
   {
     id: 9001, naslov: "Zlatni retriver - štenci s rodovnicom", cijena: "650", kategorija: "kucni-ljubimci", podkategorija: "Psi", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Maksimir", stanje: "Novo", opis: "Vrhunski štenci zlatnog retrivera, cijepljeni, čipirani, s rodovnicom HKS-a i spremni za novi dom uz stručnu potporu uzgajivača.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0911234567", promoviran: false, top: false, datum: "Objavljeno danas u 10:00", pregledi: 45, isDemo: true, slike: ["https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&q=80"]
   },
@@ -69,22 +71,220 @@ const DEMO_OGLASI = [
     id: 9002, naslov: "Britanske kratkodlake mačke - slobodne za rezervaciju", cijena: "500", kategorija: "kucni-ljubimci", podkategorija: "Mačke", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Trstenik", stanje: "Novo", opis: "Prekrasni mali mačići čistokrvnih britanskih plavih mačaka. Očišćeni od parazita, naučeni na pijesak.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0923334455", promoviran: false, top: false, datum: "Objavljeno jučer", pregledi: 32, isDemo: true, slike: ["https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&q=80"]
   },
   {
+    id: 9003, naslov: "Akvarij komplet 120L s opremom i ribicama", cijena: "180", kategorija: "kucni-ljubimci", podkategorija: "Akvaristika i ribice", zupanija: "Primorsko-goranska", grad: "Rijeka", adresa: "Trsat", stanje: "Korišteno", opis: "Prodajem kompletno uređen akvarij 120 litara s filtrom, grijačem, LED rasvjetom i šarenim ribicama.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0981112233", promoviran: false, top: false, datum: "Objavljeno prije 2 dana", pregledi: 19, isDemo: true, slike: ["https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=800&q=80"]
+  },
+  {
+    id: 9004, naslov: "Kavez za papige i glodavce (veliki luksuzni)", cijena: "95", kategorija: "kucni-ljubimci", podkategorija: "Oprema za ljubimce", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Gornji Grad", stanje: "Novo", opis: "Prostrani kavez opremljen hranilicama, pojilicama i igračkama. Idealno za papige ili činčile.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0954445566", promoviran: false, top: false, datum: "Objavljeno prije 3 dana", pregledi: 12, isDemo: true, slike: ["https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=800&q=80"]
+  },
+  {
+    id: 9005, naslov: "Tigrasti patuljasti zečići (spremni za preuzimanje)", cijena: "35", kategorija: "kucni-ljubimci", podkategorija: "Glodavci", zupanija: "Varaždinska", grad: "Varaždin", adresa: "Centar", stanje: "Novo", opis: "Uzgajivač prodaje pitome patuljaste zečiće naviknute na ljudsku ruku i maženje.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0997778899", promoviran: false, top: false, datum: "Objavljeno prije 4 dana", pregledi: 25, isDemo: true, slike: ["https://images.unsplash.com/photo-1535294441819-a1b695bb1c54?w=800&q=80"]
+  },
+  {
+    id: 9006, naslov: "Ručno hranjeni papigici Nimfe", cijena: "60", kategorija: "kucni-ljubimci", podkategorija: "Ptice", zupanija: "Istarska", grad: "Pula", adresa: "Veruda", stanje: "Novo", opis: "Mlade nimfe, pitome, prilagođene za život u stanu s obitelji.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0915556677", promoviran: false, top: false, datum: "Objavljeno prije 5 dana", pregledi: 18, isDemo: true, slike: ["https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=800&q=80"]
+  },
+  {
+    id: 9007, naslov: "Profesionalna torba i transporter za psa/mačku", cijena: "45", kategorija: "kucni-ljubimci", podkategorija: "Oprema za ljubimce", zupanija: "Zagrebačka", grad: "Velika Gorica", adresa: "Zagrebačka", stanje: "Novo", opis: "Kvalitetna torba za nošenje manjih kućnih ljubimaca u putovanjima i zrakoplovu.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0921113344", promoviran: false, top: false, datum: "Objavljeno prije 6 dana", pregledi: 22, isDemo: true, slike: ["https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800&q=80"]
+  },
+  {
+    id: 9008, naslov: "Hocu dom - udomljavanje spašenih mačića", cijena: "0", kategorija: "kucni-ljubimci", podkategorija: "Mačke", zupanija: "Zadarska", grad: "Zadar", adresa: "Relja", stanje: "Novo", opis: "Udruga za zaštita životinja poklanja u dobre ruke spašene i očišćene mačiće.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0982223344", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 88, isDemo: true, slike: ["https://images.unsplash.com/photo-1548802673-380ab8ebc7b7?w=800&q=80"]
+  },
+  {
+    id: 9009, naslov: "Hrana za pse Premium 15kg (Super povoljno)", cijena: "42", kategorija: "kucni-ljubimci", podkategorija: "Oprema za ljubimce", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Tvrđa", stanje: "Novo", opis: "Nepotstupljena vreća super premium hrane za odrasle pse svih pasmina.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0919998877", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 15, isDemo: true, slike: ["https://images.unsplash.com/photo-1589927986062-0ef7777c0dc8?w=800&q=80"]
+  },
+  {
+    id: 9010, naslov: "Terarij za gmazove i kornjače s grijačem", cijena: "110", kategorija: "kucni-ljubimci", podkategorija: "Ostalo - Kućni ljubimci", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Dubrava", stanje: "Korišteno", opis: "Stakleni terarij s UV lampom, grijačem i podlogom za bradate agame ili kornjače.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0953332211", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 29, isDemo: true, slike: ["https://images.unsplash.com/photo-1562232657-3f8d227b4b3b?w=800&q=80"]
+  },
+
+  // --- AUTO MOTO ---
+  {
     id: 9021, naslov: "Volkswagen Golf VII 2.0 TDI DSG", cijena: "13500", kategorija: "auto-moto", podkategorija: "Osobna vozila", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Vukovarska", stanje: "Korišteno", opis: "Automobil u vrhunskom stanju, redovno servisiran u ovlaštenom servisu, nove gume, bez ulaganja.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0912223344", promoviran: true, top: true, datum: "Objavljeno danas", pregledi: 120, isDemo: true, godiste: "2018", kilometri: "145000", snagaKw: "110", gorivo: "Dizel", mjenjac: "Automatski", slike: ["https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800&q=80"]
   },
+  {
+    id: 9022, naslov: "BMW Serija 3 320d M-Paket", cijena: "18900", kategorija: "auto-moto", podkategorija: "Osobna vozila", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Spinut", stanje: "Korišteno", opis: "Tvornički M paket, panorama, kožna sjedala, navigacija Professional, registriran godinu dana.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0983332211", promoviran: false, top: false, datum: "Objavljeno jučer", pregledi: 95, isDemo: true, godiste: "2019", kilometri: "130000", snagaKw: "140", gorivo: "Dizel", mjenjac: "Automatski", slike: ["https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80"]
+  },
+  {
+    id: 9023, naslov: "Yamaha MT-07 Motocikl 689ccm", cijena: "5800", kategorija: "auto-moto", podkategorija: "Motocikli i skuteri", zupanija: "Primorsko-goranska", grad: "Rijeka", adresa: "Riva", stanje: "Korišteno", opis: "Odličan naked motor, garažiran, nikad padano, stavljen Akrapovič auspuh.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0998887766", promoviran: false, top: false, datum: "Objavljeno prije 2 dana", pregledi: 64, isDemo: true, godiste: "2020", kilometri: "18000", snagaKw: "55", gorivo: "Benzin", mjenjac: "Ručni", slike: ["https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&q=80"]
+  },
+  {
+    id: 9024, naslov: "Audi A4 Avant 2.0 TDI", cijena: "15200", kategorija: "auto-moto", podkategorija: "Osobna vozila", zupanija: "Varaždinska", grad: "Varaždin", adresa: "Kroata", stanje: "Korišteno", opis: "Matrix led svjetla, virtual cockpit, automatska dvozonska klima, odličan obiteljski karavan.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0914445566", promoviran: false, top: false, datum: "Objavljeno prije 3 dana", pregledi: 51, isDemo: true, godiste: "2018", kilometri: "160000", snagaKw: "110", gorivo: "Dizel", mjenjac: "Automatski", slike: ["https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800&q=80"]
+  },
+  {
+    id: 9025, naslov: "Aluminijske felge 17 cola s ljetnim gumama", cijena: "350", kategorija: "auto-moto", podkategorija: "Auto dijelovi i oprema", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Jug 2", stanje: "Korišteno", opis: "Felge u dobrom stanju, razmak rupa 5x112, vozene dvije sezone.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0951234567", promoviran: false, top: false, datum: "Objavljeno prije 4 dana", pregledi: 30, isDemo: true, slike: ["https://images.unsplash.com/photo-1582592392723-57b1f6087799?w=800&q=80"]
+  },
+  {
+    id: 9026, naslov: "Gumenjak 5 metara s vanbrodskim motorom 60KS", cijena: "8900", kategorija: "auto-moto", podkategorija: "Nautika i plovila", zupanija: "Zadarska", grad: "Zadar", adresa: "Borik", stanje: "Korišteno", opis: "Spreman za sezonu, trajno registrovan, tenda, inox ljestve, muzika.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0929991122", promoviran: false, top: false, datum: "Objavljeno prije 5 dana", pregledi: 77, isDemo: true, slike: ["https://images.unsplash.com/photo-1569263979104-865ab9cd8d57?w=800&q=80"]
+  },
+  {
+    id: 9027, naslov: "Renault Clio 1.0 TCe (Kao nov)", cijena: "11200", kategorija: "auto-moto", podkategorija: "Osobna vozila", zupanija: "Istarska", grad: "Pula", adresa: "Šijana", stanje: "Novo", opis: "Kupljen u HR, prva vlasnica, garancija, Apple CarPlay, parking senzori i kamera.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0917773322", promoviran: false, top: false, datum: "Objavljeno prije 6 dana", pregledi: 42, isDemo: true, godiste: "2021", kilometri: "45000", snagaKw: "67", gorivo: "Benzin", mjenjac: "Ručni", slike: ["https://images.unsplash.com/photo-1550355291-bbee04a92027?w=800&q=80"]
+  },
+  {
+    id: 9028, naslov: "Mercedes-Benz C-Class 220d AMG Line", cijena: "22500", kategorija: "auto-moto", podkategorija: "Osobna vozila", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Tresnjevka", stanje: "Korišteno", opis: "Vrhunski paket opreme, ambijentalna rasvjeta, Burmester ozvučenje, panorama krov.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0984443322", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 110, isDemo: true, godiste: "2020", kilometri: "115000", snagaKw: "143", gorivo: "Dizel", mjenjac: "Automatski", slike: ["https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80"]
+  },
+  {
+    id: 9029, naslov: "Skuter Piaggio Vespa Primavera 125ccm", cijena: "3400", kategorija: "auto-moto", podkategorija: "Motocikli i skuteri", zupanija: "Dubrovačko-neretvanska", grad: "Dubrovnik", adresa: "Lapad", stanje: "Korišteno", opis: "Legendarna vespa u savršenom stanju, malo vožena, idealna za gradske gužve.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0918889900", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 56, isDemo: true, godiste: "2021", kilometri: "9500", snagaKw: "8", gorivo: "Benzin", mjenjac: "Automatski", slike: ["https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80"]
+  },
+  {
+    id: 9030, naslov: "Krovni nosači i krovna kutija Thule 450L", cijena: "320", kategorija: "auto-moto", podkategorija: "Auto dijelovi i oprema", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Novi Zagreb", stanje: "Korišteno", opis: "Thule krovni box crni sjajni s univerzalnim nosačima za rubove krova.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0956665544", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 39, isDemo: true, slike: ["https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?w=800&q=80"]
+  },
+
+  // --- NEKRETNINE ---
   {
     id: 9041, naslov: "Lijepi dvosobni stan u centru Zagreba 55m2", cijena: "165000", kategorija: "nekretnine", podkategorija: "Stanovi - Prodaja", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Zvonimirova", stanje: "Novo", opis: "Potpuno adaptiran i namješten stan na odličnoj lokaciji u blizini svih sadržaja i tramvaja.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0915554433", promoviran: true, top: true, datum: "Objavljeno danas", pregledi: 150, isDemo: true, kvadratura: "55", sobe: "2", slike: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80"]
   },
   {
+    id: 9042, naslov: "Moderan trosobni stan s pogledom na more", cijena: "240000", kategorija: "nekretnine", podkategorija: "Stanovi - Prodaja", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Žnjan", stanje: "Novo", opis: "Novogradnja blizu plaže, podno grijanje, klima u svakoj sobi, osigurano parking mjesto u garaži.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0987776655", promoviran: false, top: false, datum: "Objavljeno jučer", pregledi: 130, isDemo: true, kvadratura: "78", sobe: "3", slike: ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"]
+  },
+  {
+    id: 9043, naslov: "Kuća s okućnicom i bazenom u Istri", cijena: "380000", kategorija: "nekretnine", podkategorija: "Kuće - Prodaja", zupanija: "Istarska", grad: "Rovinj", adresa: "Kamen", stanje: "Novo", opis: "Kamena vila s bazenom, sunčalištem i uređenom okućnicom od 800m2. Uhodani turistički najam.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0913332211", promoviran: false, top: false, datum: "Objavljeno prije 2 dana", pregledi: 98, isDemo: true, kvadratura: "160", sobe: "4", slike: ["https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80"]
+  },
+  {
+    id: 9044, naslov: "Dvosoban stan za najam u Rijeci (Trešnjevac)", cijena: "650", kategorija: "nekretnine", podkategorija: "Stanovi - Najam", zupanija: "Primorsko-goranska", grad: "Rijeka", adresa: "Brajda", stanje: "Korišteno", opis: "Iznajmljuje se uredan stan na duži period zaposlenim osobama ili studentima.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0925556677", promoviran: false, top: false, datum: "Objavljeno prije 3 dana", pregledi: 74, isDemo: true, kvadratura: "48", sobe: "2", slike: ["https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800&q=80"]
+  },
+  {
+    id: 9045, naslov: "Građevinsko zemljište blizu Varaždina 800m2", cijena: "45000", kategorija: "nekretnine", podkategorija: "Zemljišta", zupanija: "Varaždinska", grad: "Varaždin", adresa: "Gornji Kućan", stanje: "Novo", opis: "Ravna parcela pravilnog oblika uz asfaltiranu cestu, sva infrastruktura uz teren.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0958887766", promoviran: false, top: false, datum: "Objavljeno prije 4 dana", pregledi: 41, isDemo: true, kvadratura: "800", slike: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"]
+  },
+  {
+    id: 9046, naslov: "Poslovni prostor u centru Osijeka 110m2", cijena: "1200", kategorija: "nekretnine", podkategorija: "Poslovni prostori", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Europska avenija", stanje: "Korišteno", opis: "Pogodno za ured, agenciju, ordinaciju ili tihu djelatnost. Veliki izlog prema ulici.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0911112233", promoviran: false, top: false, datum: "Objavljeno prije 5 dana", pregledi: 35, isDemo: true, kvadratura: "110", sobe: "4", slike: ["https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80"]
+  },
+  {
+    id: 9047, naslov: "Vikendica s vinogradom u Zagorju", cijena: "55000", kategorija: "nekretnine", podkategorija: "Nekretnine za odmor", zupanija: "Krapinsko-zagorska", grad: "Zlatar", adresa: "Brezova", stanje: "Korišteno", opis: "Mirna lokacija s predivnim pogledom na brege, podrum, kuhinja, soba i natkrivena terasa.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0985554433", promoviran: false, top: false, datum: "Objavljeno prije 6 dana", pregledi: 48, isDemo: true, kvadratura: "60", sobe: "2", slike: ["https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80"]
+  },
+  {
+    id: 9048, naslov: "Garaža u zatvorenom kompleksu (Zagreb - Trešnjevka)", cijena: "22000", kategorija: "nekretnine", podkategorija: "Garaže", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Krapinska", stanje: "Novo", opis: "Suha garaža srolo-vratima na daljinsko upravljanje, struja i rasvjeta u garaži.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0993332211", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 59, isDemo: true, kvadratura: "16", slike: ["https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=800&q=80"]
+  },
+  {
+    id: 9049, naslov: "Kuća za najam (Zagreb - Podsljeme)", cijena: "1500", kategorija: "nekretnine", podkategorija: "Kuće - Najam", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Mlinovi", stanje: "Novo", opis: "Luksuzna samostojeća kuća s okruženom šumom, kamin, 3 parkirna mjesta, mirna oaza.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0916665544", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 82, isDemo: true, kvadratura: "220", sobe: "5", slike: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80"]
+  },
+  {
+    id: 9050, naslov: "Novogradnja stan u Puli 62m2", cijena: "155000", kategorija: "nekretnine", podkategorija: "Novogradnja", zupanija: "Istarska", grad: "Pula", adresa: "Veruda", stanje: "Novo", opis: "Visokokvalitetna gradnja, protuprovalna vrata, inverter klima, useljivo odmah.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0954443322", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 67, isDemo: true, kvadratura: "62", sobe: "2", slike: ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80"]
+  },
+
+  // --- ELEKTRONIKA ---
+  {
     id: 9061, naslov: "Apple iPhone 15 Pro Max 256GB Natural Titanium", cijena: "980", kategorija: "elektronika", podkategorija: "Mobiteli i oprema", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Centar", stanje: "Novo", opis: "Mobitel nov zapakiran, račun i garancija 2 godine, nikad korišten.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0919992211", promoviran: true, top: true, datum: "Objavljeno danas", pregledi: 180, isDemo: true, slike: ["https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&q=80"]
   },
+  {
+    id: 9062, naslov: "Gaming PC i7 13700KF / RTX 4070 Ti / 32GB RAM", cijena: "1450", kategorija: "elektronika", podkategorija: "Računala i komponente", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Smrdečac", stanje: "Novo", opis: "Vrhunsko računalo za 4K gaming i renderiranje, RGB kućište, brzi NVMe SSD 2TB.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0981119988", promoviran: false, top: false, datum: "Objavljeno jučer", pregledi: 115, isDemo: true, slike: ["https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&q=80"]
+  },
+  {
+    id: 9063, naslov: "Sony PlayStation 5 Slim + Dva kontrolera + FC24", cijena: "440", kategorija: "elektronika", podkategorija: "Konzole i igrice", zupanija: "Primorsko-goranska", grad: "Rijeka", adresa: "Kantrida", stanje: "Novo", opis: "Konzola nova u kutiji, s računom i važećom garancijom.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0992224455", promoviran: false, top: false, datum: "Objavljeno prije 2 dana", pregledi: 92, isDemo: true, slike: ["https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80"]
+  },
+  {
+    id: 9064, naslov: "Samsung 65 inch OLED 4K Smart TV", cijena: "1100", kategorija: "elektronika", podkategorija: "TV, Video i Audio", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Sjenjak", stanje: "Novo", opis: "Vrhunska slika, savršena crna boja, Dolby Atmos, zapakirano u original ambalaži.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0953331122", promoviran: false, top: false, datum: "Objavljeno prije 3 dana", pregledi: 60, isDemo: true, slike: ["https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800&q=80"]
+  },
+  {
+    id: 9065, naslov: "Canon EOS R50 Mirrorless Fotoaparat + Objektiv", cijena: "680", kategorija: "elektronika", podkategorija: "Foto i video oprema", zupanija: "Varaždinska", grad: "Varaždin", adresa: "Korzo", stanje: "Novo", opis: "Odličan fotoaparat za početnike i vlogere, 4K video, RF-S 18-45mm objektiv.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0917778899", promoviran: false, top: false, datum: "Objavljeno prije 4 dana", pregledi: 44, isDemo: true, slike: ["https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80"]
+  },
+  {
+    id: 9066, naslov: "MacBook Pro 16 M3 Pro / 18GB / 512GB", cijena: "2100", kategorija: "elektronika", podkategorija: "Računala i komponente", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Centar", stanje: "Novo", opis: "Najnoviji model prijenosnog računala u space black boji, HR tipkovnica, zapakirano.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0984441122", promoviran: false, top: false, datum: "Objavljeno prije 5 dana", pregledi: 83, isDemo: true, slike: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80"]
+  },
+  {
+    id: 9067, naslov: "Samsung Galaxy S24 Ultra 512GB Titanium", cijena: "1050", kategorija: "elektronika", podkategorija: "Mobiteli i oprema", zupanija: "Istarska", grad: "Pula", adresa: "Veruda", stanje: "Novo", opis: "Vrhunski android flagship, olovka S-Pen, AI funkcije, nekorišteno.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0912228877", promoviran: false, top: false, datum: "Objavljeno prije 6 dana", pregledi: 71, isDemo: true, slike: ["https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&q=80"]
+  },
+  {
+    id: 9068, naslov: "Nintendo Switch OLED Model White", cijena: "270", kategorija: "elektronika", podkategorija: "Konzole i igrice", zupanija: "Zadarska", grad: "Zadar", adresa: "Relja", stanje: "Korišteno", opis: "Konzola u odličnom stanju sa zaštitnim staklom, torbicom i dvije igre.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0926663322", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 53, isDemo: true, slike: ["https://images.unsplash.com/photo-1578303512597-81e6cc155b12?w=800&q=80"]
+  },
+  {
+    id: 9069, naslov: "JBL PartyBox 310 Bluetooth Zvučnik", cijena: "390", kategorija: "elektronika", podkategorija: "TV, Video i Audio", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Dubrava", stanje: "Korišteno", opis: "Moćan zvuk i svjetlosni efekti, kotačići za lakši prijenos, baterija drži do 18 sati.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0951114455", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 69, isDemo: true, slike: ["https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800&q=80"]
+  },
+  {
+    id: 9070, naslov: "DJI Mini 4 Pro Drone + Fly More Combo", cijena: "850", kategorija: "elektronika", podkategorija: "Foto i video oprema", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Poljud", stanje: "Novo", opis: "Pametni dron s izbjegavanjem prepreka u svim smjerovima, RC 2 daljinski sa zaslonom.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0989998877", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 76, isDemo: true, slike: ["https://images.unsplash.com/photo-1527977966376-1c8408f9f108?w=800&q=80"]
+  },
+
+  // --- DOM I VRT ---
   {
     id: 9081, naslov: "Kutna garnitura na razvlačenje (Moderni dizajn)", cijena: "650", kategorija: "dom-vrt", podkategorija: "Namještaj", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Vukovarska", stanje: "Novo", opis: "Udobna kutna garnitura presvučena kvalitetnom tkaninom otpornom na mrlje, sanduk za posteljinu.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0913334455", promoviran: true, top: true, datum: "Objavljeno danas", pregledi: 110, isDemo: true, slike: ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80"]
   },
   {
+    id: 9082, naslov: "Bosch perilica posuđa Serie 4 (Samostojeća)", cijena: "350", kategorija: "dom-vrt", podkategorija: "Kućanski aparati", zupanija: "Primorsko-goranska", grad: "Rijeka", adresa: "Kozala", stanje: "Novo", opis: "Energetska klasa A, tihi rad, AquaStop zaštita od izljevanja vode, garancija.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0921112233", promoviran: false, top: false, datum: "Objavljeno jučer", pregledi: 65, isDemo: true, slike: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80"]
+  },
+  {
+    id: 9083, naslov: "Vrtna garnitura od ratana (stol + 6 stolica)", cijena: "420", kategorija: "dom-vrt", podkategorija: "Vrt i gradnja", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Bačvice", stanje: "Novo", opis: "Otporno na UV zračenje i vremenske uvjete, udobni jastuci uključeni u cijenu.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0987778899", promoviran: false, top: false, datum: "Objavljeno prije 2 dana", pregledi: 84, isDemo: true, slike: ["https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=80"]
+  },
+  {
+    id: 9084, naslov: "Set porculanskog posuđa za 12 osoba (60 komada)", cijena: "130", kategorija: "dom-vrt", podkategorija: "Posuđe i pribor", zupanija: "Varaždinska", grad: "Varaždin", adresa: "Centar", stanje: "Novo", opis: "Elegantni bijeli porculan sa zlatnim rubom, pogodno za pranje u perilici posuđa.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0952221144", promoviran: false, top: false, datum: "Objavljeno prije 3 dana", pregledi: 33, isDemo: true, slike: ["https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&q=80"]
+  },
+  {
+    id: 9085, naslov: "Dizajnerska stropna LED rasvjeta / Luster", cijena: "95", kategorija: "dom-vrt", podkategorija: "Rasvjeta", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Gornji Grad", stanje: "Novo", opis: "Mogućnost podešavanja temperature boje svjetlosti daljinskim upravljačem.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0916667788", promoviran: false, top: false, datum: "Objavljeno prije 4 dana", pregledi: 41, isDemo: true, slike: ["https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=800&q=80"]
+  },
+  {
+    id: 9086, naslov: "Bračni krevet 160x200 s madracem", cijena: "380", kategorija: "dom-vrt", podkategorija: "Namještaj", zupanija: "Istarska", grad: "Pula", adresa: "Kaštanjer", stanje: "Novo", opis: "Tapecirani krevet s ortopedskim madracem i prostorom za odlaganje posteljine.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0983331144", promoviran: false, top: false, datum: "Objavljeno prije 5 dana", pregledi: 52, isDemo: true, slike: ["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80"]
+  },
+  {
+    id: 9087, naslov: "Samostojeći hladnjak s ledenicom NoFrost", cijena: "480", kategorija: "dom-vrt", podkategorija: "Kućanski aparati", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Dubrava", stanje: "Novo", opis: "Inverter kompresor, veliki kapacitet, inox dizajn otporan na otiske prstiju.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0914447788", promoviran: false, top: false, datum: "Objavljeno prije 6 dana", pregledi: 49, isDemo: true, slike: ["https://images.unsplash.com/photo-1571175420322-91a0a575a7b6?w=800&q=80"]
+  },
+  {
+    id: 9088, naslov: "Motorna kosilica za travu s košarom", cijena: "260", kategorija: "dom-vrt", podkategorija: "Vrt i gradnja", zupanija: "Zadarska", grad: "Zadar", adresa: "Bili Brig", stanje: "Korišteno", opis: "Snažan benzinski motor, centralno podešavanje visine košnje, velika korpa.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0998881122", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 57, isDemo: true, slike: ["https://images.unsplash.com/photo-1592417817098-8f3d691a4bf5?w=800&q=80"]
+  },
+  {
+    id: 9089, naslov: "Blagovaonski stol masivno drvo + 6 stolica", cijena: "520", kategorija: "dom-vrt", podkategorija: "Namještaj", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Maksimir", stanje: "Novo", opis: "Rastezljivi stol od hrastovog drveta visoke kvalitete izrade.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0915551122", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 63, isDemo: true, slike: ["https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?w=800&q=80"]
+  },
+  {
+    id: 9090, naslov: "Infracrvena sauna za dvije osobe", cijena: "1150", kategorija: "dom-vrt", podkategorija: "Ostalo - Dom i Vrt", zupanija: "Primorsko-goranska", grad: "Opatija", adresa: "Slatina", stanje: "Novo", opis: "Kanadska jela, keramički grijači, radio i bluetooth zvučnici, opuštanje kod kuće.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0982225566", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 80, isDemo: true, slike: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80"]
+  },
+
+  // --- SPORT I OPREMA ---
+  {
     id: 9101, naslov: "Specijalizirani brdski bicikl MTB 29 cola", cijena: "550", kategorija: "sport", podkategorija: "Bicikli i oprema", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Jarun", stanje: "Korišteno", opis: "Aluminijska rama, hidraulične disk kočnice, Shimano oprema, servisiran i spreman za vožnju.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0911239876", promoviran: true, top: true, datum: "Objavljeno danas", pregledi: 135, isDemo: true, slike: ["https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&q=80"]
   },
   {
+    id: 9102, naslov: "Električni romobil Xiaomi Mi Scooter Pro 2", cijena: "320", kategorija: "sport", podkategorija: "Bicikli i oprema", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Poljud", stanje: "Korišteno", opis: "Domet do 45 km, maksimalna brzina 25 km/h, očuvan s originalnim punjačem.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0984443355", promoviran: false, top: false, datum: "Objavljeno jučer", pregledi: 89, isDemo: true, slike: ["https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80"]
+  },
+  {
+    id: 9103, naslov: "Multifunkcionalna fitness sprava za kućnu teretanu", cijena: "480", kategorija: "sport", podkategorija: "Fitness i teretana", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Jug 2", stanje: "Novo", opis: "Sve vježbe za tijelo na jednom mjestu, utezi uključeni u cijenu (do 80kg).", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0953337788", promoviran: false, top: false, datum: "Objavljeno prije 2 dana", pregledi: 62, isDemo: true, slike: ["https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&q=80"]
+  },
+  {
+    id: 9104, naslov: "Profesionalni stolni nogomet (Kvalitetan masiv)", cijena: "290", kategorija: "sport", podkategorija: "Loptački sportovi", zupanija: "Varaždinska", grad: "Varaždin", adresa: "Kroata", stanje: "Korišteno", opis: "Tvrdo drvo, teleskopske šipke, stabilne noge, savršeno za zabavu u društvu.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0917774411", promoviran: false, top: false, datum: "Objavljeno prije 3 dana", pregledi: 40, isDemo: true, slike: ["https://images.unsplash.com/photo-1534158914592-062994fbe900?w=800&q=80"]
+  },
+  {
+    id: 9105, naslov: "Ski oprema komplet: Skije Elan 160cm + Pancerice", cijena: "210", kategorija: "sport", podkategorija: "Zimski sportovi", zupanija: "Primorsko-goranska", grad: "Rijeka", adresa: "Trsat", stanje: "Korišteno", opis: "Servisirane skije spremne za snježnu sezonu, pancerice broj 42.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0921118899", promoviran: false, top: false, datum: "Objavljeno prije 4 dana", pregledi: 48, isDemo: true, slike: ["https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80"]
+  },
+  {
+    id: 9106, naslov: "Pribor za morski ribolov i štapovi (Komplet)", cijena: "160", kategorija: "sport", podkategorija: "Lov i ribolov", zupanija: "Zadarska", grad: "Zadarska", adresa: "Poluotok", stanje: "Novo", opis: "Kvalitetni teleskopski štapovi, role s najlonom i kutija s varalicama.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0995552233", promoviran: false, top: false, datum: "Objavljeno prije 5 dana", pregledi: 55, isDemo: true, slike: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80"]
+  },
+  {
+    id: 9107, naslov: "Podesiva bučica set 2x24kg (Brza promjena težine)", cijena: "190", kategorija: "sport", podkategorija: "Fitness i teretana", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Trešnjevka", stanje: "Novo", opis: "Jednostavnim okretanjem kotačića birate težinu od 2 do 24 kg po bučici.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0918883311", promoviran: false, top: false, datum: "Objavljeno prije 6 dana", pregledi: 73, isDemo: true, slike: ["https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&q=80"]
+  },
+  {
+    id: 9108, naslov: "SUP daska na napuhavanje (Stand Up Paddle 320cm)", cijena: "250", kategorija: "sport", podkategorija: "Ostalo - Sport", zupanija: "Istarska", grad: "Rovinj", adresa: "Centar", stanje: "Novo", opis: "Komplet s veslom, pumpom, ruksakom i sigurnosnim užetom za ljetne radosti.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0986664422", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 91, isDemo: true, slike: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80"]
+  },
+  {
+    id: 9109, naslov: "Košarkaška konstrukcija podesiva s obručem", cijena: "210", kategorija: "sport", podkategorija: "Loptački sportovi", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Dubrava", stanje: "Novo", opis: "Prijenosni koš za dvorište s bazom na punjenje vodom ili pijeskom.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0957771122", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 37, isDemo: true, slike: ["https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80"]
+  },
+  {
+    id: 9110, naslov: "Glatka Yoga prostirka + Pilates loptu set", cijena: "40", kategorija: "sport", podkategorija: "Fitness i teretana", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Tvrđa", stanje: "Novo", opis: "Eko materijal, protuklizna podloga, idealno za vježbanje doma.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0913339988", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 28, isDemo: true, slike: ["https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80"]
+  },
+
+  // --- OSTALO / RAZNO ---
+  {
     id: 9121, naslov: "Stara vintage gramofonska ploča kolekcija (50 kom)", cijena: "150", kategorija: "ostalo", podkategorija: "Kolekcionarstvo i antikviteti", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Ilica", stanje: "Korišteno", opis: "Rock i pop klasici iz 70-ih i 80-ih u dobrom stanju s omotima.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0912224411", promoviran: true, top: true, datum: "Objavljeno danas", pregledi: 95, isDemo: true, slike: ["https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?w=800&q=80"]
+  },
+  {
+    id: 9122, naslov: "Akustična gitara Fender + torba i štimer", cijena: "180", kategorija: "ostalo", podkategorija: "Glazbeni instrumenti", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Dioklecijanova", stanje: "Novo", opis: "Odličan zvuk, niska akcija žica, idealno za početnike i napredne svirače.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0985551144", promoviran: false, top: false, datum: "Objavljeno jučer", pregledi: 72, isDemo: true, slike: ["https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800&q=80"]
+  },
+  {
+    id: 9123, naslov: "Dječja kolica 3 u 1 (Kinderkraft s torbom)", cijena: "280", kategorija: "ostalo", podkategorija: "Dječja oprema i igračke", zupanija: "Primorsko-goranska", grad: "Rijeka", adresa: "Riva", stanje: "Novo", opis: "Komplet uključuje košaru, sportski dio i autosjedalicu (jaje) s adapterima.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0923338899", promoviran: false, top: false, datum: "Objavljeno prije 2 dana", pregledi: 68, isDemo: true, slike: ["https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&q=80"]
+  },
+  {
+    id: 9124, naslov: "Enciklopedije i knjige komplet (12 knjiga)", cijena: "60", kategorija: "ostalo", podkategorija: "Knjige i literatura", zupanija: "Varaždinska", grad: "Varaždin", adresa: "Trg bana Jelačića", stanje: "Korišteno", opis: "Očuvana enciklopedija svijeta, bogato ilustrirana, tvrdi uvez.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0951113322", promoviran: false, top: false, datum: "Objavljeno prije 3 dana", pregledi: 31, isDemo: true, slike: ["https://images.unsplash.com/photo-1495640388908-05fa85288e61?w=800&q=80"]
+  },
+  {
+    id: 9125, naslov: "Električni električni piano / Klavijatura Yamaha", cijena: "410", kategorija: "ostalo", podkategorija: "Glazbeni instrumenti", zupanija: "Osječko-baranjska", grad: "Osijek", adresa: "Tvrđa", stanje: "Novo", opis: "Otežane tipke s osjećajem pravog klavira, razne instrumentalne boje i ritmovi.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0916662211", promoviran: false, top: false, datum: "Objavljeno prije 4 dana", pregledi: 50, isDemo: true, slike: ["https://images.unsplash.com/photo-1520523839896-5aa46627372b?w=800&q=80"]
+  },
+  {
+    id: 9126, naslov: "Lego Technic Bugatti Bolide set (Zapakirano)", cijena: "115", kategorija: "ostalo", podkategorija: "Dječja oprema i igračke", zupanija: "Istarska", grad: "Pula", adresa: "Centar", stanje: "Novo", opis: "Original Lego set u originalnoj neotvorenoj kutiji, odličan poklon.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0987771199", promoviran: false, top: false, datum: "Objavljeno prije 5 dana", pregledi: 61, isDemo: true, slike: ["https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=800&q=80"]
+  },
+  {
+    id: 9127, naslov: "Stari džepni sat Omega (Antikvitet)", cijena: "350", kategorija: "ostalo", podkategorija: "Kolekcionarstvo i antikviteti", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Kaptol", stanje: "Korišteno", opis: "Mehanički navijač u ispravnom stanju, pozlaćeno kućište, kolekcionarski primjerak.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0914449988", promoviran: false, top: false, datum: "Objavljeno prije 6 dana", pregledi: 88, isDemo: true, slike: ["https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80"]
+  },
+  {
+    id: 9128, naslov: "Set romana poznatih svjetskih autora (10 knjiga)", cijena: "45", kategorija: "ostalo", podkategorija: "Knjige i literatura", zupanija: "Zadarska", grad: "Zadar", adresa: "Relja", stanje: "Novo", opis: "Popularni bestseleri u mekom uvezu, odlično očuvano.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0925553344", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 36, isDemo: true, slike: ["https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80"]
+  },
+  {
+    id: 9129, naslov: "Elektronički set bubnjeva s palicama", cijena: "490", kategorija: "ostalo", podkategorija: "Glazbeni instrumenti", zupanija: "Grad Zagreb", grad: "Zagreb", adresa: "Novi Zagreb", stanje: "Novo", opis: "Mrežaste opne za realističan odziv, ugrađeni moduli s ritmovima i mogućnost priključka slušalica.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0953335566", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 54, isDemo: true, slike: ["https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=800&q=80"]
+  },
+  {
+    id: 9130, naslov: "Dječji automobil na akumulator (Daljinski upravljač)", cijena: "190", kategorija: "ostalo", podkategorija: "Dječja oprema i igračke", zupanija: "Splitsko-dalmatinska", grad: "Split", adresa: "Trstenik", stanje: "Novo", opis: "Auto s LED svjetlima, glazbom, kožnim sjedalom i roditeljskim daljinskim upravljačem.", prodavac: "Kupko Demo", autor_email: "admin@kupko.hr", telefon: "0981116677", promoviran: false, top: false, datum: "Objavljeno prije tjedan dana", pregledi: 79, isDemo: true, slike: ["https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&q=80"]
   }
 ];
 
@@ -1632,7 +1832,7 @@ export default function KupkoApp() {
                                   {korisnik && mozeUreditiIliBrisati(o) && !o.isDemo && (
                                     <button
                                       type="button"
-                                      onClick={(e) => obnoviOglas(e, o)}
+                                      onClick={(e) => obnoviOglas(e, o.id)}
                                       title="Obnovi oglas"
                                       className="p-2 bg-slate-50 hover:bg-amber-50 text-slate-600 hover:text-amber-600 rounded-xl transition"
                                     >
@@ -1735,7 +1935,7 @@ export default function KupkoApp() {
               </p>
               <div className="mb-4">
                 <a 
-                  href="https://www.facebook.com" 
+                  href="https://www.facebook.com/profile.php?id=61595502347266" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-bold px-3.5 py-2 rounded-xl transition shadow-sm"
@@ -1749,8 +1949,8 @@ export default function KupkoApp() {
             <div>
               <h4 className="font-black text-white uppercase text-xs mb-3 tracking-wider text-amber-400">Pomoć i Korisnici</h4>
               <ul className="space-y-2 font-medium">
-                <li><button type="button" onClick={() => alert("Kontakt: kupko.podrska@gmail.com")} className="hover:text-amber-400 transition">Kontakt i podrška</button></li>
-                <li><button type="button" onClick={() => alert("O nama: Kupko je prvi pravi domaći oglasnik.")} className="hover:text-amber-400 transition">O nama</button></li>
+                <li><button type="button" onClick={() => alert("Kontakt i podrška: kupko.podrska@gmail.com")} className="hover:text-amber-400 transition">Kontakt i podrška</button></li>
+                <li><button type="button" onClick={() => alert("O nama: Kupko.hr je vodeći domaći oglasnik kreiran s ciljem spajanja kupaca i prodavača na siguran, brz i pouzdan način. Za sve upite obratite nam se na kupko.podrska@gmail.com.")} className="hover:text-amber-400 transition">O nama</button></li>
                 <li><button type="button" onClick={() => { if(!korisnik){setPrikaziPrijavu(true); return;} setPrikaziFormu(true); }} className="hover:text-amber-400 transition text-amber-300 font-bold">Predaj oglas</button></li>
               </ul>
             </div>
@@ -1803,7 +2003,7 @@ export default function KupkoApp() {
               <h2 className="text-xl font-black text-slate-900">Politika privatnosti (GDPR)</h2>
               <div className="text-xs text-slate-600 space-y-2 font-medium leading-relaxed">
                 <p>Kupko.hr štiti vašu privatnost u skladu s GDPR propisima.</p>
-                <p>Prikupljamo samo nužne podatke za rad oglasnika i ne dijelimo ih s trećim stranama.</p>
+                <p>Prikupljamo samo nužne podatke za rad oglasnika i ne dijelimo ih s trećim stranama. Za sva pitanja obratite nam se putem e-maila: <strong>kupko.podrska@gmail.com</strong>.</p>
               </div>
             </div>
           </div>
