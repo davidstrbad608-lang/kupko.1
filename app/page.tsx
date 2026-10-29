@@ -428,6 +428,7 @@ export default function KupkoApp() {
       } else if (!data || data.length === 0) {
         setOglasi(DEMO_OGLASI);
       } else {
+        // Kombiniramo bazu i demo oglase tako da stranica nikad nije prazna
         const kombinirani = [...data, ...DEMO_OGLASI];
         setOglasi(kombinirani);
       }
@@ -856,10 +857,11 @@ export default function KupkoApp() {
     alert("Osobni podaci su uspješno spremljeni!");
   };
 
+  // Provjera može li korisnik uređivati/brisati (Samo vlasnik oglasa ili admin, DEMO oglase može brisati/uređivati SAMO admin)
   const mozeUreditiIliBrisati = (glas: any) => {
     if (!korisnik) return false;
     if (glas.isDemo) {
-      return korisnik.isOwner;
+      return korisnik.isOwner; // Demo oglase može dirati samo admin
     }
     if (glas.autor_email) {
       return glas.autor_email.toLowerCase() === korisnik.email.toLowerCase() || korisnik.isOwner;
@@ -914,15 +916,12 @@ export default function KupkoApp() {
     setPrikaziUredivanje(true);
   };
 
-  // Funkcija za pakete s ispravljenom cijenom od 2.00 € za Mini Boost i pametnom preporukom ovisno o cijeni
   const dohvatiPaketeZaOglas = (glas: any) => {
-    const cijenaOglasa = parseFloat(glas.cijena || "0");
-
     return [
-      { naziv: "Mini Boost (3 dana)", cijena: "2.00", stripeLink: "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00", preporuceno: cijenaOglasa <= 50 },
-      { naziv: "Standardni Boost (7 dana)", cijena: "5.00", stripeLink: "https://buy.stripe.com/8x27sK0G92De7jQ2ApfEk01", preporuceno: cijenaOglasa > 50 && cijenaOglasa <= 300 },
-      { naziv: "Premium Paket (14 dana)", cijena: "10.00", stripeLink: "https://buy.stripe.com/7sYeVc60t2Deaw2a2RfEk02", preporuceno: cijenaOglasa > 300 && cijenaOglasa <= 1000 },
-      { naziv: "VIP Mega Boost (30 dana)", cijena: "20.00", stripeLink: "https://buy.stripe.com/5kQ28q74xfq0cEa3EtfEk03", preporuceno: cijenaOglasa > 1000 }
+      { naziv: "Mini Boost (3 dana)", cijena: "3.00", stripeLink: "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00" },
+      { naziv: "Standardni Boost (7 dana)", cijena: "5.00", stripeLink: "https://buy.stripe.com/8x27sK0G92De7jQ2ApfEk01" },
+      { naziv: "Premium Paket (14 dana)", cijena: "10.00", stripeLink: "https://buy.stripe.com/7sYeVc60t2Deaw2a2RfEk02" },
+      { naziv: "VIP Mega Boost (30 dana)", cijena: "20.00", stripeLink: "https://buy.stripe.com/5kQ28q74xfq0cEa3EtfEk03" }
     ];
   };
 
@@ -932,9 +931,7 @@ export default function KupkoApp() {
     if (glas.isDemo) { alert("Demo oglasi se ne mogu promovirati."); return; }
     setOglasZaPromociju(glas);
     const paketi = dohvatiPaketeZaOglas(glas);
-    // Automatski odabir preporučenog paketa prema cijeni
-    const preporuceniPaket = paketi.find(p => p.preporuceno) || paketi[0];
-    setOdabraniPromoPaket(preporuceniPaket);
+    setOdabraniPromoPaket(paketi[0]);
     setPrikaziPlacanjePromo(true);
   };
 
@@ -1119,8 +1116,7 @@ export default function KupkoApp() {
         if (noviOglas.promoviran) {
           setOglasZaPromociju(data[0]);
           const paketi = dohvatiPaketeZaOglas(data[0]);
-          const preporuceniPaket = paketi.find(p => p.preporuceno) || paketi[0];
-          setOdabraniPromoPaket(preporuceniPaket);
+          setOdabraniPromoPaket(paketi[0]);
           setPrikaziPlacanjePromo(true);
         } else {
           alert("Oglas je uspješno objavljen!");
@@ -1351,7 +1347,7 @@ export default function KupkoApp() {
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Pretraži ponudu (npr. Stan, Auto, Bicikl...)"
+                  placeholder="Pretraži ponudu (npr. Stan, BMW, Bicikl...)"
                   value={pojamPretrage}
                   onChange={(e) => { setPojamPretrage(e.target.value); setTrenutnaStranica(1); }}
                   className="w-full pl-11 pr-4 py-3 rounded-2xl text-slate-900 bg-white shadow-sm text-sm font-medium outline-none focus:ring-4 focus:ring-amber-400/50 placeholder:text-slate-400 transition"
@@ -1471,7 +1467,7 @@ export default function KupkoApp() {
         )}
 
         <main className="max-w-7xl mx-auto px-6 py-8 space-y-8 flex-1 w-full">
-            
+           
           {korisnik?.isOwner && (
             <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 border border-amber-400/40 rounded-3xl p-6 text-white shadow-xl space-y-4">
               <div className="flex items-center justify-between">
@@ -1726,7 +1722,7 @@ export default function KupkoApp() {
                   <div className="flex gap-1 bg-slate-100 p-1 rounded-2xl">
                     <button onClick={() => setPrikaz("grid")} className={`p-2 rounded-xl text-xs transition ${prikaz === "grid" ? "bg-white text-blue-600 shadow-sm font-bold" : "text-slate-500"}`} title="Grid"><Grid className="w-4 h-4" /></button>
                     <button onClick={() => setPrikaz("list")} className={`p-2 rounded-xl text-xs transition ${prikaz === "list" ? "bg-white text-blue-600 shadow-sm font-bold" : "text-slate-500"}`} title="Lista"><List className="w-4 h-4" /></button>
-                    <button onClick={() => setPrikaz("karta")} className={`p-2 rounded-xl text-xs transition flex items-center gap-1 ${prikaz === "karta" ? "bg-white text-blue-600 shadow-sm font-bold" : "text-slate-500"}`} title="Karta"></button>
+                    <button onClick={() => setPrikaz("karta")} className={`p-2 rounded-xl text-xs transition flex items-center gap-1 ${prikaz === "karta" ? "bg-white text-blue-600 shadow-sm font-bold" : "text-slate-500"}`} title="Karta"><Map className="w-4 h-4" /></button>
                   </div>
                 </div>
 
@@ -1835,6 +1831,7 @@ export default function KupkoApp() {
                                 <span className="text-xl font-black text-blue-700">{o.cijena} €</span>
 
                                 <div className="flex items-center gap-1.5">
+                                  {/* Gumb Obnovi prikazuje se SAMO ako je korisnik prijavljen i vlasnik oglasa (i nije demo) */}
                                   {korisnik && mozeUreditiIliBrisati(o) && !o.isDemo && (
                                     <button
                                       type="button"
@@ -1860,6 +1857,7 @@ export default function KupkoApp() {
                                 </div>
                               )}
 
+                              {/* Uređivanje i brisanje vidljivo samo ako korisnik ima ovlasti za taj oglas */}
                               {mozeUreditiIliBrisati(o) && (
                                 <div className="mt-2.5 pt-2.5 flex gap-2">
                                   {!o.isDemo && (
@@ -1941,7 +1939,7 @@ export default function KupkoApp() {
               </p>
               <div className="mb-4">
                 <a 
-                  href="https://www.facebook.com/profile.php?id=61595502347266" 
+                  href="https://www.facebook.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-bold px-3.5 py-2 rounded-xl transition shadow-sm"
@@ -1955,8 +1953,8 @@ export default function KupkoApp() {
             <div>
               <h4 className="font-black text-white uppercase text-xs mb-3 tracking-wider text-amber-400">Pomoć i Korisnici</h4>
               <ul className="space-y-2 font-medium">
-                <li><button type="button" onClick={() => alert("Kontakt i podrška: kupko.podrska@gmail.com")} className="hover:text-amber-400 transition">Kontakt i podrška</button></li>
-                <li><button type="button" onClick={() => alert("O nama: Kupko.hr je vodeći domaći oglasnik kreiran s ciljem spajanja kupaca i prodavača na siguran, brz i pouzdan način. Za sve upite obratite nam se na kupko.podrska@gmail.com.")} className="hover:text-amber-400 transition">O nama</button></li>
+                <li><button type="button" onClick={() => alert("Kontakt: kupko.podrska@gmail.com")} className="hover:text-amber-400 transition">Kontakt i podrška</button></li>
+                <li><button type="button" onClick={() => alert("O nama: Kupko je prvi pravi domaći oglasnik.")} className="hover:text-amber-400 transition">O nama</button></li>
                 <li><button type="button" onClick={() => { if(!korisnik){setPrikaziPrijavu(true); return;} setPrikaziFormu(true); }} className="hover:text-amber-400 transition text-amber-300 font-bold">Predaj oglas</button></li>
               </ul>
             </div>
@@ -2009,7 +2007,7 @@ export default function KupkoApp() {
               <h2 className="text-xl font-black text-slate-900">Politika privatnosti (GDPR)</h2>
               <div className="text-xs text-slate-600 space-y-2 font-medium leading-relaxed">
                 <p>Kupko.hr štiti vašu privatnost u skladu s GDPR propisima.</p>
-                <p>Prikupljamo samo nužne podatke za rad oglasnika i ne dijelimo ih s trećim stranama. Za sva pitanja obratite nam se putem e-maila: <strong>kupko.podrska@gmail.com</strong>.</p>
+                <p>Prikupljamo samo nužne podatke za rad oglasnika i ne dijelimo ih s trećim stranama.</p>
               </div>
             </div>
           </div>
@@ -2090,16 +2088,11 @@ export default function KupkoApp() {
                         onClick={() => setOdabraniPromoPaket(paket)}
                         className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center transition ${
                           odabraniPromoPaket?.naziv === paket.naziv 
-                            ? "bg-blue-50 border-blue-600 ring-2 ring-blue-400" 
+                            ? "bg-blue-50 border-blue-600" 
                             : "bg-slate-50 border-slate-200"
                         }`}
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-slate-800">{paket.naziv}</span>
-                          {paket.preporuceno && (
-                            <span className="bg-amber-400 text-blue-950 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">Preporučeno</span>
-                          )}
-                        </div>
+                        <span className="font-bold text-xs text-slate-800">{paket.naziv}</span>
                         <span className="font-black text-blue-700 text-xs">{paket.cijena} €</span>
                       </div>
                     ))}
@@ -2172,6 +2165,7 @@ export default function KupkoApp() {
                   </div>
                 </div>
 
+                {/* AUTOMATSKO UPOZORENJE ZA KUĆNE LJUBIMCE */}
                 {noviOglas.kategorija === "kucni-ljubimci" && (
                   <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-[11px] text-amber-900 font-medium space-y-1">
                     <span className="font-black block">⚠️ Važna pravila za kućne ljubimce:</span>
