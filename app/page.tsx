@@ -620,7 +620,7 @@ export default function KupkoApp() {
     }
   };
 
-  const posaljiPorukuProdavacu = (oglasId: any, primateljEmail: string) => {
+  const posaljiPorukuProdavacu = (oglasId: any, primateljEmail: string, oglasNaslov?: string) => {
     if (!korisnik) {
       alert("Morate biti prijavljeni da biste poslali poruku prodavaču!");
       setPrikaziPrijavu(true);
@@ -634,6 +634,7 @@ export default function KupkoApp() {
     const novaPoruka = {
       id: Date.now().toString(),
       oglasId: String(oglasId),
+      oglasNaslov: oglasNaslov || (odabraniOglas ? odabraniOglas.naslov : "Upit za oglas"),
       posiljatelj: korisnik.email,
       primatelj: primateljEmail || "admin@kupko.hr",
       tekst: noviTekstPoruke,
@@ -652,9 +653,16 @@ export default function KupkoApp() {
     e.preventDefault();
     if (!korisnik || !aktivniChatEmail || !tekstOdgovoraInbox.trim()) return;
 
+    const prethodnaPoruka = poruke.find(p => 
+      ((p.posiljatelj === korisnik.email && p.primatelj === aktivniChatEmail) || 
+       (p.posiljatelj === aktivniChatEmail && p.primatelj === korisnik.email)) && 
+      p.oglasId && p.oglasId !== "chat"
+    );
+
     const novaPoruka = {
       id: Date.now().toString(),
-      oglasId: "chat",
+      oglasId: prethodnaPoruka ? prethodnaPoruka.oglasId : "chat",
+      oglasNaslov: prethodnaPoruka ? prethodnaPoruka.oglasNaslov : "Izravna poruka",
       posiljatelj: korisnik.email,
       primatelj: aktivniChatEmail,
       tekst: tekstOdgovoraInbox,
@@ -844,14 +852,14 @@ export default function KupkoApp() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: mailClean,
-          subject: 'Kod za oporavak lozinke - Kupko.hr',
-          message: `Vaš kod za promjenu lozinke je: <strong style="font-size: 20px; color: #2563eb;">${kod}</strong>`
+          subject: 'Kod za promjenu / oporavak lozinke - Kupko.hr',
+          message: `Vaš verifikacijski kod za promjenu lozinke na Kupko.hr je: <strong style="font-size: 20px; color: #2563eb;">${kod}</strong>`
         }),
       });
 
       const data = await response.json();
       if (data.success) {
-        alert(`📧 Kod za oporavak poslan je na adresu: ${mailClean}`);
+        alert(`📧 Kod za potvrdu promjene lozinke poslan je na adresu: ${mailClean}`);
       } else {
         alert("Greška pri slanju e-maila: " + (data.error || "Nepoznata greška"));
       }
@@ -889,13 +897,15 @@ export default function KupkoApp() {
     setRegistriraniKorisnici(azuriraniKorisnici);
     localStorage.setItem("kupko_baza_korisnika", JSON.stringify(azuriraniKorisnici));
 
-    alert("Lozinka je uspješno promijenjena! Sada se možete prijaviti s novom lozinkom.");
+    alert("Lozinka je uspješno promijenjena!");
     setPrikaziZaboravljenuLozinku(false);
     setKorakResetiranja(1);
     setZaboravljeniEmail("");
     setUneseniKodReset("");
     setNovaLozinka("");
-    setPrikaziPrijavu(true);
+    if (!korisnik) {
+      setPrikaziPrijavu(true);
+    }
   };
 
   const spremiOsobnePodatke = (e: React.FormEvent) => {
@@ -965,7 +975,7 @@ export default function KupkoApp() {
 
   const dohvatiPaketeZaOglas = (glas: any) => {
     return [
-      { naziv: "Mini Boost (3 dana)", cijena: "3.00", stripeLink: "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00" },
+      { naziv: "Mini Boost (3 dana)", cijena: "2.00", stripeLink: "https://buy.stripe.com/3cI00igF7a5G33Adf3fEk00" },
       { naziv: "Standardni Boost (7 dana)", cijena: "5.00", stripeLink: "https://buy.stripe.com/8x27sK0G92De7jQ2ApfEk01" },
       { naziv: "Premium Paket (14 dana)", cijena: "10.00", stripeLink: "https://buy.stripe.com/7sYeVc60t2Deaw2a2RfEk02" },
       { naziv: "VIP Mega Boost (30 dana)", cijena: "20.00", stripeLink: "https://buy.stripe.com/5kQ28q74xfq0cEa3EtfEk03" }
@@ -1357,6 +1367,9 @@ export default function KupkoApp() {
                         </button>
                         <button onClick={() => { setPrikaziMeniKorisnika(false); setPrikaziUnosPodatakaModal(true); }} className="w-full text-left px-3.5 py-2.5 font-bold hover:bg-blue-50/80 rounded-xl flex items-center gap-3 text-slate-700 hover:text-blue-700 transition">
                           <Settings className="w-4 h-4 text-slate-600" /> Osobni podaci
+                        </button>
+                        <button onClick={() => { setPrikaziMeniKorisnika(false); setZaboravljeniEmail(korisnik.email); setKorakResetiranja(1); setPrikaziZaboravljenuLozinku(true); }} className="w-full text-left px-3.5 py-2.5 font-bold hover:bg-blue-50/80 rounded-xl flex items-center gap-3 text-slate-700 hover:text-blue-700 transition">
+                          <KeyRound className="w-4 h-4 text-amber-500" /> Promijeni lozinku (E-mail)
                         </button>
                       </div>
 
@@ -2103,26 +2116,33 @@ export default function KupkoApp() {
                         .filter(p => p.primatelj === korisnik.email || p.posiljatelj === korisnik.email)
                         .map(p => p.posiljatelj === korisnik.email ? p.primatelj : p.posiljatelj)
                     )).map((sugovornik: any) => {
-                      const zadnjaPoruka = poruke.filter(p => (p.posiljatelj === sugovornik && p.primatelj === korisnik.email) || (p.posiljatelj === korisnik.email && p.primatelj === sugovornik)).slice(-1)[0];
+                      const razgovorPoruke = poruke.filter(p => (p.posiljatelj === sugovornik && p.primatelj === korisnik.email) || (p.posiljatelj === korisnik.email && p.primatelj === sugovornik));
+                      const zadnjaPoruka = razgovorPoruke.slice(-1)[0];
+                      const porukaSOglasom = razgovorPoruke.find(p => p.oglasId && p.oglasId !== "chat");
+                      const vezaniOglas = porukaSOglasom ? oglasi.find(o => String(o.id) === String(porukaSOglasom.oglasId)) : null;
+                      const nazivVezanogOglasa = vezaniOglas ? vezaniOglas.naslov : (porukaSOglasom?.oglasNaslov || "Opći upit");
                       const imaNeprocitanih = poruke.some(p => p.posiljatelj === sugovornik && p.primatelj === korisnik.email && p.procitano === false);
 
                       return (
                         <div 
                           key={sugovornik} 
                           onClick={() => otvoriChat(sugovornik)}
-                          className={`p-4 rounded-2xl border cursor-pointer transition flex justify-between items-center ${
+                          className={`p-4 rounded-2xl border cursor-pointer transition flex justify-between items-center gap-3 ${
                             imaNeprocitanih ? "bg-amber-50 border-amber-300 shadow-sm" : "bg-slate-50 hover:bg-blue-50/50 border-slate-100"
                           }`}
                         >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-black text-xs text-slate-900">{sugovornik}</span>
+                              <span className="bg-blue-100 text-blue-800 text-[10px] font-extrabold px-2 py-0.5 rounded-lg truncate max-w-[240px]">
+                                📦 Oglas: {nazivVezanogOglasa}
+                              </span>
                               {imaNeprocitanih && <span className="bg-rose-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase">Nova poruka!</span>}
                             </div>
                             <p className="text-xs text-slate-600 line-clamp-1 font-medium">{zadnjaPoruka?.tekst}</p>
                             <span className="text-[10px] text-slate-400 block">{zadnjaPoruka?.datum}</span>
                           </div>
-                          <span className="bg-blue-600 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-sm">
+                          <span className="bg-blue-600 text-white text-xs font-black px-3.5 py-2 rounded-xl shadow-sm shrink-0">
                             Dopisuj se →
                           </span>
                         </div>
@@ -2132,28 +2152,70 @@ export default function KupkoApp() {
                 </div>
               ) : (
                 <div className="flex flex-col flex-1 space-y-3 overflow-hidden">
-                  <div className="flex items-center justify-between border-b pb-2.5">
-                    <button type="button" onClick={() => setAktivniChatEmail(null)} className="text-xs font-black text-blue-600 hover:underline flex items-center gap-1">
-                      <ArrowLeft className="w-4 h-4" /> Natrag na sve razgovore
-                    </button>
-                    <span className="text-xs font-bold text-slate-600">Sugovornik: <strong className="text-slate-900">{aktivniChatEmail}</strong></span>
-                  </div>
+                  {(() => {
+                    const razgovorPoruke = poruke.filter(p => (p.posiljatelj === korisnik.email && p.primatelj === aktivniChatEmail) || (p.posiljatelj === aktivniChatEmail && p.primatelj === korisnik.email));
+                    const porukaSOglasom = razgovorPoruke.find(p => p.oglasId && p.oglasId !== "chat");
+                    const vezaniOglas = porukaSOglasom ? oglasi.find(o => String(o.id) === String(porukaSOglasom.oglasId)) : null;
+                    const nazivVezanogOglasa = vezaniOglas ? vezaniOglas.naslov : porukaSOglasom?.oglasNaslov;
 
-                  <div className="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-50 rounded-2xl border border-slate-100 max-h-72">
-                    {poruke
-                      .filter(p => (p.posiljatelj === korisnik.email && p.primatelj === aktivniChatEmail) || (p.posiljatelj === aktivniChatEmail && p.primatelj === korisnik.email))
-                      .map(p => {
-                        const jesamJa = p.posiljatelj === korisnik.email;
-                        return (
-                          <div key={p.id} className={`flex flex-col ${jesamJa ? "items-end" : "items-start"}`}>
-                            <div className={`p-3 rounded-2xl max-w-[80%] text-xs font-semibold ${jesamJa ? "bg-blue-600 text-white rounded-br-none" : "bg-white border border-slate-200 text-slate-800 rounded-bl-none"}`}>
-                              <p>{p.tekst}</p>
+                    return (
+                      <>
+                        <div className="flex items-center justify-between border-b pb-2.5 flex-wrap gap-2">
+                          <button type="button" onClick={() => setAktivniChatEmail(null)} className="text-xs font-black text-blue-600 hover:underline flex items-center gap-1">
+                            <ArrowLeft className="w-4 h-4" /> Natrag na sve razgovore
+                          </button>
+                          <span className="text-xs font-bold text-slate-600">Sugovornik: <strong className="text-slate-900">{aktivniChatEmail}</strong></span>
+                        </div>
+
+                        {nazivVezanogOglasa && (
+                          <div 
+                            onClick={() => {
+                              if (vezaniOglas) {
+                                setPrikaziSanducicPoruka(false);
+                                otvoriDetaljeOglasa(vezaniOglas);
+                              }
+                            }}
+                            className={`bg-blue-50 border border-blue-200 p-3 rounded-2xl flex items-center justify-between gap-3 ${vezaniOglas ? "cursor-pointer hover:bg-blue-100/70 transition" : ""}`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              {vezaniOglas?.slike?.[0] && (
+                                <img src={vezaniOglas.slike[0]} alt={nazivVezanogOglasa} className="w-11 h-11 rounded-xl object-cover shrink-0 border border-blue-200" />
+                              )}
+                              <div className="min-w-0">
+                                <span className="text-[10px] font-black uppercase text-blue-600 block">Upit vezan uz oglas:</span>
+                                <p className="text-xs font-black text-slate-900 truncate">{nazivVezanogOglasa}</p>
+                                {vezaniOglas && <span className="text-[11px] font-extrabold text-blue-700">{vezaniOglas.cijena} €</span>}
+                              </div>
                             </div>
-                            <span className="text-[9px] text-slate-400 mt-1 px-1">{p.datum}</span>
+                            {vezaniOglas && (
+                              <span className="text-[10px] bg-blue-600 text-white font-black px-2.5 py-1.5 rounded-xl shrink-0">
+                                Pogledaj oglas
+                              </span>
+                            )}
                           </div>
-                        );
-                      })}
-                  </div>
+                        )}
+
+                        <div className="flex-1 overflow-y-auto space-y-2.5 p-3 bg-slate-50 rounded-2xl border border-slate-100 max-h-72">
+                          {razgovorPoruke.map(p => {
+                            const jesamJa = p.posiljatelj === korisnik.email;
+                            return (
+                              <div key={p.id} className={`flex flex-col ${jesamJa ? "items-end" : "items-start"}`}>
+                                <div className={`p-3 rounded-2xl max-w-[80%] text-xs font-semibold ${jesamJa ? "bg-blue-600 text-white rounded-br-none" : "bg-white border border-slate-200 text-slate-800 rounded-bl-none"}`}>
+                                  {p.oglasNaslov && p.oglasId !== "chat" && (
+                                    <span className={`text-[9px] font-black uppercase block mb-1 pb-1 border-b ${jesamJa ? "text-amber-300 border-blue-500" : "text-blue-600 border-slate-100"}`}>
+                                      📦 Oglas: {p.oglasNaslov}
+                                    </span>
+                                  )}
+                                  <p>{p.tekst}</p>
+                                </div>
+                                <span className="text-[9px] text-slate-400 mt-1 px-1">{p.datum}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    );
+                  })()}
 
                   <form onSubmit={posaljiOdgovorIzSanducica} className="flex gap-2 pt-1">
                     <input 
@@ -2540,35 +2602,42 @@ export default function KupkoApp() {
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white text-slate-900 rounded-3xl max-w-sm w-full p-6 relative shadow-2xl space-y-3.5">
               <button type="button" onClick={() => { setPrikaziZaboravljenuLozinku(false); setKorakResetiranja(1); }} className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
-              <h2 className="text-lg font-black text-slate-900 flex items-center gap-2"><KeyRound className="w-5 h-5 text-blue-600" /> Oporavak lozinke</h2>
+              <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                <KeyRound className="w-5 h-5 text-blue-600" /> {korisnik ? "Promjena lozinke" : "Oporavak lozinke"}
+              </h2>
 
               {korakResetiranja === 1 ? (
                 <form onSubmit={pokreniZaboravljenuLozinku} className="space-y-3">
-                  <p className="text-xs text-slate-500">Unesite vaš registrirani e-mail.</p>
+                  <p className="text-xs text-slate-500">
+                    {korisnik 
+                      ? "Poslat ćemo sigurnosni kod za potvrdu promjene lozinke na vaš e-mail:" 
+                      : "Unesite vaš registrirani e-mail za oporavak lozinke:"}
+                  </p>
                   <input 
                     type="email" required placeholder="email@gmail.com"
                     value={zaboravljeniEmail} onChange={(e) => setZaboravljeniEmail(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none"
+                    readOnly={!!korisnik}
+                    className={`w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none ${korisnik ? "bg-slate-100 text-slate-600" : ""}`}
                   />
-                  <button type="submit" className="w-full bg-blue-600 text-white font-black py-3 rounded-xl uppercase text-xs shadow transition">
-                    Pošalji kod
+                  <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl uppercase text-xs shadow transition">
+                    Pošalji verifikacijski kod na e-mail
                   </button>
                 </form>
               ) : (
                 <form onSubmit={potvrdiResetLozinke} className="space-y-3">
-                  <p className="text-xs text-slate-500">Unesite primljeni kod i novu lozinku.</p>
+                  <p className="text-xs text-slate-500">Unesite kod koji ste primili na e-mail i upišite novu lozinku.</p>
                   <input 
-                    type="text" required maxLength={6} placeholder="Kod"
+                    type="text" required maxLength={6} placeholder="6-znamenkasti kod"
                     value={uneseniKodReset} onChange={(e) => setUneseniKodReset(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border text-center tracking-widest font-black text-base outline-none"
+                    className="w-full p-2.5 rounded-xl border text-center tracking-widest font-black text-base outline-none focus:border-blue-600"
                   />
                   <input 
-                    type="password" required placeholder="Nova lozinka"
+                    type="password" required placeholder="Upišite novu lozinku"
                     value={novaLozinka} onChange={(e) => setNovaLozinka(e.target.value)}
-                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none"
+                    className="w-full p-3 rounded-xl border border-slate-200 text-xs font-semibold outline-none focus:border-blue-600"
                   />
-                  <button type="submit" className="w-full bg-emerald-600 text-white font-black py-3 rounded-xl uppercase text-xs shadow transition">
-                    Spremi lozinku
+                  <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl uppercase text-xs shadow transition">
+                    Potvrdi i spremi novu lozinku
                   </button>
                 </form>
               )}
@@ -2853,7 +2922,18 @@ export default function KupkoApp() {
                   )}
                 </div>
                 <div className="text-right text-xs text-slate-700 font-bold">
-                  <span>📞 <strong className="text-slate-900">{odabraniOglas.telefon || "Na upit"}</strong></span>
+                  {odabraniOglas.telefon ? (
+                    <a 
+                      href={`tel:${odabraniOglas.telefon.replace(/\s+/g, '')}`}
+                      className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-2.5 rounded-xl shadow transition text-xs"
+                      title="Klikni za poziv"
+                    >
+                      <Phone className="w-4 h-4 animate-bounce" />
+                      <span>Nazovi: {odabraniOglas.telefon}</span>
+                    </a>
+                  ) : (
+                    <span>📞 <strong className="text-slate-900">Na upit</strong></span>
+                  )}
                 </div>
               </div>
 
@@ -2893,7 +2973,7 @@ export default function KupkoApp() {
                   />
                   <button
                     type="button"
-                    onClick={() => posaljiPorukuProdavacu(odabraniOglas.id, odabraniOglas.autor_email)}
+                    onClick={() => posaljiPorukuProdavacu(odabraniOglas.id, odabraniOglas.autor_email, odabraniOglas.naslov)}
                     className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-4 py-2.5 rounded-xl uppercase tracking-wider transition shadow flex items-center gap-1.5"
                   >
                     <Send className="w-3.5 h-3.5" /> Pošalji poruku
