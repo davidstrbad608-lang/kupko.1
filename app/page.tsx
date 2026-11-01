@@ -7,6 +7,10 @@ import {
   ShoppingBag, CheckCircle2, Mail, User, Clock, Upload, Image as ImageIcon,
   LogIn, UserPlus, Sparkles, Compass, Menu, Tag, Car, Home, ShieldCheck, Video, CreditCard, Crown, Package, Trash2, Shield, RotateCw, ArrowLeft, Lock, Gauge, Calendar, Fuel, Cog, HelpCircle, FileText, Cookie, Map, Info, Megaphone, Edit3, TrendingDown, ChevronLeft, ChevronRight, Percent, Check, AlertCircle, Send, ShieldAlert, SlidersHorizontal, Eye, Bot, Navigation, MessageSquare, Wallet, Bell, Settings, Flame, Play, KeyRound, Share2, BarChart2
 } from "lucide-react";
+import SanducicModal from "./components/SanducicModal";
+import PredajOglasModal from "./components/PredajOglasModal";
+import DetaljiOglasaModal from "./components/DetaljiOglasaModal";
+import ReelsModal from "./components/ReelsModal";
 
 const ZUPANIJE = [
   "Bjelovarsko-bilogorska", "Brodsko-posavska", "Dubrovačko-neretvanska", "Grad Zagreb",
