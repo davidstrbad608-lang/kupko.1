@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     console.log("Pokušaj slanja na: " + email);
 
     const response = await resend.emails.send({
-      from: 'Kupko.hr <onboarding@resend.dev>',
+      from: 'Kupko <info@kupko.eu>',
       to: [email],
       subject: subject,
       html: `<p>${message}</p>`,
